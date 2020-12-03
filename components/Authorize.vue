@@ -129,7 +129,14 @@
 </script>
 
 <style scoped lang='scss'>
-	.Popup{width:500rpx;background-color:#fff;position:fixed;top:50%;left:50%;margin-left:-250rpx;transform:translateY(-50%);z-index:320;}
+	.Popup{
+		width:500rpx;
+		background-color:#fff;
+		position:fixed;
+		top:50%;
+		left:50%;
+		margin-left:-250rpx;
+		transform:translateY(-50%);z-index:320;}
 	.Popup{
 		.logo-auth{
 			z-index: -1;

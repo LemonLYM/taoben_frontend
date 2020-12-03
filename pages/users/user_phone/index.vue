@@ -57,9 +57,9 @@
 		computed: mapGetters(['isLogin']),
 		onLoad() {
 			if (this.isLogin) {
-				verifyCode().then(res=>{
-					this.$set(this, 'key', res.data.key)
-				});
+				// verifyCode().then(res=>{
+				// 	this.$set(this, 'key', res.data.key)
+				// });
 			} else {
 				// #ifdef H5 || APP-PLUS
 				toLogin();
@@ -156,7 +156,8 @@
 				await registerVerify({
 					phone:that.phone,
 					key:that.key, 
-					code:that.captcha
+					code:that.captcha,
+					type: 'binding'
 				}).then(res => {
 					that.$util.Tips({
 						title: res.msg

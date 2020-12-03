@@ -30,7 +30,8 @@
 						</view>
 						<view class='item acea-row row-between-wrapper'>
 							<view class='name'>提现</view>
-							<view class='input'><input :placeholder='"最低提现金额"+minPrice' placeholder-class='placeholder' name="extract_price" type='digit'></input></view>
+							<view class='input'><input :placeholder='"最低提现金额"+minPrice' placeholder-class='placeholder' name="extract_price"
+								 type='digit' v-model="extract_price"></input></view>
 						</view>
 						<view class='tip'>
 							当前可提现金额: <text class="price">￥{{userInfo.brokerage_price}},</text>冻结佣金：￥{{userInfo.lock_brokerage}}
@@ -38,7 +39,7 @@
 						<view class='tip'>
 							说明: 每笔佣金的冻结期为{{userInfo.broken_day}}天，到期后可提现
 						</view>
-						<button formType="submit" class='bnt bg-color'>提现</button>
+						<button formType="submit" :disabled="load" class='bnt bg-color'>提现</button>
 					</form>
 				</view>
 				<view :hidden='currentTab != 1' class='list'>
@@ -49,15 +50,30 @@
 						</view>
 						<view class='item acea-row row-between-wrapper'>
 							<view class='name'>提现</view>
-							<view class='input'><input :placeholder='"最低提现金额"+minPrice' placeholder-class='placeholder' name="extract_price" type='digit'></input></view>
+							<view class='input'><input :placeholder='"最低提现金额"+minPrice' placeholder-class='placeholder' name="extract_price"
+								 type='digit' v-model="extract_price"></input></view>
 						</view>
+						<view class='item acea-row row-between-wrapper uploadItem'>
+							<view class='name'>收款码</view>
+							<view class='input upload acea-row row-middle'>
+								<view class='picture' v-for="(item,index) in pics" :key="index">
+									<image :src='item'></image>
+									<text class='iconfont icon-guanbi1' @click='DelPic(index)'></text>
+								</view>
+								<view class='picture acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 1">
+									<text class='iconfont icon-icon25201'></text>
+									<view>上传图片</view>
+								</view>
+							</view>
+						</view>
+
 						<view class='tip'>
 							当前可提现金额: <text class="price">￥{{userInfo.brokerage_price}},</text>冻结佣金：￥{{userInfo.lock_brokerage}}
 						</view>
 						<view class='tip'>
 							说明: 每笔佣金的冻结期为{{userInfo.broken_day}}天，到期后可提现
 						</view>
-						<button formType="submit" class='bnt bg-color'>提现</button>
+						<button formType="submit" :disabled="load" class='bnt bg-color'>提现</button>
 					</form>
 				</view>
 				<view :hidden='currentTab != 2' class='list'>
@@ -68,7 +84,21 @@
 						</view>
 						<view class='item acea-row row-between-wrapper'>
 							<view class='name'>提现</view>
-							<view class='input'><input :placeholder='"最低提现金额"+minPrice' placeholder-class='placeholder' name="extract_price" type='digit'></input></view>
+							<view class='input'><input :placeholder='"最低提现金额"+minPrice' placeholder-class='placeholder' name="extract_price"
+								 type='digit' v-model="extract_price"></input></view>
+						</view>
+						<view class='item acea-row row-between-wrapper uploadItem'>
+							<view class='name'>收款码</view>
+							<view class='input upload acea-row row-middle'>
+								<view class='picture' v-for="(item,index) in pics" :key="index">
+									<image :src='item'></image>
+									<text class='iconfont icon-guanbi1' @click='DelPic(index)'></text>
+								</view>
+								<view class='picture acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 1">
+									<text class='iconfont icon-icon25201'></text>
+									<view>上传图片</view>
+								</view>
+							</view>
 						</view>
 						<view class='tip'>
 							当前可提现金额: <text class="price">￥{{userInfo.brokerage_price}},</text>冻结佣金：￥{{userInfo.lock_brokerage}}
@@ -76,7 +106,7 @@
 						<view class='tip' v-if="userInfo.broken_day>0">
 							说明: 每笔佣金的冻结期为{{userInfo.broken_day}}天，到期后可提现
 						</view>
-						<button formType="submit" class='bnt bg-color'>提现</button>
+						<button formType="submit" :disabled="load" class='bnt bg-color'>提现</button>
 					</form>
 				</view>
 			</view>
@@ -125,13 +155,18 @@
 					}
 				],
 				currentTab: 0,
+				extract_price: '',
 				index: 0,
 				array: [], //提现银行
 				minPrice: 0.00, //最低提现金额
 				userInfo: [],
 				isClone: false,
 				isAuto: false, //没有授权的不会自动授权
-				isShowAuth: false //是否隐藏授权
+				isShowAuth: false, //是否隐藏授权
+				loading: false,
+				load: false,
+				pics: [], //收款码
+				extract_pic: ''
 			};
 		},
 		computed: mapGetters(['isLogin']),
@@ -173,6 +208,7 @@
 				let that = this;
 				spreadInfo().then(res => {
 					that.userInfo = res.data;
+					that.minPrice = res.data.user_extract_min;
 				});
 			},
 			swichNav: function(current) {
@@ -181,10 +217,30 @@
 			bindPickerChange: function(e) {
 				this.index = e.detail.value;
 			},
+			uploadpic: function() {
+				let that = this;
+				console.log('地方');
+				that.$util.uploadImageOne('upload/image', function(res) {
+					console.log(res);
+					that.pics.push(res.data.path);
+					that.$set(that, 'pics', that.pics);
+					that.$set(that, 'extract_pic', that.pics[0])
+				});
+
+			},
+			/**
+			 * 删除图片
+			 * 
+			 */
+			DelPic: function(index) {
+				let that = this,
+					pic = this.pics[index];
+				that.pics.splice(index, 1);
+				that.$set(that, 'pics', that.pics);
+			},
 			subCash: function(e) {
 				let that = this,
 					value = e.detail.value;
-					
 				if (that.currentTab == 0) { //银行卡
 					if (value.real_name.length == 0) return this.$util.Tips({
 						title: '请填写持卡人姓名'
@@ -196,35 +252,48 @@
 					// 	title: "请选择银行"
 					// });
 					value.extract_type = 'bank';
-					value.bank_name = that.array[that.index].name;
+					value.bank_address = that.array[that.index].name;
 				} else if (that.currentTab == 1) { //微信
 					value.extract_type = 'weixin';
+					value.extract_pic = that.extract_pic
 					if (value.wechat.length == 0) return this.$util.Tips({
 						title: '请填写微信号'
 					});
+					if (value.extract_pic.length == 0) return this.$util.Tips({
+						title: '请上传收款码'
+					});
+
 				} else if (that.currentTab == 2) { //支付宝
 					value.extract_type = 'alipay';
+					value.extract_pic = that.extract_pic
 					if (value.alipay_code.length == 0) return this.$util.Tips({
 						title: '请填写账号'
+					});
+					if (value.extract_pic.length == 0) return this.$util.Tips({
+						title: '请上传收款码'
 					});
 				}
 				if (value.extract_price.length == 0) return this.$util.Tips({
 					title: '请填写提现金额'
 				});
-				if (value.extract_price < that.minPrice) return this.$util.Tips({
+				if (Number(value.extract_price) < that.minPrice) return this.$util.Tips({
 					title: '提现金额不能低于' + that.minPrice
 				});
 				value.extract_type = this.currentTab
-				console.log(value,'value')
+				console.log(value, 'value')
+				if(that.load) return ;
+				that.load = true;
 				extractCash(value).then(res => {
 					that.getUserInfo();
+					setTimeout(function(){
+						that.load = false;
+					}, 500);
 					return that.$util.Tips({
 						title: res.message,
 						icon: 'success'
-					},{
-						tab:3
 					});
 				}).catch(err => {
+					that.load = false;
 					return that.$util.Tips({
 						title: err
 					});
@@ -248,6 +317,7 @@
 		font-size: 26rpx;
 		flex: 1;
 		text-align: center;
+
 	}
 
 	.cash-withdrawal .nav .item~.item {
@@ -292,6 +362,42 @@
 		height: 107rpx;
 		font-size: 30rpx;
 		color: #333;
+
+		&.uploadItem {
+			border-bottom: none;
+			height: auto;
+
+			.name {
+				height: 107rpx;
+				;
+			}
+		}
+	}
+
+	.picture {
+		width: 70px;
+		height: 70px;
+		margin: 0 0 17px 0;
+		position: relative;
+		font-size: 11px;
+		color: #bbb;
+		border: 0.5px solid #ddd;
+		box-sizing: border-box;
+		margin-top: 40rpx;
+
+		uni-image,image {
+			width: 100%;
+			height: 100%;
+			border-radius: 1px;
+		}
+
+		.icon-guanbi1 {
+			font-size: 22px;
+			position: absolute;
+			top: -10px;
+			right: -10px;
+			color: #fc4141;
+		}
 	}
 
 	.cash-withdrawal .wrapper .list .item .name {
@@ -321,6 +427,10 @@
 		border-radius: 50rpx;
 		line-height: 90rpx;
 		margin: 64rpx auto;
+
+		/deep/ &.disabled {
+			// background: #E3E3E3!important;
+		}
 	}
 
 	.cash-withdrawal .wrapper .list .tip2 {
@@ -351,5 +461,15 @@
 
 	.price {
 		color: $theme-color;
+	}
+
+	.Bank {
+		display: block;
+		width: 100%;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+
+
 	}
 </style>

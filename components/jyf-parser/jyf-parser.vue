@@ -241,7 +241,7 @@
 									})
 								}
 								html =
-									'<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1' +
+									'<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no' +
 									(this.selectable ? '' : ',user-scalable=no') +
 									'"><script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></' +
 									'script><base href="' + this.domain + '">' + this._handleHtml(html) +

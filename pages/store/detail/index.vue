@@ -4,7 +4,7 @@
 		<view class="section head">
 			<image :src="store.mer_avatar"></image>
 			<view class="text-wrap">
-				<view class="name">{{ store.mer_name }}</view>
+				<view class="name">{{ store.mer_name }}<text v-if="store.is_trader" class="font-bg-red ml8">自营</text></view>
 				<view class="fans">{{store.care_count}}人关注</view>
 			</view>
 			<button :class="{ followed: store.care }" hover-class="none" @click="followToggle">
@@ -40,7 +40,7 @@
 			</view>
 			<view class="item very">
 				<view class="name">店铺地址</view>
-				<view class="value">{{ store.bank_address }}</view>
+				<view class="value">{{ store.mer_address }}</view>
 			</view>
 			<view class="item">
 				<view class="name">联系电话</view>
@@ -55,7 +55,13 @@
 		<view :class="{ 'popup-active': popupShow }" class="popup-qrcode">
 			<view class="name">{{ store.mer_name }}</view>
 			<view class="info">保存二维码可分享店铺给好友哦~</view>
+			<!-- #ifdef H5 -->
 			<image :src="storeCode"></image>
+			<!-- #endif -->
+			<!-- #ifdef MP -->
+			<image :src="storeCode" @longpress="savePosterPath(storeCode)"></image>
+
+			<!-- #endif -->
 		</view>
 	</view>
 </template>
@@ -71,7 +77,7 @@
 		merchantQrcode
 	} from '@/api/store.js';
 	export default {
-		computed: mapGetters(['isLogin','uid']),
+		computed: mapGetters(['isLogin', 'uid']),
 		filters: {
 			dateFormat: function(value) {
 				if (!value) {
@@ -87,7 +93,8 @@
 				score: 0,
 				star: 0,
 				popupShow: false,
-				storeCode:''
+				storeCode: '',
+				openSettingBtnHidden: true, //是否授权
 			}
 		},
 		onLoad: function(options) {
@@ -129,16 +136,119 @@
 				this.store.care ? this.unfollow() : this.follow();
 			},
 			// 店铺二维码
-			getStoreCode(){
-				merchantQrcode(this.id).then(res=>{
+			getStoreCode() {
+				let params = {}
+				// #ifdef MP
+				params = {type:'routine'}
+				//#endif
+				merchantQrcode(this.id,params).then(res => {
 					this.storeCode = res.data.url
-				})
-			}
+				}).catch(err => {})						
+			},
+			// #ifdef MP
+			// 小程序保存图片
+			savePosterPath(url) {
+				uni.downloadFile({
+					url,
+					success: (resFile) => {
+						console.log(resFile, "resFile");
+						if (resFile.statusCode === 200) {
+							uni.getSetting({
+								success: (res) => {
+									if (!res.authSetting["scope.writePhotosAlbum"]) {
+										uni.authorize({
+											scope: "scope.writePhotosAlbum",
+											success: () => {
+												uni.saveImageToPhotosAlbum({
+													filePath: resFile.tempFilePath,
+													success: (res) => {
+														return uni.showToast({
+															title: "保存成功！",
+														});
+													},
+													fail: (res) => {
+														return uni.showToast({
+															title: res.errMsg,
+														});
+													},
+													complete: (res) => {},
+												});
+											},
+											fail: () => {
+												uni.showModal({
+													title: "您已拒绝获取相册权限",
+													content: "是否进入权限管理，调整授权？",
+													success: (res) => {
+														if (res.confirm) {
+															uni.openSetting({
+																success: (res) => {
+																	console.log(res.authSetting);
+																},
+															});
+														} else if (res.cancel) {
+															return uni.showToast({
+																title: "已取消！",
+															});
+														}
+													},
+												});
+											},
+										});
+									} else {
+										uni.saveImageToPhotosAlbum({
+											filePath: resFile.tempFilePath,
+											success: (res) => {
+												return uni.showToast({
+													title: "保存成功！",
+												});
+											},
+											fail: (res) => {
+												return uni.showToast({
+													title: res.errMsg,
+												});
+											},
+											complete: (res) => {},
+										});
+									}
+								},
+								fail: (res) => {},
+							});
+						} else {
+							return uni.showToast({
+								title: resFile.errMsg,
+							});
+						}
+					},
+					fail: (res) => {
+						return uni.showToast({
+							title: res.errMsg,
+						});
+					},
+				});
+			},
+			// #endif
 		}
 	}
 </script>
 
 <style lang="scss">
+	.font-bg-red {
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 34rpx;
+		border-radius: 5rpx;
+		margin-right: 8rpx;
+
+		&.ml8 {
+			margin-left: 8rpx;
+			margin-right: 0;
+		}
+	}
+
 	.store-detail {
 		padding-top: 80rpx;
 		padding-right: 20rpx;

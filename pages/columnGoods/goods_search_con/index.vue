@@ -9,7 +9,9 @@
 					<input placeholder='搜索商品名称' placeholder-class='placeholder' confirm-type='search' name="search" :value='where.keyword'
 					 @confirm="searchSubmit"></input>
 				</view>
-				<view style="text-align: right;" class='iconfont' :class='is_switch==true?"icon-pailie":"icon-tupianpailie"' @click='Changswitch'></view>
+				<view style="text-align: right;" v-if="tabIndex==1" class='iconfont' :class='is_switch==true?"icon-pailie":"icon-tupianpailie"'
+				 @click='Changswitch'></view>
+				<view v-else style="text-align: right;" class='iconfont iconempty'></view>
 			</view>
 			<view class="nav-wrapper">
 				<view class="tab-bar">
@@ -66,15 +68,15 @@
 							<span class="pictrue_log_class" :class="is_switch === true ? 'pictrue_log_big' : 'pictrue_log'" v-if="item.activity && item.activity.type === '3'">拼团</span> -->
 						</view>
 						<view class='text' :class='is_switch==true?"":"on"'>
-							<view class='name line1'>{{item.store_name}}</view>
+							<view class='name line1'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 							<view class='money font-color' :class='is_switch==true?"":"on"'>
 								￥<text class='num'>{{item.price}}</text>
 								<view class="ticket" v-if="is_switch && item.issetCoupon">领券</view>
 								<view class="ticket-big" v-if="!is_switch && item.issetCoupon">领券满{{item.issetCoupon.use_min_price}}减{{item.issetCoupon.coupon_price}}</view>
 							</view>
-							<view class="score">{{item.rate}}评分 {{item.reply_count}}+条评论</view>
+							<view class="score">{{item.rate}}评分 {{item.reply_count}}条评论</view>
 							<view class="company" v-if="item.merchant">
-								{{item.merchant.mer_name}}
+								<text class='name'>{{item.merchant.mer_name}}</text>
 								<view class="flex" @click.stop="goStore(item.merchant.mer_id)">
 									进店
 									<text class="iconfont icon-xiangyou"></text>
@@ -111,7 +113,7 @@
 									<image :src="item.mer_avatar" mode=""></image>
 								</view>
 								<view class="con-box">
-									<view class="name">{{item.mer_name}}</view>
+									<view class="name">{{item.mer_name}}<text v-if="item.is_trader" class="font-bg-red ml8">自营</text></view>
 									<view class="star-box">
 										<view class="star">
 											<view class="star-active" :style="'width:'+item.allScore+'%'"></view>
@@ -124,10 +126,12 @@
 						</view>
 						<view class="pic-wrapper">
 							<view class="pic-item" v-for="goods in item.recommend">
-								<image :src="goods.image" mode=""></image>
-								<view class="price">
-									<text>￥</text>{{goods.price}}
-								</view>
+								<navigator :url="`/pages/goods_details/index?id=${goods.product_id}`">
+									<image :src="goods.image" mode=""></image>
+									<view class="price">
+										<text>￥</text>{{goods.price}}
+									</view>
+								</navigator>
 							</view>
 						</view>
 					</view>
@@ -167,13 +171,13 @@
 			recommend,
 			rightSlider
 		},
-		watch:{
-			tabIndex(nVal,oVal){
-				if(nVal == 1){
+		watch: {
+			tabIndex(nVal, oVal) {
+				if (nVal == 1) {
 					this.loadend = false;
 					this.$set(this.where, 'page', 1)
 					this.get_product_list(true);
-				}else{
+				} else {
 					this.downStatus = false
 					this.storeMerchantList()
 				}
@@ -189,9 +193,9 @@
 					price_on: '',
 					price_off: '',
 					brand_id: '',
-					keyword:'',
-					page:1,
-					limit:10
+					keyword: '',
+					page: 1,
+					limit: 10
 				},
 				price: 0,
 				stock: 0,
@@ -225,19 +229,19 @@
 					}
 				],
 				// 是否第一个
-				firstKey:0,
+				firstKey: 0,
 				// tab切换
 				tabIndex: 1,
 				// 商铺列表
 				storeList: [],
-				sotreParam:{
-					keyword:'',
-					page:1,
-					limit:10,
-					order:''
+				sotreParam: {
+					keyword: '',
+					page: 1,
+					limit: 10,
+					order: ''
 				},
-				storeKey:0,
-				storeScroll:true
+				storeKey: 0,
+				storeScroll: true
 			};
 		},
 		onLoad: function(options) {
@@ -249,32 +253,32 @@
 		},
 		methods: {
 			// 查找店铺
-			storeMerchantList(){
-				if(!this.storeScroll) return
+			storeMerchantList() {
+				if (!this.storeScroll) return
 				storeMerchantList({
-					keyword:this.where.keyword,
-					page:this.sotreParam.page,
-					limit:this.sotreParam.limit,
-					order:this.sotreParam.order
-				}).then(res=>{
-					res.data.list.forEach(item=>{
-						var tempNum = parseFloat(item.product_score)+parseFloat(item.service_score)+parseInt(item.postage_score)
-						tempNum = tempNum/3/5*100
+					keyword: this.where.keyword,
+					page: this.sotreParam.page,
+					limit: this.sotreParam.limit,
+					order: this.sotreParam.order
+				}).then(res => {
+					res.data.list.forEach(item => {
+						var tempNum = parseFloat(item.product_score) + parseFloat(item.service_score) + parseInt(item.postage_score)
+						tempNum = tempNum / 3 / 5 * 100
 						item.allScore = tempNum.toFixed(2)
 					})
-					this.storeScroll = res.data.list.length>=this.sotreParam.limit
-					this.sotreParam.page+=1
-					this.storeList =this.storeList.concat(res.data.list) 
+					this.storeScroll = res.data.list.length >= this.sotreParam.limit
+					this.sotreParam.page += 1
+					this.storeList = this.storeList.concat(res.data.list)
 				})
 			},
 			// 店铺排序
-			storeTab(key){
+			storeTab(key) {
 				this.storeKey = key
-				if(key == 0){
+				if (key == 0) {
 					this.sotreParam.order = ''
-				}else if(key == 1){
+				} else if (key == 1) {
 					this.sotreParam.order = 'sales'
-				}else{
+				} else {
 					this.sotreParam.order = 'rate'
 				}
 				this.sotreParam.page = 1
@@ -283,29 +287,29 @@
 				this.storeMerchantList()
 			},
 			// 右侧切换
-			bindRight(){
+			bindRight() {
 				this.price = 0;
 				this.firstKey = 4
 				this.getBrandlist()
-				
+
 			},
 			// 品牌列表
-			getBrandlist(){
+			getBrandlist() {
 				let temp = []
 				getBrandlist({
-					cate_id:this.where.cate_id,
-					keyword:this.where.keyword
-				}).then(res=>{
-					temp = res.data.list.map(item=>{
+					cate_id: this.where.cate_id,
+					keyword: this.where.keyword
+				}).then(res => {
+					temp = res.data.list.map(item => {
 						return {
 							...item,
-							check:false
+							check: false
 						}
 					})
-					if(this.where.brand_id.length>0){
-						this.where.brand_id.forEach((ids,index)=>{
-							temp.forEach(el=>{
-								if(ids == el.brand_id){
+					if (this.where.brand_id.length > 0) {
+						this.where.brand_id.forEach((ids, index) => {
+							temp.forEach(el => {
+								if (ids == el.brand_id) {
 									el.check = true
 								}
 							})
@@ -326,13 +330,13 @@
 			// 组件确定
 			confirm(data) {
 				let arr = []
-				if(data.brandList.length == 0){
+				if (data.brandList.length == 0) {
 					this.where.brand_id = ''
-				}else{
-					data.brandList.forEach(item =>{
+				} else {
+					data.brandList.forEach(item => {
 						arr.push(item.brand_id)
 					})
-					this.where.brand_id =arr
+					this.where.brand_id = arr
 				}
 				this.rightBox = data.status
 				this.where.price_on = data.price_on
@@ -340,7 +344,7 @@
 				this.loadend = false;
 				this.$set(this.where, 'page', 1)
 				this.get_product_list(true);
-				
+
 			},
 			// 组件关闭
 			close() {
@@ -349,11 +353,11 @@
 			// 下拉选项
 			bindDown(item, index) {
 				this.firstKey = 0
-				if(index == 0){
+				if (index == 0) {
 					this.where.order = ''
-				}else if(index == 1){
+				} else if (index == 1) {
 					this.where.order = 'rate'
-				}else if(index == 2){
+				} else if (index == 2) {
 					this.where.order = 'is_new'
 				}
 				this.downKey = index
@@ -369,17 +373,17 @@
 			searchSubmit: function(e) {
 				let that = this;
 				that.$set(that.where, 'keyword', e.detail.value);
-				if(this.tabIndex == 1){
+				if (this.tabIndex == 1) {
 					that.loadend = false;
 					that.$set(that.where, 'page', 1)
 					this.get_product_list(true);
-				}else{
+				} else {
 					this.sotreParam.page = 1
 					this.storeScroll = true
 					this.storeList = []
 					this.storeMerchantList()
 				}
-				
+
 			},
 			/**
 			 * 获取我的推荐
@@ -405,13 +409,13 @@
 						break
 					case 2:
 						this.firstKey = e
-						if (this.price == 0){
+						if (this.price == 0) {
 							this.price = 1;
 							this.where.order = 'price_asc'
-						}else if (this.price == 1){
+						} else if (this.price == 1) {
 							this.price = 2;
 							this.where.order = 'price_desc'
-						}else if (this.price == 2){
+						} else if (this.price == 2) {
 							this.price = 0;
 							this.where.order = ''
 						}
@@ -463,13 +467,13 @@
 
 		},
 		onReachBottom() {
-			if(this.tabIndex == 1){
+			if (this.tabIndex == 1) {
 				if (this.productList.length > 0) {
 					this.get_product_list();
 				} else {
 					this.get_host_product();
 				}
-			}else{
+			} else {
 				this.storeMerchantList()
 			}
 		}
@@ -477,6 +481,23 @@
 </script>
 
 <style lang="scss">
+	.font-bg-red {
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 34rpx;
+		border-radius: 5rpx;
+		margin-right: 8rpx;
+
+		&.ml8 {
+			margin-left: 8rpx;
+			margin-right: 0;
+		}
+	}
+
 	.productList .search {
 		width: 100%;
 		height: 86rpx;
@@ -526,13 +547,15 @@
 	}
 
 	.productList .search .icon-pailie,
-	.productList .search .icon-tupianpailie {
+	.productList .search .icon-tupianpailie,
+	.productList .search .iconempty {
 		color: #fff;
 		width: 62rpx;
 		font-size: 40rpx;
 		height: 86rpx;
 		line-height: 86rpx;
 	}
+
 
 	.productList .nav-wrapper {
 		z-index: 9;
@@ -714,6 +737,14 @@
 		color: #737373;
 		font-size: 20rpx;
 		margin-top: 10rpx;
+
+		.name {
+			display: inline-block;
+			width: 200rpx;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
 
 		.flex {
 			display: flex;

@@ -30,10 +30,10 @@
 				</block>
 			</view>
 			<view>
-				<view class="more-btn" v-if="hotSearchList.length>9 && !hotSearchBox" @click="hotSearchBox = true">
+				<view class="more-btn" v-if="hotSearchList.length>8 && !hotSearchBox" @click="hotSearchBox = true">
 					展开全部<text class="iconfont icon-xiangxia"></text>
 				</view>
-				<view class="more-btn" v-if="hotSearchList.length>9 && hotSearchBox" @click="hotSearchBox = false">
+				<view class="more-btn" v-if="hotSearchList.length>8 && hotSearchBox" @click="hotSearchBox = false">
 					收起<text class="iconfont icon-xiangshang"></text>
 				</view>
 			</view>
@@ -222,6 +222,7 @@
 		border-radius: 22rpx;
 		line-height: 60rpx;
 		margin: 0 0 20rpx 20rpx;
+		max-width: 150rpx;
 	}
 
 	.searchGood .line {

@@ -22,9 +22,9 @@
 							</view>
 							<view class='iconfont icon-fenxiang' @click="listenerActionSheet"></view>
 						</view>
-						<view class='introduce'>{{storeInfo.store_name}}</view>
+						<view class='introduce'><text v-if="storeInfo.merchant.is_trader" class="font-bg-red">自营</text>{{storeInfo.store_name}}</view>
 						<view class='label acea-row row-between-wrapper'>
-							<view>原价:￥{{storeInfo.ot_price}}</view>
+							<view>原价:￥{{storeInfo.ot_price ? storeInfo.ot_price : ''}}</view>
 							<view>库存:{{storeInfo.stock}}{{storeInfo.unit_name}}</view>
 							<view>销量:{{storeInfo.sales}}{{storeInfo.unit_name}}</view>
 						</view>
@@ -76,19 +76,19 @@
 							<text class='iconfont icon-jiantou'></text>
 						</navigator>
 					</view>
-					<block v-if="replyCount">
+					<block v-if="replyCount>0">
 						<userEvaluation :reply="reply"></userEvaluation>
 					</block>
 				</view>
 				<!-- 商铺信息 -->
-				<view class="store-wrapper" v-if="storeInfo.merchant">
+				<view class="store-wrapper" v-if="storeInfo.merchant && hide_mer_status !=1">
 					<view class="store-hd">
 						<view class="store-info">
 							<view class="logo">
 								<image :src="storeInfo.merchant.mer_avatar" mode=""></image>
 							</view>
 							<view class="info">
-								<view class="name">{{storeInfo.merchant.mer_name}}</view>
+								<view class="name">{{storeInfo.merchant.mer_name}}<text v-if="storeInfo.merchant.is_trader" class="font-bg-red ml8">自营</text></view>
 								<view class="txt">{{storeInfo.merchant.care_count}}人关注</view>
 							</view>
 							<navigator :url="'/pages/store/home/index?id='+storeInfo.merchant.mer_id" class="link" hover-class="none">进店</navigator>
@@ -123,18 +123,18 @@
 				<view class='product-intro' id="past3">
 					<view class='title'>产品介绍</view>
 					<view class='conter' v-if="description">
-						<jyf-parser :html="description.content" ref="article" :tag-style="tagStyle"></jyf-parser>
+						<jyf-parser :html="description.content.replace(/<br\/>/ig, '')" ref="article" :tag-style="tagStyle"></jyf-parser>
 					</view>
 				</view>
 				<view style='height:120rpx;'></view>
 			</scroll-view>
 		</view>
 		<view class='footer acea-row row-between-wrapper'>
-		
-			<navigator hover-class="none" class="item" :url="`/pages/chat/customer_list/chat?mer_id=${storeInfo.mer_id}&uid=${uid}&productId=${id}`">
+			<view class="item" @click="couponTap2">
 				<view class="iconfont icon-kefu"></view>
 				<view>客服</view>
-			</navigator>
+			</view>
+
 			<view @click="setCollect" class='item'>
 				<view class='iconfont icon-shoucang1' v-if="storeInfo.isRelation"></view>
 				<view class='iconfont icon-shoucang' v-else></view>
@@ -212,6 +212,9 @@
 <script>
 	var statusBarHeight = uni.getSystemInfoSync().statusBarHeight + 'px';
 	import {
+		getconfig,
+	} from '@/api/public.js';
+	import {
 		getProductDetail,
 		getProductCode,
 		collectAdd,
@@ -280,7 +283,7 @@
 				id: 0, //商品id
 				replyCount: 0, //总评论数量
 				reply: [], //评论列表
-				storeInfo: {}, //商品详情
+				storeInfo: {merchant:{}}, //商品详情
 				productValue: [], //系统属性
 				couponList: [], //优惠券
 				cart_num: 1, //购买数量
@@ -294,6 +297,7 @@
 				canvasStatus: false, //海报绘图标签
 				posterImage: '', //海报路径
 				posterbackgd: '/static/images/posterbackgd.png',
+				source: '',
 				sharePacket: {
 					isState: true, //默认不显示
 				}, //分销商详细
@@ -334,16 +338,20 @@
 					img: 'width:100%;'
 				},
 				// 动画状态
-				showAnimate:true
+				showAnimate:true,
+				hide_mer_status:''
 			};
 		},
 		computed: mapGetters(['isLogin','uid']),
 		onLoad(options) {
 			let that = this
 			var pages = getCurrentPages();
+			 let curPage = pages[pages.length-1];
 			if (pages.length <= 1) {
 				that.retunTop = false
 			}
+			let curParam  = curPage.options || curPage.$route.query;
+			this.source = curParam.source;	
 			// #ifdef MP
 			this.navH = app.globalData.navHeight;
 			// #endif
@@ -385,8 +393,8 @@
 			//#endif
 		},
 		onReady() {},
-		show() {
-			console.log('222')
+		onShow() {
+			this.getConfig()
 		},
 		/**
 		 * 用户点击右上角分享
@@ -404,6 +412,13 @@
 		},
 		// #endif
 		methods: {
+			getConfig() {
+				let self = this
+				// 获取配置
+				getconfig().then(res => {
+					this.hide_mer_status = res.data.hide_mer_status
+				}).catch(err => {})
+			},
 			goProDetail(item){
 				console.log(item,'goProDetail')
 				uni.redirectTo({
@@ -515,7 +530,7 @@
 			},
 			// 微信登录回调
 			onLoadFun: function(e) {
-				this.getCouponList();
+				// this.getCouponList();
 				this.getCartCount();
 				this.downloadFilePromotionCode();
 				// this.getUserInfo();
@@ -575,7 +590,7 @@
 			ChangeAttr: function(res) {
 				let productSelect = this.productValue[res];
 				if (productSelect && productSelect.stock > 0) {
-					this.$set(this.attr.productSelect, "image", productSelect.image);
+					this.$set(this.attr.productSelect, "image", productSelect.image ? productSelect.image :  this.storeInfo.image);
 					this.$set(this.attr.productSelect, "price", productSelect.price);
 					this.$set(this.attr.productSelect, "stock", productSelect.stock);
 					this.$set(this.attr.productSelect, "unique", productSelect.unique);
@@ -626,8 +641,8 @@
 				getProductDetail(that.id).then(res => {
 					uni.hideLoading();
 					let storeInfo = res.data;
-					that.$set(that, 'storeInfo', storeInfo);
-					that.$set(that, 'description', storeInfo.content);
+					that.$set(that, 'storeInfo', storeInfo);					
+					that.$set(that, 'description', storeInfo.content);					
 					that.$set(that, 'reply', res.data.topReply ? [res.data.topReply] : []);
 					that.$set(that, 'replyCount', res.data.replayData.count);
 					that.$set(that, 'replyChance', res.data.replayData.rate);
@@ -764,7 +779,7 @@
 						"store_name",
 						this.storeInfo.store_name
 					);
-					this.$set(this.attr.productSelect, "image", productSelect.image);
+					this.$set(this.attr.productSelect, "image", productSelect.image ? productSelect.image : this.storeInfo.image);
 					this.$set(this.attr.productSelect, "price", productSelect.price);
 					this.$set(this.attr.productSelect, "stock", productSelect.stock);
 					this.$set(this.attr.productSelect, "unique", productSelect.unique);
@@ -920,6 +935,23 @@
 					that.$set(that.coupon, 'coupon', true);
 				}
 			},
+			couponTap2: function() {
+				let that = this;
+				if (that.isLogin === false) {
+					// #ifdef H5 || APP-PLUS
+					toLogin();
+					// #endif
+					// #ifdef MP
+					that.$set(that, 'isAuto', true);
+					that.$set(that, 'isShowAuth', true);
+					// #endif
+				} else {
+					// that.getCouponList();
+					uni.navigateTo({
+						url: `/pages/chat/customer_list/chat?mer_id=${that.storeInfo.mer_id}&uid=${that.uid}&productId=${that.id}`
+					});
+				}
+			},
 			onMyEvent: function() {
 				this.$set(this.attr, 'cartAttr', false);
 				this.$set(this, 'isOpen', false);
@@ -969,6 +1001,11 @@
 					return that.$util.Tips({
 						title: "产品库存不足，请选择其它"
 					});
+				if(that.attr.productSelect.cart_num == 0){
+					return that.$util.Tips({
+						title:'购买个数不能为0！'
+					})
+				}	
 				let q = {
 					// productId: that.id,
 					// cartNum: that.attr.productSelect.cart_num,
@@ -977,7 +1014,8 @@
 					// 	that.attr.productSelect.unique : ""
 					product_id:that.id,
 					cart_num:that.attr.productSelect.cart_num,
-					product_attr_unique:that.attr.productSelect !== undefined ? that.attr.productSelect.unique : ""
+					product_attr_unique:that.attr.productSelect !== undefined ? that.attr.productSelect.unique : "",
+					source: this.source
 				};
 				postCartAdd(q)
 					.then(function(res) {
@@ -1087,7 +1125,12 @@
 			downloadFilestoreImage: function() {
 				let that = this;
 				uni.downloadFile({
+					// #ifdef MP
 					url: that.setDomain(that.storeInfo.image),
+					// #endif
+					// #ifdef H5
+					url: that.storeInfo.image,
+					// #endif
 					success: function(res) {
 						that.storeImage = res.tempFilePath;
 					},
@@ -1108,7 +1151,12 @@
 				let that = this;
 				getProductCode(that.id).then(res => {
 					uni.downloadFile({
+						// #ifdef MP
 						url: that.setDomain(res.data.url),
+						// #endif
+						// #ifdef H5
+						url: res.data.url,
+						// #endif
 						success: function(res) {
 							that.$set(that, 'isDown', false);
 							if (typeof successFn == 'function')
@@ -1295,6 +1343,20 @@
 </script>
 
 <style scoped lang="scss">
+	.font-bg-red{
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 38rpx;
+		border-radius: 5rpx;
+		margin-right: 8rpx;
+		&.ml8{
+			margin-left: 8rpx;
+		}
+	}
 	.activity_pin {
 		width: auto;
 		height: 44rpx;
@@ -1385,6 +1447,7 @@
 	.product-con .footer {
 		padding: 0 20rpx 0 30rpx;
 		position: fixed;
+		left: 0;
 		bottom: 0;
 		width: 100%;
 		box-sizing: border-box;

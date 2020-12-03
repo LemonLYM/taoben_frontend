@@ -22,12 +22,12 @@ export function toLogin(push, pathLogin) {
 	if(path){
 		path = path.router;
 		if(path == undefined){
-			path = location.pathname;
+			path = location.pathname + location.search;
 		}
 	}  
 		// #ifdef H5
 	else{
-		path = location.pathname;
+		path = location.pathname + location.search;
 	} 
 		// #endif
 		

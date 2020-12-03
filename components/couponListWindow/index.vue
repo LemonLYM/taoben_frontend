@@ -5,7 +5,7 @@
 				<view class="item" :class="{'on':tabIndex == index}" v-for="(item,index) in tabList" :key="index" @click="bindTab(item,index)">{{item}}</view>
 			</view>
 			<view class='coupon-list' v-if="couponArr.length">
-				<view class='item acea-row row-center-wrapper' v-for="(item,index) in couponArr" @click="getCouponUser(index,item.coupon_id)"
+				<view class='item acea-row row-center-wrapper' v-for="(item,index) in couponArr" @click="getCouponUser(index,item)"
 				 :key='index'>
 					<view class='money acea-row row-column row-center-wrapper' :class='item.issue?"moneyGray":""'>
 						<view>￥<text class='num'>{{item.coupon_price}}</text></view>
@@ -13,8 +13,8 @@
 					</view>
 					<view class='text'>
 						<view class='condition line1'>
-							<span class='line-title' :class='item.issue?"gray":""' v-if='item.type===0'>店铺券</span>
-							<span class='line-title' :class='item.issue?"gray":""' v-else-if='item.type===1'>商品券</span>
+							<span class='line-title' :class='item.issue ? "gray":""' v-if='item.type===0'>店铺券</span>
+							<span class='line-title' :class='item.issue ? "gray":""' v-else-if='item.type===1'>商品券</span>
 							<span>{{item.title}}</span>
 						</view>
 						<view class='data acea-row row-between-wrapper'>
@@ -62,8 +62,7 @@
 				if(value){
 					var newDate=/\d{4}-\d{1,2}-\d{1,2}/g.exec(value)
 					return newDate[0]
-				}
-				
+				}		
 		  }
 		},
 		data() {
@@ -83,14 +82,15 @@
 			close: function() {
 				this.$emit('ChangCouponsClone');
 			},
-			getCouponUser: function(index, id) {
+			getCouponUser: function(index, item) {
 				let that = this;
 				let list = this.couponArr;
 				if (list[index].issue) return true;
 				switch (this.openType) {
 					case 0:
 						//领取优惠券
-						setCouponReceive(id).then(res => {
+						setCouponReceive(item.coupon_id).then(res => {
+							item.issue = true
 							that.$emit('ChangCouponsUseState', index);
 							that.$util.Tips({
 								title: "领取成功"

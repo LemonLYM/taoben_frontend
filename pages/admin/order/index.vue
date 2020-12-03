@@ -2,24 +2,24 @@
 	<view>
 		<view class="order-index" ref="container">
 			<view class="header acea-row">
-				<navigator class="item" url="/pages/admin/orderList/index?types=0" hover-class="none">
-					<view class="num">{{ census.unpaid_count }}</view>
+				<navigator class="item" url="/pages/admin/orderList/index?types=1" hover-class="none">
+					<view class="num">{{ census.unpaid }}</view>
 					<view>待付款</view>
 				</navigator>
-				<navigator class="item" url="/pages/admin/orderList/index?types=1" hover-class="none">
-					<view class="num">{{ census.unshipped_count }}</view>
+				<navigator class="item" url="/pages/admin/orderList/index?types=2" hover-class="none">
+					<view class="num">{{ census.unshipped }}</view>
 					<view>待发货</view>
 				</navigator>
-				<navigator class="item" url="/pages/admin/orderList/index?types=2" hover-class="none">
-					<view class="num">{{ census.received_count }}</view>
+				<navigator class="item" url="/pages/admin/orderList/index?types=3" hover-class="none">
+					<view class="num">{{ census.untake }}</view>
 					<view>待收货</view>
 				</navigator>
-				<navigator class="item" url="/pages/admin/orderList/index?types=3" hover-class="none">
-					<view class="num">{{ census.evaluated_count }}</view>
+				<navigator class="item" url="/pages/admin/orderList/index?types=4" hover-class="none">
+					<view class="num">{{ census.unevaluate }}</view>
 					<view>待评价</view>
 				</navigator>
-				<navigator class="item" url="/pages/admin/orderList/index?types=-3" hover-class="none">
-					<view class="num">{{ census.refund_count }}</view>
+				<navigator class="item" url="/pages/admin/orderList/index?types=6" hover-class="none">
+					<view class="num">{{ census.refund }}</view>
 					<view>退款</view>
 				</navigator>
 			</view>
@@ -27,29 +27,29 @@
 				<view class="title">
 					<span class="iconfont icon-shujutongji"></span>数据统计
 				</view>
-				<view class="list acea-row">
+				<view class="list acea-row" v-if="orderData">
 					<navigator class="item" url="/pages/admin/statistics/index?type=price&time=today" hover-class="none">
-						<view class="num">{{ census.todayPrice }}</view>
+						<view class="num">{{ orderData.today.payPrice }}</view>
 						<view>今日成交额</view>
 					</navigator>
 					<navigator class="item" url="/pages/admin/statistics/index?type=price&time=yesterday" hover-class="none">
-						<view class="num">{{ census.proPrice }}</view>
+						<view class="num">{{ orderData.yesterday.payPrice }}</view>
 						<view>昨日成交额</view>
 					</navigator>
 					<navigator class="item" url="/pages/admin/statistics/index?type=price&time=month" hover-class="none">
-						<view class="num">{{ census.monthPrice }}</view>
+						<view class="num">{{ orderData.month.payPrice  }}</view>
 						<view>本月成交额</view>
 					</navigator>
 					<navigator class="item" url="/pages/admin/statistics/index?type=order&time=today" hover-class="none">
-						<view class="num">{{ census.todayCount }}</view>
+						<view class="num">{{ orderData.today.orderNum}}</view>
 						<view>今日订单数</view>
 					</navigator>
 					<navigator class="item" url="/pages/admin/statistics/index?type=order&time=yesterday" hover-class="none">
-						<view class="num">{{ census.proCount }}</view>
+						<view class="num">{{ orderData.yesterday.orderNum }}</view>
 						<view>昨日订单数</view>
 					</navigator>
 					<navigator class="item" url="/pages/admin/statistics/index?type=order&time=month" hover-class="none">
-						<view class="num">{{ census.monthCount }}</view>
+						<view class="num">{{ orderData.month.orderNum}}</view>
 						<view>本月订单数</view>
 					</navigator>
 				</view>
@@ -65,9 +65,9 @@
 				</view>
 				<view class="conter">
 					<view class="item acea-row row-between-wrapper" v-for="(item, index) in list" :key="index">
-						<view class="data">{{ item.time }}</view>
-						<view class="browse">{{ item.count }}</view>
-						<view class="turnover">{{ item.price }}</view>
+						<view class="data">{{ item.day }}</view>
+						<view class="browse">{{ item.total }}</view>
+						<view class="turnover">{{ item.pay_price }}</view>
 					</view>
 				</view>
 			</view>
@@ -79,7 +79,9 @@
 <script>
 	import {
 		getStatisticsInfo,
-		getStatisticsMonth
+		getStatisticsMonth,
+		orderStatistics,
+		orderPrice
 	} from "@/api/admin";
 	import Loading from '@/components/Loading/index.vue'
 	export default {
@@ -90,6 +92,11 @@
 		data() {
 			return {
 				census: {},
+				orderData: {
+					today: {},
+					yesterday: {},
+					month: {}
+				},
 				list: [],
 				where: {
 					page: 1,
@@ -100,8 +107,10 @@
 			}
 		},
 		onLoad() {
-			this.getIndex();
+			// this.getIndex();
 			this.getList();
+			this.getOrderStatistics();
+			// this.getOrderPrice();
 			// this.$scroll(this.$refs.container, () => {
 			// 	!this.loading && this.getList();
 			// });
@@ -115,7 +124,7 @@
 					},
 					err => {
 						that.$util.Tips({
-							title: error.msg
+							title: err.msg
 						})
 					}
 				);
@@ -124,7 +133,7 @@
 				var that = this;
 				if (that.loading || that.loaded) return;
 				that.loading = true;
-				getStatisticsMonth(that.where).then(
+				orderPrice(that.where).then(
 					res => {
 						that.loading = false;
 						that.loaded = res.data.length < that.where.limit;
@@ -137,6 +146,20 @@
 						})
 					},
 					300
+				);
+			},
+			getOrderStatistics: function(){
+				let that = this;
+				orderStatistics().then(
+					res => {
+						that.census = res.data.order;
+						that.orderData = res.data.data;
+					},
+					err => {
+						that.$util.Tips({
+							title: err.msg
+						})
+					}
 				);
 			}
 		},

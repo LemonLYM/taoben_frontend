@@ -7,10 +7,10 @@
 				</view>
 				<view class="acea-row row-middle">
 					<view class="name line1">{{ item.nickname }}</view>
-					<view class="start" :class="'star' + item.star"></view>
+					<view class="start" :class="'star' + item.star" :style="'width:'+(item.rate/5)*122+'rpx'"></view>
 				</view>
 			</view>
-			<view class="time">{{ item.create_time }} {{ item.suk }}</view>
+			<view class="time">{{ item.create_time }} {{ item.sku ? item.sku : '' }}</view>
 			<view class="evaluate-infor">{{ item.comment }}</view>
 			<view class="imgList acea-row">
 				<view class="pictrue" v-for="(itemn, indexn) in item.pics" :key="indexn">
@@ -38,6 +38,7 @@
 		},
 		methods: {
 			getpreviewImage: function(indexw, indexn) {
+				console.log(this.reply)
 				uni.previewImage({
 					urls: this.reply[indexw].pics,
 					current: this.reply[indexw].pics[indexn]

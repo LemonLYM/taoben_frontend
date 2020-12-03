@@ -275,7 +275,6 @@ import {
  			sizeType: sizeType, // 可以指定是原图还是压缩图，默认二者都有  
  			sourceType: sourceType, // 可以指定来源是相册还是相机，默认二者都有  
  			success: function(res) {
-				console.log()
  				//启动上传等待中...  
  				uni.showLoading({
  					title: '图片上传中',
@@ -294,6 +293,7 @@ import {
 						[TOKENNAME]: 'Bearer ' + store.state.app.token
 					},
 					success: function(res) {
+						console.log(res,'res22222222222222')
 						uni.hideLoading();
 						if (res.statusCode == 403) {
 							that.Tips({
@@ -306,7 +306,7 @@ import {
 							} else {
 								errorCallback && errorCallback(data);
 								that.Tips({
-									title: data.msg
+									title: data.message
 								});
 							}
 						}
@@ -329,6 +329,19 @@ import {
  			}
  		})
  	},
+	
+	serialize: function(obj) {
+	  var str = [];
+	  for (var p in obj)
+	    if (obj.hasOwnProperty(p)) {
+	      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+	    }
+	  return str.join("&");
+	},
+	getNowUrl: function(){
+		const pages = getCurrentPages(), page = pages[pages.length -1], query = this.serialize(page.options || {});
+		return page.route + (query ? '?' + query : '');
+	},
  	/**
  	 * 处理服务器扫码带进来的参数
  	 * @param string param 扫码携带参数

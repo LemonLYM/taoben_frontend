@@ -28,9 +28,9 @@
 						</div>
 					</div>
 				</form>
-				<navigator class="forgetPwd" hover-class="none" url="/pages/users/retrievePassword/index">
+		<!-- 		<navigator class="forgetPwd" hover-class="none" url="/pages/users/retrievePassword/index">
 					<span class="iconfont icon-wenti"></span>忘记密码
-				</navigator>
+				</navigator> -->
 			</div>
 			<div class="list" :hidden="current !== 1">
 				<div class="item">
@@ -165,6 +165,11 @@
 		mounted: function() {
 			// this.getCode();
 			// this.getLogoImage();
+			const app = getApp();
+			this.$nextTick(() => {
+				this.logoUrl = app.globalData.site_logo
+				console.log(app.globalData.site_logo);
+			});
 		},
 		methods: {
 			again() {
@@ -284,16 +289,15 @@
 				if (!/^1(3|4|5|7|8|9|6)\d{9}$/i.test(that.account)) return that.$util.Tips({
 					title: '请输入正确的手机号码'
 				});
-				if (that.formItem == 2) that.type = "register";
-				
+				// if (that.formItem == 2) that.type = "register";
 				await registerVerify({
 						phone: that.account,
-						type: that.type,
+						type: 'login',
 						key: that.keyCode,
 						code: that.codeVal
 					})
 					.then(res => {
-						that.$util.Tips({title:res.msg});
+						that.$util.Tips({title:res.message});
 						that.sendCode();
 					})
 					.catch(res => {
@@ -329,7 +333,8 @@
 				});
 				loginH5({
 						account: that.account,
-						password: that.password
+						password: that.password,
+						spread: that.$Cache.get("spread")
 					})
 					.then(({
 						data

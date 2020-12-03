@@ -2,18 +2,21 @@
 	<view>
 		<form @submit="formSubmit" report-submit='true'>
 			<view class='personal-data'>
-				<view class="wrapper">
+				<view class="wrapper" v-if="switchUserInfo.length>0">
 					<view class="title">管理我的账号</view>
 					<view class="wrapList">
 						<view class="item acea-row row-between-wrapper" :class="item.uid === userInfo.uid ? 'on' : ''" v-for="(item,index) in switchUserInfo"
 						 :key="index" @click='switchAccounts(item,index)'>
 							<view class="picTxt acea-row row-between-wrapper">
-								<view class="pictrue" @click.stop='uploadpic' v-if='item.uid === userInfo.uid'>
-									<image :src='item.avatar'></image>
-									<image src='../../../static/images/alter.png' class="alter"></image>
+								<!-- @click.stop='uploadpic' -->
+								<view class="pictrue" v-if='item.uid === userInfo.uid'>
+									<image :src='item.avatar' v-if="item.avatar"></image>
+									<image src="/static/images/f.png" v-else></image>
+									<!-- <image src='../../../static/images/alter.png' class="alter"></image> -->
 								</view>
 								<view class="pictrue" v-else>
-									<image :src='item.avatar'></image>
+									<image :src='item.avatar' v-if="item.avatar"></image>
+									<image src="/static/images/f.png" v-else></image>
 								</view>
 								<view class="text">
 									<view class="name line1">{{ item.nickname }}</view>
@@ -34,7 +37,7 @@
 				<view class='list'>
 					<view class='item acea-row row-between-wrapper'>
 						<view>昵称</view>
-						<view class='input'><input type='text' name='nickname' :value='userInfo.nickname'></input></view>
+						<view class='input'><input type='text' name='nickname' :value='userInfo.nickname' disabled></input></view>
 					</view>
 					<view class='item acea-row row-between-wrapper'>
 						<view>手机号码</view>
@@ -61,14 +64,14 @@
 						</view>
 					</view>
 					<!-- #endif -->
-					<view class="item acea-row row-between-wrapper" v-if="userInfo.phone && userInfo.user_type == 'h5'">
+					<!-- <view class="item acea-row row-between-wrapper" v-if="userInfo.phone && userInfo.user_type == 'h5'">
 						<view>密码</view>
-						<navigator url="/pages/user_pwd_edit/index" hover-class="none" class="input">
+						<navigator url="/pages/users/user_pwd_edit/index" hover-class="none" class="input">
 							点击修改密码<text class="iconfont icon-xiangyou"></text>
 						</navigator>
-					</view>
+					</view> -->
 				</view>
-			<!-- 	<button class='modifyBnt bg-color' formType="submit">保存修改</button> -->
+				<!-- 	<button class='modifyBnt bg-color' formType="submit">保存修改</button> -->
 				<!-- #ifdef H5 -->
 				<view class="logOut cart-color acea-row row-center-wrapper" @click="outLogin" v-if="!this.$wechat.isWeixin()">退出登录</view>
 				<!-- #endif -->
@@ -152,7 +155,7 @@
 					}
 				});
 			},
-			switchAccounts: function(item,index) {
+			switchAccounts: function(item, index) {
 				let userInfo = this.switchUserInfo[index],
 					that = this;
 				that.userIndex = index;
@@ -160,30 +163,32 @@
 				if (userInfo === undefined) return that.$util.Tips({
 					title: '切换的账号不存在'
 				});
-				
-					uni.showLoading({
-						title: '正在切换中'
-					});
-					switchH5Login({
-						uid:item.uid
-					}).then(({data}) => {
-						uni.hideLoading();
-						let newTime = Math.round(new Date() / 1000);
-						that.$store.commit("LOGIN", {
-							'token': data.token,
-							'time': data.exp
-						});
-						that.$store.commit("SETUID", data.user.uid);
-						that.$store.commit('UPDATE_USERINFO', data.user);
-						that.getUserInfo();
 
-					}).catch(err => {
-						uni.hideLoading();
-						return that.$util.Tips({
-							title: err
-						});
-					})
-				
+				uni.showLoading({
+					title: '正在切换中'
+				});
+				switchH5Login({
+					uid: item.uid
+				}).then(({
+					data
+				}) => {
+					uni.hideLoading();
+					let newTime = Math.round(new Date() / 1000);
+					that.$store.commit("LOGIN", {
+						'token': data.token,
+						'time': data.exp
+					});
+					that.$store.commit("SETUID", data.user.uid);
+					that.$store.commit('UPDATE_USERINFO', data.user);
+					that.getUserInfo();
+
+				}).catch(err => {
+					uni.hideLoading();
+					return that.$util.Tips({
+						title: err
+					});
+				})
+
 			},
 			/**
 			 * 退出登录
@@ -193,30 +198,30 @@
 				let that = this;
 				if (that.loginType == 'h5') {
 					uni.showModal({
-					    title: '提示',
-					    content: '确认退出登录?',
-					    success: function (res) {
-					        if (res.confirm) {
-					            getLogout()
-					              .then(res => {
-					                that.$store.commit("LOGOUT");
-									uni.switchTab({
-									    url: '/pages/index/index'
+						title: '提示',
+						content: '确认退出登录?',
+						success: function(res) {
+							if (res.confirm) {
+								getLogout()
+									.then(res => {
+										that.$store.commit("LOGOUT");
+										uni.switchTab({
+											url: '/pages/index/index',											
+										});
+									})
+									.catch(err => {
+										console.log(err);
 									});
-					              })
-					              .catch(err => {
-					                console.log(err);
-					              });
-					        } else if (res.cancel) {
-					            console.log('用户点击取消');
-					        }
-					    }
-					});	
+							} else if (res.cancel) {
+								console.log('用户点击取消');
+							}
+						}
+					});
 				}
 			},
 			// 获取用户列表
-			userAcc(){
-				userAcc().then(res=>{
+			userAcc() {
+				userAcc().then(res => {
 					let that = this
 					let switchUserInfo = res.data || [];
 					for (let i = 0; i < switchUserInfo.length; i++) {
@@ -250,13 +255,13 @@
 			 */
 			uploadpic: function() {
 				let that = this;
-				that.$util.uploadImageOne('upload/image', function(res){
+				that.$util.uploadImageOne('upload/image', function(res) {
 					let userInfo = that.switchUserInfo[that.userIndex];
 					if (userInfo !== undefined) {
 						userInfo.avatar = res.data.url;
 					}
 					that.switchUserInfo[that.userIndex] = userInfo;
-					that.$set(that,'switchUserInfo',that.switchUserInfo);
+					that.$set(that, 'switchUserInfo', that.switchUserInfo);
 				});
 			},
 
@@ -280,7 +285,7 @@
 						url: 1
 					});
 				}).catch(msg => {
-					return that.$util.Tips({	
+					return that.$util.Tips({
 						title: msg || '保存失败，您并没有修改'
 					}, {
 						tab: 3,
@@ -314,7 +319,7 @@
 		padding: 0 30rpx;
 		position: relative;
 		border: 2rpx solid #f8f8f8;
-		box-sizing:border-box;
+		box-sizing: border-box;
 	}
 
 	.personal-data .wrapper .wrapList .item.on {

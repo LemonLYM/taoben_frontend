@@ -121,17 +121,29 @@
 	font-size: 26rpx;
 	color: #82848f;
 	margin-top: 20rpx;
-	height: 80rpx
+	height: 80rpx;
+	position: relative;
 }
 
 .product-con .attribute .atterTxt {
 	font-size: 28rpx;
 	color: #282828
 }
+.product-con .attribute .atterTxt span{
+	 overflow: hidden;
+	 white-space: nowrap;
+	 text-overflow:ellipsis;
+	 display: inline-block;
+	 width: 400rpx;
+	 position: relative;
+	 top: 6rpx;
+}
 
 .product-con .attribute .iconfont {
 	font-size: 28rpx;
-	color: #7a7a7a
+	color: #7a7a7a;
+	position: absolute;
+	right: 30rpx;
 }
 
 .product-con .userEvaluation {
@@ -532,7 +544,8 @@
 	color: #16ac57
 }
 
-.statistical-page .mc-body {
+.statistical-page .mc-
+{
 	padding-bottom: 0
 }
 

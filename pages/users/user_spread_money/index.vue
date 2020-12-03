@@ -25,7 +25,7 @@
 											<view class='name line1' v-if="item.extract_type == 2">支付宝提现</view>
 										</block>
 										<block v-else>
-											<view class='name line1'>提现失败</view>
+											<view class='name line1'>提现失败<text class="message">({{item.fail_msg}})</text></view>
 										</block>
 										<view>{{item.create_time}}</view>
 									</view>
@@ -104,7 +104,7 @@
 				name: '',
 				type: 0,
 				page: 1,
-				limit: 8,
+				limit: 12,
 				recordList: [],
 				recordType: 0,
 				recordCount: 0,
@@ -222,5 +222,9 @@
 
 	.commission-details .promoterHeader .headerCon .money .num {
 		font-family: 'Guildford Pro';
+	}
+	.message{
+		font-size: 18rpx;
+		color: #fc4141;
 	}
 </style>

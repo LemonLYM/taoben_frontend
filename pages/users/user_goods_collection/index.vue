@@ -86,9 +86,6 @@
 		/**
 		 * 页面上拉触底事件的处理函数
 		 */
-		onReachBottom: function() {
-			this.get_user_collect_product();
-		},
 		methods: {
 			/**
 			 * 授权回调
@@ -163,7 +160,7 @@
 			}
 		},
 		onReachBottom() {
-			this.get_host_product();
+			this.get_user_collect_product();
 		}
 	}
 </script>

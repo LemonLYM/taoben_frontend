@@ -17,10 +17,10 @@
 		<view class='nav acea-row' v-if="menus.length">
 			<block v-for="(item,index) in menus" :key="index">
 				<view class='item'>
-					<view class='pictrue'>
+					<view class='pictrue' style="width: 90rpx; height: 90rpx; background-color: #FFF8EC; border-radius: 100%; text-align: center;">
 						<image :src='item.img'></image>
 					</view>
-					<view class="menu-txt">{{item.title}}</view>
+					<view class="menu-txt area-row">{{item.title}}</view>
 				</view>
 			</block>
 		</view>
@@ -41,7 +41,8 @@
 										<image :src="item.image"></image>
 									</view>
 									<view class="text">
-										<view class="name line2">{{item.store_name}}</view>
+										<view class="name">{{item.store_name}}</view>
+										<text v-if="item.merchant && item.merchant.is_trader" class="font-bg-red mt8">自营</text>
 										<view class="money font-color-red">￥<text class="num">{{item.price}}</text></view>
 									</view>
 								</view>
@@ -65,7 +66,7 @@
 						<image :src="item.image"></image>
 					</view>
 					<view class="text">
-						<view class="name line2">{{item.store_name}}</view>
+						<view class="name line2"><text v-if="item.merchant && item.merchant.is_trader" class="font-bg-red ml8">自营</text>{{item.store_name}}</view>
 						<view class="money font-color-red">￥<text class="num">{{item.price}}</text>
 						</view>
 						<view class="open bg-color-red" @click.stop="goBuy(item)">立即开通</view>
@@ -126,7 +127,7 @@
 				attrValue: '', //已选属性
 				attrTxt: '请选择', //属性页面提示
 				cart_num: 1, //购买数量
-				id: 0,//产品id
+				id: 0, //产品id
 				loadend: false,
 				loading: false,
 				loadTitle: '加载更多',
@@ -163,7 +164,7 @@
 			getGoodsDetails: function(item) {
 				uni.showLoading({
 					title: '加载中',
-					mask:true
+					mask: true
 				});
 				let that = this;
 				getProductDetail(item.product_id).then(res => {
@@ -217,7 +218,7 @@
 				let productAttr = this.attr.productAttr;
 				let value = [];
 				let arr = [];
-				let unSortArr = [];	
+				let unSortArr = [];
 				for (var key in this.productValue) {
 					if (this.productValue[key].stock > 0) {
 						value = this.attr.productAttr.length ? key.split(",") : [];
@@ -239,12 +240,12 @@
 					this.$set(this.attr.productSelect, "price", productSelect.price);
 					this.$set(this.attr.productSelect, "stock", productSelect.stock);
 					this.$set(this.attr.productSelect, "unique", productSelect.unique);
-					
-					this.$set(this, "attrValue",  value.join(","));
+
+					this.$set(this, "attrValue", value.join(","));
 					this.$set(this, "attrTxt", "已选择");
-					if(productSelect.stock == 0){
+					if (productSelect.stock == 0) {
 						this.$set(this.attr.productSelect, "cart_num", 0);
-					}else{
+					} else {
 						this.$set(this.attr.productSelect, "cart_num", 1);
 					}
 				} else if (!productSelect && productAttr.length) {
@@ -277,7 +278,7 @@
 					this.$set(this.attr.productSelect, "cart_num", 1);
 					this.$set(this, "attrValue", "");
 					this.$set(this, "attrTxt", "请选择");
-				} else if(productSelect && !productAttr.length){
+				} else if (productSelect && !productAttr.length) {
 					this.$set(
 						this.attr.productSelect,
 						"store_name",
@@ -287,12 +288,12 @@
 					this.$set(this.attr.productSelect, "price", productSelect.price);
 					this.$set(this.attr.productSelect, "stock", productSelect.stock);
 					this.$set(this.attr.productSelect, "unique", productSelect.unique);
-					
-					this.$set(this, "attrValue",  value.join(","));
+
+					this.$set(this, "attrValue", value.join(","));
 					this.$set(this, "attrTxt", "已选择");
-					if(productSelect.stock == 0){
+					if (productSelect.stock == 0) {
 						this.$set(this.attr.productSelect, "cart_num", 0);
-					}else{
+					} else {
 						this.$set(this.attr.productSelect, "cart_num", 1);
 					}
 				}
@@ -337,21 +338,22 @@
 				this.$set(this.attr.productSelect, 'cart_num', e);
 			},
 			// 立即购买
-			goPay(){
-				let that = this,productSelect = that.productValue[this.attrValue];
+			goPay() {
+				let that = this,
+					productSelect = that.productValue[this.attrValue];
 				if (
 					that.attr.productAttr.length &&
-					productSelect.stock ==0
+					productSelect.stock == 0
 				)
 					return that.$util.Tips({
 						title: "产品库存不足，请选择其它"
 					});
 				let q = {
-					product_id:that.id,
-					cart_num:Number(that.attr.productSelect.cart_num),
-					is_new:1,
-					product_attr_unique:that.attr.productSelect !== undefined ? that.attr.productSelect.unique : ""
-				};	
+					product_id: that.id,
+					cart_num: Number(that.attr.productSelect.cart_num),
+					is_new: 1,
+					product_attr_unique: that.attr.productSelect !== undefined ? that.attr.productSelect.unique : ""
+				};
 				postCartAdd(q)
 					.then(function(res) {
 						that.attr.cartAttr = false;
@@ -365,7 +367,7 @@
 						});
 					});
 			},
-			
+
 			// 去商品详情
 			godDetail(id) {
 				goShopDetail(id).then(res => {
@@ -396,9 +398,9 @@
 				});
 			},
 			// 推荐
-			bagRecommend: function(){
+			bagRecommend: function() {
 				let that = this;
-				bagRecommend().then(res=>{
+				bagRecommend().then(res => {
 					this.fastList = res.data
 				})
 			},
@@ -414,13 +416,13 @@
 			// 说明以及导航
 			bagExplain: function() {
 				let that = this;
-				bagExplain().then(res=>{
+				bagExplain().then(res => {
 					let data = res.data;
 					this.menus = data.data;
 					this.explainTxt = data.explain;
 				})
 			},
-			
+
 			explain() {
 				this.explainShow = true;
 			},
@@ -436,7 +438,34 @@
 		background-color: #fff;
 	}
 
+	.area-row {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		display: block;
+		width: 80%;
+		text-align: center;
+	}
+
 	.distributor {
+		.font-bg-red {
+			display: inline-block;
+			background: #E93424;
+			color: #fff;
+			font-size: 20rpx;
+			width: 58rpx;
+			text-align: center;
+			line-height: 34rpx;
+			border-radius: 5rpx;
+			margin-right: 8rpx;
+			&.mt8{
+				margin-top: 8rpx;
+			}
+			&.ml8 {
+				margin-left: 8rpx;
+			}
+		}
+
 		.headerBg {
 			width: 100%;
 			height: 371rpx;
@@ -503,13 +532,18 @@
 				justify-content: center;
 				width: 25%;
 				margin-top: 30rpx;
-
 				image {
-					width: 89rpx;
-					height: 89rpx;
+					width: 48rpx;
+					height: 48rpx;
 					border-radius: 50%;
+					position: relative;
+					top: 20rpx;	
+						
 				}
-
+				.picture{
+					border: 40rpx solid #FFF8EC;
+					
+				}				
 				.menu-txt {
 					color: #B99450;
 					font-size: 32rpx;
@@ -610,7 +644,9 @@
 									width: 210rpx;
 									font-size: 26rpx;
 									color: #282828;
-									height: 65rpx;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+									overflow: hidden;
 								}
 
 								.money {

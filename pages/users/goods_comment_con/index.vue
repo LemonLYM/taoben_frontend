@@ -29,7 +29,7 @@
 								<image :src='item'></image>
 								<text class='iconfont icon-guanbi1 font-color' @click='DelPic(index)'></text>
 							</view>
-							<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 8">
+							<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 6">
 								<text class='iconfont icon-icon25201'></text>
 								<view>上传图片</view>
 							</view>

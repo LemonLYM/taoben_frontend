@@ -18,21 +18,19 @@
 
 		},
 		onLoad(option) {
-			debugger
 			let that = this
 			const {
 				code,
 				state
 			} = option;
 			wechat.auth(code, state)
-				.then(({data}) => {
+				.then(() => {
 					// let newTime = Math.round(new Date() / 1000);
 					// that.$store.commit("LOGIN", {
 					// 	'token': data.token,
 					// 	'time': dayjs(data.exp) - newTime
 					// });
 					// that.$store.commit("SETUID", data.user.uid);
-					console.log(option,'option')
 					console.log(decodeURIComponent(
 						decodeURIComponent(option.back_url)
 					),'back_url')

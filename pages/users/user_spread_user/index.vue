@@ -6,7 +6,7 @@
 					<view>当前佣金</view>
 					<navigator url='/pages/users/user_spread_money/index?type=1' hover-class="none" class='record'>提现记录<text class='iconfont icon-xiangyou'></text></navigator>
 				</view>
-				<view class='num'>{{userInfo.brokerage_price}}</view>
+				<view class='num'>{{userInfo.total_brokerage_price}}</view>
 				<view class='profit acea-row row-between-wrapper'>
 					<view class='item'>
 						<view>昨日收益</view>
@@ -14,7 +14,7 @@
 					</view>
 					<view class='item'>
 						<view>累积已提</view>
-						<view class='money'>{{userInfo.total_brokerage}}</view>
+						<view class='money'>{{userInfo.total_extract}}</view>
 					</view>
 				</view>
 			</view>

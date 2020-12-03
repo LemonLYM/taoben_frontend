@@ -119,6 +119,10 @@
 				text-align: center;
 				font-size: 28rpx;
 				color: #333333;
+				max-width: 160rpx;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 				&.click{
 					font-weight: bold;
 					font-size: 30rpx;

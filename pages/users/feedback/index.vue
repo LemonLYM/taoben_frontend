@@ -6,7 +6,10 @@
 			</view>
 			<view class="tab-box" v-if="tabList.length>0">
 				<block v-for="(item,index) in tabList">
-					<view class="tab-item" v-if="item.children && item.children.length > 0" :key="index" :class="{'active':index == tabKey}" @click="bindTab(item,index)">{{item.cate_name}}</view>
+					<view class="tab-item" :key="index" :class="{'active':index == tabKey}"
+					 @click="bindTab(item,index)">{{item.cate_name}}</view>
+					<!--<view class="tab-item" v-if="item.children && item.children.length > 0" :key="index" :class="{'active':index == tabKey}"
+					 @click="bindTab(item,index)">{{item.cate_name}}</view>-->
 				</block>
 			</view>
 			<view class="picker" v-if="qsArray.length>0">
@@ -91,10 +94,23 @@
 			// 获取反馈类型
 			feedbackType().then(({data})=>{
 				this.tabList = data
-				this.qsArray = data[this.tabKey].children
+				this.getFeedBack(data)
+				console.log(this.tabKey)
+				
 			})
 		},
 		methods:{
+			// 获取含有二级分类的反馈类型
+			getFeedBack(data){
+				let that = this;
+				data.forEach(function(item,i) {
+					if(item.children){
+						that.tabKey = i;
+						that.qsArray = data[that.tabKey].children
+						return;
+					}
+				});
+			},
 			// 下拉选中
 			bindPickerChange(e){
 				this.qsIndex = e.target.value
@@ -113,7 +129,7 @@
 			uploadpic: function () {
 			  let that = this;
 			  that.$util.uploadImageOne('upload/image', function (res) {
-					console.log(res)
+					console.log(res,'回调')
 			    that.uploadImg.push(res.data.path);
 					that.$set(that,'uploadImg',that.uploadImg);
 			  });
@@ -210,7 +226,11 @@
 				flex-wrap: wrap;
 
 				.tab-item {
-					display: flex;
+					overflow: hidden;
+					-webkit-line-clamp: 1;
+					-webkit-box-orient: vertical;
+					display: -webkit-box;
+					line-height: 28px;
 					align-items: center;
 					justify-content: center;
 					width: 200rpx;
@@ -219,6 +239,7 @@
 					border: 1px solid #BFBFBF;
 					border-radius: 33px;
 					font-size: 28rpx;
+					text-align: center;
 
 					&.active {
 						background: $theme-color;

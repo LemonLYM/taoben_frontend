@@ -48,7 +48,7 @@
 							<span class="pictrue_log_class" :class="is_switch === true ? 'pictrue_log_big' : 'pictrue_log'" v-if="item.activity && item.activity.type === '3'">拼团</span>
 						</view>
 						<view class='text' :class='is_switch==true?"":"on"'>
-							<view class='name line1'>{{item.store_name}}</view>
+							<view class='name line1'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 							<view class='money font-color' :class='is_switch==true?"":"on"'>
 								￥<text class='num'>{{item.price}}</text>
 								<view :class="is_switch ? 'ticket' : 'ticket-big' " v-if="item.issetCoupon">领券</view>
@@ -350,8 +350,9 @@
 			set_where: function(e) {
 				switch (e) {
 					case 1:
-						uni.navigateBack()
-						break
+					uni.setStorageSync('storeIndex', this.where.cate_id);
+					uni.navigateBack()			
+					break
 					case 2:
 						this.firstKey = e
 						if (this.price == 0){
@@ -421,6 +422,17 @@
 </script>
 
 <style lang="scss">
+	.font-bg-red{
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 34rpx;
+		border-radius: 5rpx;
+		margin-right: 8rpx;
+	}
 	.productList .search {
 		width: 100%;
 		height: 86rpx;

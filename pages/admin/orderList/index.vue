@@ -1,57 +1,60 @@
 <template>
 	<view class="pos-order-list" ref="container">
 		<view class="nav acea-row row-around row-middle">
-			<view class="item" :class="where.status == 0 ? 'on' : ''" @click="changeStatus(0)">
+			<view class="item" :class="where.status == 1 ? 'on' : ''" @click="changeStatus(1)">
 				待付款
 			</view>
-			<view class="item" :class="where.status == 1 ? 'on' : ''" @click="changeStatus(1)">
+			<view class="item" :class="where.status == 2 ? 'on' : ''" @click="changeStatus(2)">
 				待发货
 			</view>
-			<view class="item" :class="where.status == 2 ? 'on' : ''" @click="changeStatus(2)">
+			<view class="item" :class="where.status == 3 ? 'on' : ''" @click="changeStatus(3)">
 				待收货
 			</view>
-			<view class="item" :class="where.status == 3 ? 'on' : ''" @click="changeStatus(3)">
+			<view class="item" :class="where.status == 4 ? 'on' : ''" @click="changeStatus(4)">
 				待评价
 			</view>
-			<view class="item" :class="where.status == 4 ? 'on' : ''" @click="changeStatus(4)">
+			<view class="item" :class="where.status == 5 ? 'on' : ''" @click="changeStatus(5)">
 				已完成
 			</view>
-			<view class="item" :class="where.status == -3 ? 'on' : ''" @click="changeStatus(-3)">
+			<view class="item" :class="where.status == 6 ? 'on' : ''" @click="changeStatus(6)">
 				退款
 			</view>
 		</view>
 		<view class="list">
 			<view class="item" v-for="(item, index) in list" :key="index">
-				<view class="order-num acea-row row-middle" @click="toDetail(item)">
-					订单号：{{ item.order_id }}
-					<span class="time">下单时间：{{ item.add_time }}</span>
+				<view class="order-num acea-row row-middle">
+					订单号：{{ item.order_sn }}
+					<span class="time">下单时间：{{ item.create_time }}</span>
 				</view>
-				<view class="pos-order-goods" v-for="(val, key) in item._info" :key="key">
-					<view class="goods acea-row row-between-wrapper" @click="toDetail(item)">
+				<view class="pos-order-goods" v-for="(val, key) in item.orderProduct" :key="key" @click="toDetail(item)">
+					<view class="goods acea-row row-between-wrapper">
 						<view class="picTxt acea-row row-between-wrapper">
 							<view class="pictrue">
-								<image :src="val.cart_info.productInfo.image" />
+								<image :src="val.cart_info.product.image" />
 							</view>
 							<view class="text acea-row row-between row-column">
 								<view class="info line2">
-									{{ val.cart_info.productInfo.store_name }}
+									{{ val.cart_info.product.store_name }}
 								</view>
-								<view class="attr" v-if="val.cart_info.productInfo.suk">
-									{{ val.cart_info.productInfo.suk }}
+								<view class="attr" v-if="val.cart_info.productAttr.suk">
+									{{ val.cart_info.productAttr.suk }}
 								</view>
 							</view>
 						</view>
 						<view class="money">
-							<view class="x-money">￥{{ val.cart_info.productInfo.price }}</view>
-							<view class="num">x{{ val.cart_info.cart_num }}</view>
+							<view class="x-money">￥{{ val.cart_info.product.price }}</view>
+							<view class="num">x{{ item.total_num }}</view>
 							<view class="y-money">
-								￥{{ val.cart_info.productInfo.ot_price }}
+								￥{{ val.cart_info.productAttr.cost }}
 							</view>
 						</view>
 					</view>
 				</view>
 				<view class="public-total">
-					共{{ item.total_num }}件商品，应支付
+					共{{ item.total_num }}件商品，
+					<span v-if="where.status <= 1">应</span>
+					<span v-else>已</span>
+					支付
 					<span class="money">￥{{ item.pay_price }}</span> ( 邮费 ¥{{
 	            item.total_postage
 	          }}
@@ -68,17 +71,11 @@
 						<!--            </view>-->
 					</view>
 					<view class="acea-row row-middle">
-						<view class="bnt" @click="modify(item, 0)" v-if="where.status == 0">
+						<view class="bnt" @click="modify(item, 0)" v-if="where.status == 1">
 							一键改价
 						</view>
 						<view class="bnt" @click="modify(item, 1)">订单备注</view>
-						<view class="bnt" @click="modify(item, 0)" v-if="where.status == -3 && item.refund_status === 1">
-							立即退款
-						</view>
-						<view class="bnt cancel" v-if="item.pay_type === 'offline' && item.paid === 0" @click="offlinePay(item)">
-							确认付款
-						</view>
-						<navigator class="bnt" v-if="where.status == 1" :url="'/pages/admin/delivery/index?id='+item.order_id">去发货
+						<navigator class="bnt" v-if="where.status == 2 && item.order_type == 0" :url="'/pages/admin/delivery/index?id='+item.order_id">去发货
 						</navigator>
 					</view>
 				</view>
@@ -92,7 +89,7 @@
 
 <script>
 	import {
-		getAdminOrderList,
+		getOrderList,
 		setAdminOrderPrice,
 		setAdminOrderRemark,
 		setOfflinePay,
@@ -111,11 +108,11 @@
 			return {
 				current: "",
 				change: false,
-				types: 0,
+				types: 1,
 				where: {
 					page: 1,
 					limit: 10,
-					status: 0
+					status: 1
 				},
 				list: [],
 				loaded: false,
@@ -147,15 +144,15 @@
 				let that = this;
 				if (that.loading || that.loaded) return;
 				that.loading = true;
-				getAdminOrderList(that.where).then(
+				getOrderList(that.where).then(
 					res => {
 						that.loading = false;
-						that.loaded = res.data.length < that.where.limit;
-						that.list.push.apply(that.list, res.data);
+						that.loaded = res.data.list.length < that.where.limit;
+						that.list.push.apply(that.list, res.data.list);
 						that.where.page = that.where.page + 1;
 					},
 					err => {
-						that.$dialog.error(err.msg);
+						that.$dialog.message(error.msg);
 					}
 				);
 			},
@@ -192,13 +189,13 @@
 					refund_price = opt.refund_price,
 					refund_status = that.orderInfo.refund_status,
 					remark = opt.remark;
-				data.order_id = that.orderInfo.order_id;
-				if (that.status == 0 && refund_status === 0) {
+				let id = that.orderInfo.order_id;
+				if (that.status == 0) {
 					if(!isMoney(price)){
 						return that.$util.Tips({title: '请输入正确的金额'});
 					}
-					data.price = price;
-					setAdminOrderPrice(data).then(
+					data.pay_price = price;
+					setAdminOrderPrice(id,{pay_price: price}).then(
 						function() {
 							that.change = false;
 							that.$util.Tips({
@@ -207,45 +204,25 @@
 							})
 							that.init();
 						},
-						function() {
+						function(res) {
 							that.change = false;
 							that.$util.Tips({
-								title:'改价失败',
+								title:res,
 								icon:'none'
 							})
 						}
 					);
-				} else if (that.status == 0 && refund_status === 1) {
-					if(!isMoney(refund_price)){
-						return that.$util.Tips({title: '请输入正确的金额'});
-					}
-					data.price = refund_price;
-					data.type = opt.type;
-					setOrderRefund(data).then(
-						res => {
-							that.change = false;
-							that.$util.Tips({title: res.msg});
-							that.init();
-						},
-						err => {
-							console.log(err,'err')
-							that.change = false;
-							that.$util.Tips({title: err});
-						}
-					);
-				} else {
-					
+				} else {					
 					if(!remark){
 						return this.$util.Tips({
 							title:'请输入备注'
 						})
 					}
-					data.remark = remark;
-					setAdminOrderRemark(data).then(
+					setAdminOrderRemark(id, {remark: remark}).then(
 						res => {
 							that.change = false;
 							this.$util.Tips({
-								title:res.msg,
+								title:res.message,
 								icon:'success'
 							})
 							that.init();

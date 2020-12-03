@@ -93,8 +93,8 @@ export function unOrderCancel(id){
  * @param string uni
  * 
 */
-export function orderDel(uni){
-  return request.post('order/del',{uni:uni});
+export function orderDel(id){
+  return request.post('order/del/'+id);
 }
 
 /**
@@ -140,8 +140,8 @@ export function orderTake(uni){
  * 订单查询物流信息
  * @returns {*}
  */
-export function express(uni) {
-  return request.post("order/express/" + uni);
+export function express(id) {
+  return request.post("order/express/" + id);
 }
 
 /**
@@ -249,4 +249,9 @@ export function refundDel(id) {
 // 退款记录删除
 export function refundExpress(id) {
 	return request.get("refund/express/"+id,{ noAuth : true });
+}
+
+// 核销二维码
+export function verifyCode(id) {
+	return request.get("order/verify_code/"+id);
 }

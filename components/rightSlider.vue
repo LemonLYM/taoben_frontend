@@ -13,10 +13,10 @@
 				<view class="title">品牌</view>
 				<view class="brand-wrapper">
 					<scroll-view :style="{'height':isShow?'90%':'250rpx'}" :scroll-y="isShow">
-						<view class="wrapper">
-							<view class="item line1" v-for="item in list" :key="item.id" :class="item.check?'on':''" @click="bindChenck(item)">
+						<view class="wrapper">			
+							<view class="item line1" v-for="(item,index) in list" :key="index" :class="item.check?'on':''" @tap="bindChenck(item)">
 								{{item.brand_name}}
-							</view>
+							</view>				
 						</view>
 					</scroll-view>
 					<view class="btns" v-if="!isShow && list.length>9" @click="isShow = true">展开全部<text class="iconfont icon-xiangxia"></text></view>
@@ -58,11 +58,11 @@
 			this.list = this.brandList
 			this.showBox = this.status
 		},
-		methods:{
+		methods:{	
 			bindChenck(item){
 				item.check = !item.check
 				this.arrFilter()
-			},
+			},				
 			arrFilter(){
 				this.activeList = this.list.filter(item=>{
 					return item.check == true

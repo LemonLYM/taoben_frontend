@@ -74,6 +74,12 @@
 			}
 		},
 		{
+			"path": "pages/error/index",
+			"style": {
+				"navigationBarTitleText": "网站已关闭"
+			}
+		},
+		{
 			"path": "pages/order_details/index",
 			"style": {
 				"navigationBarTitleText": "订单详情",
@@ -435,10 +441,11 @@
 			"pages": [{
 					"path": "home/index",
 					"style": {
-						"navigationStyle": "custom"
+						"navigationStyle": "custom",
+						"navigationBarTitleText": "店铺首页"
 							// #ifdef MP
 							,
-						"navigationBarTextStyle": "#fff"
+						"navigationBarTextStyle": "#FFFFFF"
 						// #endif
 					}
 				},
@@ -452,6 +459,11 @@
 					"path": "list/index",
 					"style": {
 						"navigationBarTitleText": "商品列表"
+					}
+				}, {
+					"path": "settled/index",
+					"style": {
+						"navigationBarTitleText": "商家入驻"
 					}
 				}
 			]
@@ -525,12 +537,17 @@
 					}
 				}
 			]
+			// ,"plugins": {
+			// 	 "live-player-plugin": {
+			// 		"version": "1.1.8",
+			// 		"provider": "wx2b03c6e691cd7370"
+			// 	 }
+			// }
 		},
 		{
 			"root": "pages/chat",
 			"name": "chat",
-			"pages": [
-				{
+			"pages": [{
 					"path": "customer_list/index",
 					"style": {
 						"navigationBarTitleText": "消息中心"
@@ -542,6 +559,40 @@
 						"navigationBarTitleText": "客服聊天"
 					}
 				}
+			]
+		},
+		{
+			"root": "pages/activity",
+			"name": "activity",
+			"pages": [{
+					"path": "goods_seckill/index",
+					"style": {
+						"navigationBarTitleText": "限时秒杀"
+							// #ifdef MP
+							,
+						"navigationBarTextStyle": "#fff",
+						"navigationBarBackgroundColor": "#e93323"
+						// #endif
+					}
+				},
+				{
+					"path": "goods_seckill_details/index",
+					"style": {
+						"navigationBarTitleText": "秒杀详情"
+							// #ifdef MP
+							,
+						"navigationStyle": "custom"
+						// #endif
+					}
+				}
+				// {
+				// 	"path": "liveBroadcast/index",
+				// 	"style": {
+				// 		"navigationBarTitleText": "直播列表",
+				// 		"navigationBarBackgroundColor": "#F2F2F2"
+
+				// 	}
+				// }
 			]
 		}
 	],
@@ -590,5 +641,6 @@
 			"path": "", //启动页面，必选
 			"query": "" //启动参数，在页面的onLoad函数里面得到
 		}]
-	}
+	},
+	"sitemapLocation": "sitemap.json"
 }

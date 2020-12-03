@@ -8,7 +8,8 @@
 				<!-- 	<view class='item'><text class='iconfont icon-liulan'></text>{{articleInfo.visit}}</view> -->
 			</view>
 			<view class='conters'>
-				<rich-text :nodes="content" class="conter"></rich-text>
+				<!-- <rich-text :nodes="content" class="conter"></rich-text> -->
+					<jyf-parser :html="content.replace(/<br\/>/ig, '')" ref="article" :tag-style="tagStyle"></jyf-parser>
 			</view>
 			<view class="picTxt acea-row row-between-wrapper" v-if="store_info.id">
 				<view class="pictrue">
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+	import parser from "@/components/jyf-parser/jyf-parser";
 	import {
 		getArticleDetails
 	} from '@/api/api.js';
@@ -44,7 +46,8 @@
 	export default {
 		components: {
 			shareInfo,
-			home
+			home,
+			"jyf-parser": parser,
 		},
 		data() {
 			return {
@@ -52,7 +55,10 @@
 				articleInfo: [],
 				store_info: {},
 				content: '',
-				shareInfoStatus: false
+				shareInfoStatus: false,
+				tagStyle: {
+					img: 'width:100%;'
+				},
 			};
 		},
 		/**
@@ -162,6 +168,9 @@
 		font-size: 32rpx;
 		color: #8A8B8C;
 		line-height: 1.7;
+		/deep/ img{
+			max-width: 100%;
+		}
 	}
 
 	.newsDetail .picTxt {

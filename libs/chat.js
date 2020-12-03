@@ -1,11 +1,17 @@
 import $store from "@/store";
 import {
+	HTTP_REQUEST_URL,
 	VUE_APP_WS_URL
-} from "@/utils/index.js";
+} from "@/config/app.js";
+let wsUrl = `${VUE_APP_WS_URL}&token=${$store.state.app.token}`
 const Socket = function() {
-	// this.ws = new WebSocket(wss(VUE_APP_WS_URL));
 	this.ws = uni.connectSocket({
-		url: VUE_APP_WS_URL,
+		// #ifdef H5
+		url:wss(wsUrl),
+		// #endif
+		// #ifdef MP
+		url:wsUrl,
+		// #endif
 		header: {
 			'content-type': 'application/json'
 		},
@@ -19,12 +25,21 @@ const Socket = function() {
 	this.ws.onMessage(this.onMessage.bind(this))
 	this.ws.onClose(this.onClose.bind(this));
 	// this.ws.close(this.close.bind(this));
-
-
-
-
-
 };
+
+// #ifdef H5
+function wss(wsSocketUrl) {
+	let ishttps = document.location.protocol == 'https:';
+	if (ishttps) {
+		return wsSocketUrl.replace('ws:', 'wss:');
+	} else {
+		return wsSocketUrl.replace('wss:', 'ws:');
+	}
+}
+// #endif
+
+
+
 Socket.prototype = {
 	// close() {
 	//   clearInterval(this.timer);
@@ -56,17 +71,17 @@ Socket.prototype = {
 		} = JSON.parse(res.data);
 		uni.$emit(type, data)
 	},
-	
+
 	onClose: function() {
 		uni.closeSocket();
-	  clearInterval(this.timer);
+		clearInterval(this.timer);
 		uni.$emit("socket_close");
 	},
 	onError: function(e) {
-	  console.log(e);
-	  uni.$emit("socket_error", e);
+		console.log(e);
+		uni.$emit("socket_error", e);
 	},
-	close:function(){
+	close: function() {
 		uni.closeSocket();
 	}
 };

@@ -57,14 +57,7 @@
 					</view>
 				</view>
 				<div class="goodCall" @click="goGoodCall">
-					<!-- #ifdef H5 -->
 					<span class="iconfont icon-kefu"></span><span style="font-size: 28rpx;">联系客服</span>
-					<!-- #endif -->
-					<!-- #ifdef MP -->
-					<button open-type='contact' hover-class='none'>
-						<span class="iconfont icon-kefu"></span><span style="font-size: 28rpx;">联系客服</span>
-					</button>
-					<!-- #endif -->
 				</div>
 			</view>
 			

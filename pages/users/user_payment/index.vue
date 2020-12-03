@@ -19,9 +19,9 @@
 						</view>
 						<view class="pic-number">赠送：{{ item.data.give }} 元</view>
 					</view>
-					<view class="pic-box pic-box-color acea-row row-center-wrapper" :class="activePic == picList.length ? 'pic-box-color-active' : ''"
+					<view class="pic-box pic-box-color acea-row row-center-wrapper" :class="rechar_id == 0 ? 'pic-box-color-active' : ''"
 					 @click="picCharge(picList.length)">
-						<input type="number" placeholder="其他" v-model="money" class="pic-box-money pic-number-pic" :class="activePic == picList.length ? 'pic-box-color-active' : ''" />
+						<input type="number" placeholder="其他" v-model="money" class="pic-box-money pic-number-pic" :class="rechar_id == 0 ? 'pic-box-color-active' : ''" />
 					</view>
 					<view class="tips-box">
 						<view class="tips mt-30">注意事项：</view>
@@ -221,29 +221,32 @@
 						mask:true
 					})
 					// #ifdef MP || APP-PLUS
-					let money = parseFloat(this.money);
-					if (this.rechar_id == 0) {
-						if (Number.isNaN(money)) {
+					// let money = parseFloat(this.money);
+					if (this.rechar_id == 0) {						
+						if (parseFloat(that.money)=== 0) {
 							return that.$util.Tips({
-								title: '充值金额必须为数字'
+								title: '充值金额金额不能为0！'
 							});
 						}
-						if (money <= 0) {
+						if (!that.money) {
 							return that.$util.Tips({
-								title: '充值金额不能为0'
+								title: '请填写充值金额！'
 							});
 						}
-					} else {
-						money = this.numberPic
+						if (!Number(that.money)) {
+							return that.$util.Tips({
+								title: '请填写正确的金额！'
+							});
+						}
 					}
 
 					rechargeWechat({
-						price: money,
+						price: that.rechar_id == 0 ? that.money : that.numberPic,
 						type: 'routine',
 						recharge_id: this.rechar_id
 					}).then(res => {
 						uni.hideLoading();
-						let jsConfig = res.data;
+						let jsConfig = res.data.data;
 						uni.requestPayment({
 							timeStamp: jsConfig.timestamp,
 							nonceStr: jsConfig.nonceStr,
@@ -286,14 +289,17 @@
 					}).then(res => {
 						let data = res.data;
 						if (data.type == "h5") {
-							location.replace(data.data.mweb_url);
+							// location.replace(data.data.mweb_url);
 							return that.$util.Tips({
-								title: '支付成功',
-								icon: 'success'
-							}, {
-								tab: 5,
-								url: '/pages/users/user_money/index'
+								title: '请前往小程序充值！'
 							});
+							// return that.$util.Tips({
+							// 	title: '支付成功',
+							// 	icon: 'success'
+							// }, {
+							// 	tab: 5,
+							// 	url: '/pages/users/user_money/index'
+							// });
 						} else {
 							that.$wechat.pay(data.data)
 								.finally(() => {

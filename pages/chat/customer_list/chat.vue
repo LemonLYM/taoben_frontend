@@ -74,7 +74,7 @@
 							<div class="acea-row row-between">
 								<div class="broadcast_details_pic">
 									￥{{ refundDetail.refundProduct[0].product.cart_info.productAttr.price
-									}}<span class="broadcast_details_pic_num">￥{{ refundDetail.refundProduct[0].product.cart_info.productAttr.cost}}</span>
+									}}<span class="broadcast_details_pic_num">￥{{ refundDetail.refundProduct[0].product.cart_info.productAttr.ot_price}}</span>
 								</div>
 								<div class="broadcast_details_btn" @click="sendRefundOrder">
 									发送客服
@@ -93,12 +93,15 @@
 					<block v-for="(item,index) in history" v-if="userId != 0" :key="index">
 						<!-- 左边 -->
 						<div class="item acea-row row-top" v-if="item.send_type == 0">
-							<div class="pictrue"><img :src="item.user.avatar" /></div>
+							<div class="pictrue">
+								<image :src="item.user.avatar" v-if="item.user.avatar"/>
+								<image src="/static/images/f.png" mode="" v-else></image>
+							</div>
 							<div class="text">
 								<div class="name">{{ item.user.nickname }}</div>
 								<div class="acea-row">
 									<!--退款订单链接-->
-									<navigator v-if="item.msn_type === 6 && item.refundOrder.refund_order_id" :url="'/pages/users/refund/detail?id='+item.refundOrder.refund_order_id" open-type="redirect">
+									<navigator v-if="item.msn_type === 6 && item.refundOrder.refund_order_id" :url="'/pages/admin/orderDetail/index?id='+item.refundOrder.refund_order_id" open-type="redirect">
 										<div class="broadcast-details_num">
 											<span>订单号：{{ item.refundOrder.refund_order_sn }}</span>
 										</div>
@@ -122,7 +125,7 @@
 										</div>
 									</navigator>
 									<!--订单链接-->
-									<navigator v-if="item.msn_type === 5 && item.orderInfo.order_id" :url="'/pages/order_details/index?order_id='+item.orderInfo.order_id" open-type="redirect">
+									<navigator v-if="item.msn_type === 5 && item.orderInfo.order_id" :url="'/pages/admin/orderDetail/index?id='+item.orderInfo.order_id" open-type="redirect">
 										<div class="broadcast-details_num">
 											<span>订单号：{{ item.orderInfo.order_sn }}</span>
 										</div>
@@ -187,7 +190,7 @@
 								<div class="name">{{ item.service.nickname }}</div>
 								<div class="acea-row ">
 									<!--退款订单链接-->
-									<navigator v-if="item.msn_type === 6 && item.refundOrder.refund_order_id" :url="'/pages/users/refund/detail?id='+item.refundOrder.refund_order_id" open-type="redirect">
+									<navigator v-if="item.msn_type === 6 && item.refundOrder.refund_order_id" :url="'/pages/admin/orderDetail/index?id='+item.refundOrder.refund_order_id" open-type="redirect">
 										<div class="broadcast-details_num">
 											<span>订单号：{{ item.refundOrder.refund_order_sn }}</span>
 										</div>
@@ -213,7 +216,7 @@
 
 
 									<!--订单链接-->
-									<navigator v-if="item.msn_type === 5 && item.orderInfo.order_id" :url="'/pages/order_details/index?order_id='+item.orderInfo.order_id" open-type="redirect">
+									<navigator v-if="item.msn_type === 5 && item.orderInfo.order_id" :url="'/pages/admin/orderDetail/index?id='+item.orderInfo.order_id" open-type="redirect">
 										<div class="broadcast-details_num">
 											<span>订单号：{{ item.orderInfo.order_sn }}</span>
 										</div>
@@ -267,14 +270,20 @@
 									</div>
 								</div>
 							</div>
-							<div class="pictrue"><img :src="item.service.avatar" /></div>
+							<div class="pictrue">
+								<image :src="item.service.avatar" v-if="item.service.avatar" />
+								<image src="/static/images/f.png" mode="" v-else></image>
+							</div>
 						</div>
 					</block>
 					<!-- 客户聊天列表 -->
 					<block v-for="(item,j) in history" v-if="userId == 0" :key="j">
 						<!-- 左边 -->
 						<div class="item acea-row row-top" v-if="item.send_type == 1">
-							<div class="pictrue"><img :src="item.service.avatar" /></div>
+							<div class="pictrue">
+								<image :src="item.service.avatar" v-if="item.service.avatar" />
+								<image src="/static/images/f.png" mode="" v-else></image>
+							</div>
 							<div class="text">
 								<div class="name">{{ item.service.nickname }}</div>
 								<div class="acea-row">
@@ -452,7 +461,10 @@
 									</div>
 								</div>
 							</div>
-							<div class="pictrue"><img :src="item.user.avatar" /></div>
+							<div class="pictrue">
+								<image :src="item.user.avatar" v-if="item.user.avatar"/>
+								<image src="/static/images/f.png" mode="" v-else></image>
+							</div>
 						</div>
 					</block>
 				</div>
@@ -670,10 +682,10 @@
 			console.log('onUnload')
 			this.wsEnd();
 		},
-		onHide() {
-			console.log('onHide')
-			this.wsEnd();
-		},
+		// onHide() {
+		// 	console.log('onHide')
+		// 	this.wsEnd();
+		// },
 		onLoad(option) {
 			let self = this
 			this.toUid = option.uid || 0;
@@ -781,7 +793,6 @@
 							}
 						}
 					});
-
 				}
 			})
 			this.wsStart();
@@ -830,7 +841,9 @@
 			uploadImg() {
 				let self = this
 				self.$util.uploadImageOne('upload/image', function(res) {
-					self.sendMsg(res.data.path, 3)
+					if(res.status == 200){
+						self.sendMsg(res.data.path, 3)
+					}
 				});
 			},
 			getOrderInfo() {
@@ -862,7 +875,9 @@
 			imageuploaded(res) {
 				console.log(res)
 				if (res.status !== 200)
-					return this.$dialog.error(res.msg || "上传图片失败");
+				return this.$util.Tips({
+					title: res.msg || "上传图片失败"
+				});
 				this.sendMsg(res.data.url, 3);
 			},
 			// 用户聊天记录
@@ -888,7 +903,9 @@
 						this.loaded = data.length < this.limit;
 					})
 					.catch(err => {
-						this.$dialog.error(err.msg || "加载失败");
+						this.$util.Tips({
+							title: err.msg || "加载失败"
+						});
 					});
 			},
 			// 客服聊天记录
@@ -913,7 +930,9 @@
 						this.loaded = data.length < this.limit;
 					})
 					.catch(err => {
-						this.$dialog.error(err.msg || "加载失败");
+						this.$util.Tips({
+							title: err.msg || "加载失败"
+						});
 					});
 			},
 			focus: function() {
@@ -1246,7 +1265,7 @@
 		margin-top: 10rpx;
 	}
 
-	.broadcast-details .chat .item .pictrue img {
+	.broadcast-details .chat .item .pictrue image {
 		width: 100%;
 		height: 100%;
 		border-radius: 50%;
@@ -1284,6 +1303,10 @@
 		position: relative;
 		max-width: 496rpx;
 		margin-top: 2rpx;
+		word-break: break-all;
+		.em{
+			margin: 0;
+		}
 	}
 
 	.broadcast-details .chat .item .text .spot {

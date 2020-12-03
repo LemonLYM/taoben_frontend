@@ -8,43 +8,101 @@
 				</view>
 				<view class='data' :class='isGoodsReturn ? "on":""'>
 					<view class='state'>
-						<block v-if="orderInfo.status == 0">待发货</block>
+						<block v-if="orderInfo.status == 0 && orderInfo.order_type == 0">待发货</block>
+						<block v-if="orderInfo.status == 0 && orderInfo.order_type == 1">待核销</block>
 						<block v-if="orderInfo.status == 1">待收货</block>
 						<block v-if="orderInfo.status == 2">待评价</block>
 						<block v-if="orderInfo.status == 3">已完成</block>
+						<block v-if="orderInfo.status == -1">已为您退款,感谢您的支持</block>
 					</view>
 					<view>{{orderInfo.pay_time}}</view>
 				</view>
 			</view>
-			<view v-if="isGoodsReturn==false">
-				<view class='nav'>
-					<view class='navCon acea-row row-between-wrapper'>
-						<view>待付款</view>
-						<view :class="orderInfo.status == 0 ? 'on':''">待发货</view>
-						<view :class="orderInfo.status == 1 ? 'on':''">待收货</view>
-						<view :class="orderInfo.status == 2 ? 'on':''">待评价</view>
-						<view :class="orderInfo.status == 3 ? 'on':''">已完成</view>
+			<view>
+				<block v-if="isGoodsReturn==false">
+					<view class='nav'>
+						<view class='navCon acea-row row-between-wrapper'>
+							<view>待付款</view>
+							<view :class="orderInfo.status == 0 ? 'on':''" v-if="orderInfo.order_type == 0">待发货</view>
+							<view :class="orderInfo.status == 0 ? 'on':''" v-if="orderInfo.order_type == 1">待核销</view>
+							<view :class="orderInfo.status == 1 ? 'on':''" v-if="orderInfo.order_type == 0">待收货</view>
+							<view :class="orderInfo.status == 2 ? 'on':''">待评价</view>
+							<view :class="orderInfo.status == 3 ? 'on':''">已完成</view>
+						</view>
+						<view class='progress acea-row row-between-wrapper'>
+							<view class='iconfont icon-yuandianxiao font-color'></view>
+							<view class='line bg-color'></view>
+							<view class='iconfont' :class='(orderInfo.status == 0 ? "icon-webicon318":"icon-yuandianxiao") + " " + (orderInfo.status >= 0 ? "font-color":"")'></view>
+							<view class='line' :class='orderInfo.status > 0 ? "bg-color":""'></view>
+							<view class='iconfont' :class='(orderInfo.status == 1 ? "icon-webicon318":"icon-yuandianxiao") + " " +(orderInfo.status >= 1 ? "font-color":"")'  v-if="orderInfo.order_type == 0"></view>
+							<view class='line' :class='orderInfo.status > 1 ? "bg-color":""'  v-if="orderInfo.order_type == 0"></view>
+							<view class='iconfont' :class='(orderInfo.status == 2 ? "icon-webicon318":"icon-yuandianxiao") + " " + (orderInfo.status >= 2 ? "font-color":"")'></view>
+							<view class='line' :class='orderInfo.status > 2 ? "bg-color":""'></view>
+							<view class='iconfont' :class='(orderInfo.status == 3 ? "icon-webicon318":"icon-yuandianxiao") + " " + (orderInfo.status >= 3 ? "font-color":"")'></view>
+						</view>
 					</view>
-					<view class='progress acea-row row-between-wrapper'>
-						<view class='iconfont icon-yuandianxiao font-color'></view>
-						<view class='line bg-color'></view>
-						<view class='iconfont' :class='(orderInfo.status == 0 ? "icon-webicon318":"icon-yuandianxiao") + " " + (orderInfo.status >= 0 ? "font-color":"")'></view>
-						<view class='line' :class='orderInfo.status > 0 ? "bg-color":""'></view>
-						<view class='iconfont' :class='(orderInfo.status == 1 ? "icon-webicon318":"icon-yuandianxiao") + " " +(orderInfo.status >= 1 ? "font-color":"")'></view>
-						<view class='line' :class='orderInfo.status > 1 ? "bg-color":""'></view>
-						<view class='iconfont' :class='(orderInfo.status == 2 ? "icon-webicon318":"icon-yuandianxiao") + " " + (orderInfo.status >= 2 ? "font-color":"")'></view>
-						<view class='line' :class='orderInfo.status > 2 ? "bg-color":""'></view>
-						<view class='iconfont' :class='(orderInfo.status == 3 ? "icon-webicon318":"icon-yuandianxiao") + " " + (orderInfo.status >= 3 ? "font-color":"")'></view>
+					<view class='line'>
+						<image src='/static/images/line.jpg'></image>
 					</view>
-				</view>
-				<view class='address'>
+				</block>
+				<!-- 配送地址 -->
+				<view class='address' v-if="orderInfo.order_type == 0">
 					<view class='name'>{{orderInfo.real_name}}<text class='phone'>{{orderInfo.user_phone}}</text></view>
 					<view>{{orderInfo.user_address}}</view>
 				</view>
-				<view class='line'>
-					<image src='/static/images/line.jpg'></image>
+				<!-- 核销订单 -->
+				<view class="writeOff" v-if="orderInfo.order_type == 1 && isGoodsReturn==false && orderInfo.take">
+					<view class="title">核销信息</view>
+					<view class="grayBg">
+						<!-- <view class="written" v-if="orderInfo.status == 2">
+							<image src="/static/images/written.png"></image>
+						</view> -->
+						<view class="pictrue">
+							<image :src="codeUrl"></image>
+						</view>
+					</view>
+					<view class="gear">
+						<image src="/static/images/writeOff.jpg"></image>
+					</view>
+					<view class="num">{{orderInfo.verify_code}}</view>
+					<view class="rules">
+						<view class="item">
+							<view class="rulesTitle acea-row row-middle">
+								<text class="iconfont icon-shijian"></text>核销时间
+							</view>
+							<view v-if="orderInfo.take" class="info">
+								<text v-if="orderInfo.take.mer_take_day !== undefind && orderInfo.take.mer_take_day.length == 7">每日：</text>
+								<block v-else>
+									<text v-for="item in orderInfo.take.mer_take_day">{{'周'+ toChinese(item)}},</text>
+								</block>
+								<text class="time">{{orderInfo.take.mer_take_time[0]}}-{{orderInfo.take.mer_take_time[1]}}</text>
+							</view>
+						</view>
+						<view class="item">
+							<view class="rulesTitle acea-row row-middle">
+								<text class="iconfont icon-shuoming1"></text>使用说明
+							</view>
+							<view class="info">可将二维码出示给店员扫描或提供数字核销码</view>
+						</view>
+					</view>
 				</view>
-				<view class="merchant" v-if="orderInfo.merchant">
+				<!-- 地图 -->
+				<view class="map acea-row row-between-wrapper"  v-if="orderInfo.order_type == 1">
+					<view>自提地址信息</view>
+					<view class="place cart-color acea-row row-center-wrapper" @tap="showMaoLocation">
+						<text class="iconfont icon-weizhi"></text>查看位置
+					</view>
+				</view>
+				<view class='address' v-if="orderInfo.order_type == 1" style="margin-top: 0;">
+					<view class='name'>
+						{{orderInfo.take.mer_take_name}}
+						<text class='phone' @click="makePhone">{{orderInfo.take.mer_take_phone}}</text>
+						<text class="iconfont icon-tonghua font-color" @click="makePhone"></text>
+					</view>
+					<view>{{orderInfo.take.mer_take_address}}</view>
+				</view>
+				
+				<view class="merchant" v-if="orderInfo.merchant" @click="goStore(orderInfo.mer_id)">
 					{{orderInfo.merchant.mer_name}}
 					<text class="iconfont icon-xiangyou"></text>
 				</view>
@@ -52,26 +110,19 @@
 					<orderGoods :evaluate='orderInfo.status' :orderId="order_id" :cartInfo="cartInfo" :jump="true"></orderGoods>
 				</block>
 				<div class="goodCall" @click="goGoodCall">
-					<!-- #ifdef H5 -->
 					<span class="iconfont icon-kefu"></span><span style="font-size: 28rpx;">联系客服</span>
-					<!-- #endif -->
-					<!-- #ifdef MP -->
-					<button open-type='contact' hover-class='none'>
-						<span class="iconfont icon-kefu"></span><span style="font-size: 28rpx;">联系客服</span>
-					</button>
-					<!-- #endif -->
 				</div>
 				<!-- 送货 -->
 				<view class="wrapper" v-if="orderInfo.delivery_type == 2">
 					<view class='item acea-row row-between'>
-						<view>配送方式：：</view>
+						<view>配送方式：</view>
 						<view class='conter'>送货</view>
 					</view>
-					<view class='item acea-row row-between' v-if="orderInfo.pay_postage > 0">
+					<view class='item acea-row row-between'>
 						<view>配送员：</view>
 						<view class='conter'>{{orderInfo.delivery_name}}</view>
 					</view>
-					<view class='item acea-row row-between' v-if="orderInfo.pay_postage > 0">
+					<view class='item acea-row row-between'>
 						<view>联系电话：</view>
 						<view class='conter'>{{orderInfo.delivery_id}}</view>
 					</view>
@@ -146,8 +197,8 @@
 					<view class='bnt bg-color' @click="goOrderConfirm">再次购买</view>
 				</block>
 				<block v-if="orderInfo.status == 3">
+					<view class='bnt cancel' @click="delOrder">删除订单</view>
 					<view class="bnt cancel" @click="allRefund" v-if="refundNum.length != cartInfo.length">批量退款</view>
-					<navigator v-if="orderInfo.delivery_type == 1" class='bnt cancel' hover-class='none' :url="'/pages/users/goods_logistics/index?orderId='+ orderInfo.order_id">查看物流</navigator>
 					<view class='bnt bg-color' @click="goOrderConfirm">再次购买</view>
 				</block>
 			</view>
@@ -540,7 +591,8 @@
 		orderAgain,
 		orderTake,
 		orderDel,
-		orderCancel
+		orderCancel,
+		verifyCode
 	} from '@/api/order.js';
 	import {
 		openOrderRefundSubscribe
@@ -575,7 +627,8 @@
 				cartInfo: [], //购物车产品
 				orderInfo: {
 					system_store: {},
-					_status: {}
+					_status: {},
+					take: {}
 				}, //订单详情
 				system_store: {},
 				isGoodsReturn: false, //是否为退款订单
@@ -603,7 +656,8 @@
 				isAuto: false, //没有授权的不会自动授权
 				isShowAuth: false, //是否隐藏授权
 				refundNum: [], //退款个数临时数据
-				imgUrl:HTTP_REQUEST_URL
+				imgUrl:HTTP_REQUEST_URL,
+				codeUrl:''
 			};
 		},
 		computed: mapGetters(['isLogin', 'uid']),
@@ -642,6 +696,32 @@
 			// #endif
 		},
 		methods: {
+			// 数字转汉字
+			toChinese(num){
+			
+					let changeNum = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+					let unit = ["", "十", "百", "千", "万"];
+					num = parseInt(num);
+					let getWan = (temp) => {
+					　　let strArr = temp.toString().split("").reverse();
+					　　let newNum = "";
+					　　for (var i = 0; i < strArr.length; i++) {
+						　　newNum = (i == 0 && strArr[i] == 0 ? "" : (i > 0 && strArr[i] == 0 && strArr[i - 1] == 0 ? "" : changeNum[strArr[i]] + (strArr[i] == 0 ? unit[0] : unit[i]))) + newNum;
+					　　}
+					 　 return newNum;
+				 }
+				 let overWan = Math.floor(num / 10000);
+				 let noWan = num % 10000;
+				 if (noWan.toString().length < 4) {　　　　　　noWan = "0" + noWan;　　　 }
+				 return overWan ? getWan(overWan) + "万" + getWan(noWan) : getWan(num);
+	
+			},
+			// 返回店铺首页
+			goStore(mer_id){
+				uni.navigateTo({
+					url: '/pages/store/home/index?id=' + mer_id
+				})
+			},
 			// 批量退款
 			allRefund() {
 				// #ifdef MP
@@ -649,7 +729,7 @@
 					uni.hideLoading();
 					if (this.orderInfo.status == 0) {
 						uni.navigateTo({
-							url: '/pages/users/refund/index?order_id=' + this.order_id + '&refund_type=1&type=1'
+							url: '/pages/users/refund/index?order_id=' + this.order_id + '&refund_type=1&type=2'
 						})
 					} else {
 						uni.navigateTo({
@@ -663,7 +743,7 @@
 				// #ifdef H5
 				if (this.orderInfo.status == 0) {
 					uni.navigateTo({
-						url: '/pages/users/refund/index?order_id=' + this.order_id + '&refund_type=1&type=1'
+						url: '/pages/users/refund/index?order_id=' + this.order_id + '&refund_type=1&type=2'
 					})
 				} else {
 					uni.navigateTo({
@@ -710,7 +790,7 @@
 			 */
 			makePhone: function() {
 				uni.makePhoneCall({
-					phoneNumber: this.system_store.phone
+					phoneNumber: this.orderInfo.take.mer_take_phone
 				})
 			},
 			/**
@@ -718,15 +798,15 @@
 			 * 
 			 */
 			showMaoLocation: function() {
-				if (!this.system_store.latitude || !this.system_store.longitude) return this.$util.Tips({
+				if (!this.orderInfo.take.mer_take_location[0] || !this.orderInfo.take.mer_take_location[1]) return this.$util.Tips({
 					title: '缺少经纬度信息无法查看地图！'
 				});
 				uni.openLocation({
-					latitude: parseFloat(this.system_store.latitude),
-					longitude: parseFloat(this.system_store.longitude),
+					latitude: parseFloat(this.orderInfo.take.mer_take_location[0]),
+					longitude: parseFloat(this.orderInfo.take.mer_take_location[1]),
 					scale: 8,
-					name: this.system_store.name,
-					address: this.system_store.address + this.system_store.detailed_address,
+					// name: this.system_store.name,
+					// address: this.system_store.address + this.system_store.detailed_address,
 					success: function() {
 
 					},
@@ -784,6 +864,11 @@
 					that.payMode[1].number = res.data.now_money;
 				})
 			},
+			getOrderCode(){
+				verifyCode(this.order_id).then(res=>{
+					this.codeUrl = res.data.qrcode
+				})
+			},
 			/**
 			 * 获取订单详细信息
 			 * 
@@ -797,6 +882,7 @@
 					// let _type = res.data._status._type;
 					uni.hideLoading();
 					that.$set(that, 'orderInfo', res.data);
+					that.orderInfo.take = res.data.take ? res.data.take: {}
 					that.$set(that, 'cartInfo', res.data.orderProduct);
 					if (this.orderInfo.status == '-1') {
 						this.isGoodsReturn = true;
@@ -806,6 +892,13 @@
 							this.refundNum.push(el)
 						}
 					})
+					
+					if(res.data.order_type == 1){
+						// verifyCode
+						this.getOrderCode()
+					}
+					
+					
 					// that.getOrderStatus();
 				}).catch(err => {
 					uni.hideLoading();
@@ -821,8 +914,12 @@
 			// #ifndef H5
 			copy: function() {
 				let that = this;
+				console.log(that.orderInfo.order_sn)
 				uni.setClipboardData({
-					data: this.orderInfo.order_id
+					data: that.orderInfo.order_sn,
+					success: function(res){
+					}
+					
 				});
 			},
 			// #endif

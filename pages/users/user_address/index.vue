@@ -320,7 +320,6 @@
 			getAddress() {
 				let that = this;
 				that.$wechat.openAddress().then(userInfo => {
-					open();
 					editAddress({
 							id: this.address_id,
 							real_name: userInfo.userName,
@@ -356,14 +355,12 @@
 									// history.back();
 								}
 							}, 1000);
-							close();
 							that.$util.Tips({
 								title: "添加成功",
 								icon: 'success'
 							});
 						})
 						.catch(err => {
-							close();
 							return that.$util.Tips({
 								title: err || "添加失败"
 							});
@@ -395,7 +392,7 @@
 					title: '请填写详细地址'
 				});
 				value.address_id = that.address_id;
-				
+
 				let regionArray = that.region;
 				// value.address = {
 				// 	province: regionArray[0],
@@ -425,7 +422,6 @@
 							icon: 'success'
 						});
 					setTimeout(function() {
-						debugger
 						if (that.cartId) {
 							let cartId = that.cartId;
 							let pinkId = that.pinkId;
@@ -433,8 +429,10 @@
 							that.cartId = '';
 							that.pinkId = '';
 							that.couponId = '';
+							uni.$emit('updataAddress')
 							uni.navigateTo({
-								url: '/pages/users/order_confirm/index?cartId=' + cartId + '&addressId=' + (that.id ? that.id : res.data.address_id) + '&pinkId=' + pinkId + '&couponId=' + couponId
+								url: '/pages/users/order_confirm/index?cartId=' + cartId + '&addressId=' + (that.id ? that.id : res.data
+									.address_id) + '&pinkId=' + pinkId + '&couponId=' + couponId
 							});
 						} else {
 							// #ifdef H5

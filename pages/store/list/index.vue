@@ -50,10 +50,9 @@
 							<view class='name line1'>{{item.store_name}}</view>
 							<view class='money font-color' :class='is_switch==true?"":"on"'>
 								￥<text class='num'>{{item.price}}</text>
-								<view class="ticket" v-if="is_switch">领券</view>
-								<view class="ticket-big" v-else>领券满100减10</view>
+								<view class="ticket" v-if="item.issetCoupon">领券</view>
 							</view>
-							<view class="score">{{item.rate}}评分 {{item.reply_count}}+条评论</view>
+							<view class="score">{{item.rate}}评分 {{item.reply_count}}条评论</view>
 							<view class="company" v-if="item.merchant" @click.stop="goShop(item)">
 								{{item.merchant.mer_name}}
 								<view class="flex">
@@ -239,8 +238,7 @@
 			bindRight(){
 				this.price = 0;
 				this.firstKey = 4
-				this.getBrandlist()
-				
+				this.getBrandlist()				
 			},
 			// 品牌列表
 			getBrandlist(){
@@ -257,8 +255,8 @@
 					})
 					if(this.where.brand_id.length>0){
 						this.where.brand_id.forEach((ids,index)=>{
-							temp.forEach(el=>{
-								if(ids == el.brand_id){
+							temp.forEach((el,index)=>{
+								if(el && ids == el.brand_id){
 									el.check = true
 								}
 							})
@@ -641,7 +639,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 163rpx;
+		width: auto;
+		padding: 0 10rpx;;
 		height: 28rpx;
 		margin-left: 10rpx;
 		background-image: url(~static/images/yh.png);

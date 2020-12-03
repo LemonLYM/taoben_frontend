@@ -22,8 +22,8 @@
 				</view>
 			</view>
 			<view class="form-item item-txt">
-				<text class="label">退款金额</text>
-				<input style="text-align: right;" type="text" placeholder="请输入金额" v-model="refund_price">
+				<text class="label">{{ status == 0 ? '退款金(含运费)' : '退款金(不含运费)' }}</text>
+				<input style="text-align: right; color: #E93323;" type="text" placeholder="请输入金额" v-model="rerundPrice">
 			</view>
 			<view class="form-item item-txt">
 				<text class="label">退款原因</text>
@@ -92,10 +92,14 @@
 				productData:[],
 				con:'',
 				refund_price:'',
+				postage_price: '',
+				maxRefundPrice: '',
+				rerundPrice: '',
 				// 单价
 				unitPrice:0,
 				msg:'',
-				refund_order_id:''//退款id
+				refund_order_id:'',//退款id
+				status: '',
 			}
 		},
 		onLoad(optios) {
@@ -106,6 +110,16 @@
 			Promise.all([this.refundProduct(),this.refundMessage()])
 		},
 		methods:{
+			// 限制退款金额
+			limitAamount(){
+				if(parseFloat(this.rerundPrice) > parseFloat(this.maxRefundPrice)){
+					uni.showToast({
+						title:'退款金额不能大于支付金额',
+						icon:'none'
+					})
+					this.validate = false;
+				} 				
+			},
 			// 退款理由
 			refundMessage(){
 				refundMessage().then(res=>{
@@ -117,12 +131,16 @@
 				refundProduct(this.order_id,{ids:this.ids}).then(({data})=>{
 					this.productData = data
 					this.refund_price = data.total_refund_price
+					this.postage_price = data.postage_price
+					this.maxRefundPrice = data.postage_price + Number(data.total_refund_price)
+					this.rerundPrice = this.maxRefundPrice.toFixed(2);
+					this.status = data.status;
 					if(this.type == 1){
 						this.unitPrice = this.$util.$h.Div(data.total_refund_price,data.product[0].refund_num)
 						for (let i=1;i<=data.product[0].refund_num;i++){
 							this.numArray.unshift(i)
 						}
-						this.refund_price = this.unitPrice*this.numArray[0]
+						this.refund_price = this.$util.$h.Mul(this.unitPrice, this.numArray[0])
 					}
 				})
 			},
@@ -132,7 +150,9 @@
 			},
 			bindNumChange(e){
 				this.numIndex = e.target.value
-				this.refund_price = this.unitPrice*this.numArray[e.target.value]
+				this.refund_price = this.$util.$h.Mul(this.unitPrice, this.numArray[e.target.value])
+				this.maxRefundPrice = this.refund_price + this.postage_price;
+				this.rerundPrice = this.maxRefundPrice.toFixed(2);	
 			},
 			// 删除图片
 			deleteImg(index){
@@ -165,7 +185,7 @@
 						ids:this.ids,
 						refund_message:this.qsArray[this.qsIndex],
 						mark:this.con,
-						refund_price:this.refund_price,
+						refund_price:this.rerundPrice,
 						// pics:this.uploadImg
 					})
 					this.msg = data.message

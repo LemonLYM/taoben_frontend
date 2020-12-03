@@ -85,14 +85,14 @@
 			this.status = false;
 			this.page = 1;
 			this.articleList = [];
-			
+
 		},
-		  /**
-		   * 页面上拉触底事件的处理函数
-		   */
-		  onReachBottom: function () {
-		    this.getCidArticle();
-		  },
+		/**
+		 * 页面上拉触底事件的处理函数
+		 */
+		onReachBottom: function() {
+			this.getCidArticle();
+		},
 		methods: {
 			getArticleHot: function() {
 				let that = this;
@@ -136,7 +136,7 @@
 			},
 			tabSelect(active) {
 				this.active = active;
-				this.scrollLeft = (active - 1) * 50;
+				// this.scrollLeft = (active - 1) * 50;
 				if (this.active == 0) this.getArticleHot();
 				else {
 					this.$set(this, 'articleList', []);
@@ -172,6 +172,7 @@
 		height: 335rpx;
 		border-radius: 6rpx;
 	}
+
 	// #ifdef MP-WEIXIN
 	.newsList .swiper .wx-swiper-dot {
 		width: 12rpx !important;
@@ -180,7 +181,7 @@
 		transform: rotate(-45deg);
 		transform-origin: 0 100%;
 	}
-	
+
 	.newsList .swiper .wx-swiper-dot~.wx-swiper-dot {
 		margin-left: 5rpx;
 	}
@@ -188,23 +189,25 @@
 	.newsList .swiper .wx-swiper-dots.wx-swiper-dots-horizontal {
 		margin-bottom: -15rpx;
 	}
+
 	// #endif
 	// #ifdef APP-PLUS || H5
 	.newsList .swiper .uni-swiper-dot {
-			width: 12rpx !important;
-			height: 12rpx !important;
-			border-radius: 0;
-			transform: rotate(-45deg);
-			transform-origin: 0 100%;
+		width: 12rpx !important;
+		height: 12rpx !important;
+		border-radius: 0;
+		transform: rotate(-45deg);
+		transform-origin: 0 100%;
 	}
-	
+
 	.newsList .swiper .uni-swiper-dot~.uni-swiper-dot {
 		margin-left: 5rpx;
 	}
-	
+
 	.newsList .swiper .uni-swiper-dots.uni-swiper-dots-horizontal {
 		margin-bottom: -15rpx;
 	}
+
 	// #endif
 	.newsList .nav {
 		padding: 0 30rpx;
@@ -218,14 +221,22 @@
 		display: inline-block;
 		font-size: 32rpx;
 		color: #999;
+		max-width: 80px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		position: relative;
+		padding-bottom: 20rpx;
 	}
 
 	.newsList .nav .item.on {
 		color: #282828;
+	
 	}
 
 	.newsList .nav .item~.item {
 		margin-left: 46rpx;
+
 	}
 
 	.newsList .nav .item .line {
@@ -233,6 +244,10 @@
 		height: 4rpx;
 		border-radius: 2rpx;
 		margin: 10rpx auto 0 auto;
+		position: absolute;
+		bottom: 5rpx;
+		left: 50%;
+		margin-left: -12rpx;
 	}
 
 	.newsList .list .item {

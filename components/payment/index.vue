@@ -19,7 +19,7 @@
 				<view class="iconfont icon-xiangyou"></view>
 			</view>
 		</view>
-		<view class="mask" @click='close' v-if="pay_close"></view>
+		<view class="mask" ref="close" @click='close' v-if="pay_close"></view>
 	</view>
 </template>
 
@@ -62,7 +62,6 @@
 			goPay: function(number, paytype) {
 				let that = this;
 				let type = ''
-
 				if (paytype == 'wechat') {
 					// #ifdef H5
 					type = this.$wechat.isWeixin() ? 'weixin' : 'h5';
@@ -86,131 +85,147 @@
 				orderPay(that.order_id, {
 					type: type,
 				}).then(res => {
-					debugger
-					if (res.message == 'success') {
-
-						switch (type) {
-							case 'wechat':
-							case 'routine':
-							case 'weixin':
-								if (res.data.result === undefined) return that.$util.Tips({
-									title: '缺少支付参数'
-								});
-								// #ifdef MP || APP-PLUS
-								let jsConfig = res.data.result.config;
-								uni.requestPayment({
-									timeStamp: jsConfig.timestamp,
-									nonceStr: jsConfig.nonceStr,
-									package: jsConfig.package,
-									signType: jsConfig.signType,
-									paySign: jsConfig.paySign,
-									success: function(res) {
-										uni.hideLoading();
-										return that.$util.Tips({
-											title: res.msg,
-											icon: 'success'
-										}, () => {
-											that.$emit('onChangeFun', {
-												action: 'pay_complete'
-											});
-										});
-									},
-									fail: function(e) {
-										uni.hideLoading();
-										return that.$util.Tips({
-											title: '取消支付'
-										}, () => {
-											that.$emit('onChangeFun', {
-												action: 'pay_fail'
-											});
-										});
-									},
-									complete: function(e) {
-										uni.hideLoading();
-										if (e.errMsg == 'requestPayment:cancel') return that.$util.Tips({
-											title: '取消支付'
-										}, () => {
-											that.$emit('onChangeFun', {
-												action: 'pay_fail'
-											});
-										});
-									},
-								});
-								// #endif
-								// #ifdef H5
-								let data = res.data;
-								if (data.status == "WECHAT_H5_PAY") {
-									uni.hideLoading();
-									location.replace(data.result.jsConfig.mweb_url);
-									return that.$util.Tips({
-										title: "支付成功",
-										icon: 'success'
-									}, () => {
-										that.$emit('onChangeFun', {
-											action: 'pay_complete'
-										});
-									});
-								} else {
-									that.$wechat.pay(data.result.jsConfig)
-										.finally(() => {
-											return that.$util.Tips({
-												title: "支付成功",
-												icon: 'success'
-											}, () => {
-												that.$emit('onChangeFun', {
-													action: 'pay_complete'
-												});
-											});
-										})
-										.catch(function() {
-											return that.$util.Tips({
-												title: '支付失败'
-											});
-										});
-								}
-								// #endif
-								break;
-							case 'balance':
-								uni.hideLoading();
+					let status = res.data.status,
+						orderId = res.data.result.order_id,
+						jsConfig = res.data.result.config,
+						goPages = '/pages/users/order_list/index';
+					switch (status) {			
+						case 'ORDER_EXIST':
+						case 'EXTEND_ORDER':
+						case 'PAY_ERROR':
+						case 'error':
+							uni.hideLoading();
+							this.$emit('onChangeFun', {
+								action: 'payClose'
+							});
+							return that.$util.Tips({
+								title: res.message
+							});							
+							break;
+						case 'success':
+							uni.hideLoading();
+							this.$emit('onChangeFun', {
+								action: 'payClose'
+							});
+							if (that.BargainId || that.combinationId || that.pinkId || that.seckillId)					
 								return that.$util.Tips({
 									title: res.message,
 									icon: 'success'
-								}, () => {
-									that.$emit('onChangeFun', {
-										action: 'pay_complete'
-									});
+								}, {
+									tab: 5,
+									url: goPages + '?status=1'
+								});								
+							return that.$util.Tips({
+								title: res.message,
+								icon: 'success'
+							}, {
+								tab: 5,
+								url: goPages + '?status=1'
+							});
+							break;
+						// #ifndef MP
+						case "wechat":
+						case "weixin":
+							jsConfig.timeStamp = jsConfig.timestamp;
+							that.$wechat.pay(jsConfig).then(res => {	
+								console.log('测试支付数据无效的success：'+res.data)
+								this.$emit('onChangeFun', {
+									action: 'payClose'
 								});
-								break;
-							case 'offline':
-								uni.hideLoading();
 								return that.$util.Tips({
-									title: res.msg,
+									title: res.message,
 									icon: 'success'
-								}, () => {
-									that.$emit('onChangeFun', {
-										action: 'pay_complete'
-									});
+								}, {	
+									tab: 5,
+									url: goPages + 'status=1'
 								});
-								break;
-						}
-					} else {
-						uni.hideLoading();
-						uni.showToast({
-							title: res.message,
-							icon: 'none'
-						})
-						that.$emit('onChangeFun', {
-							action: 'pay_fail'
-						});
+							}).catch(res => {
+								console.log('测试支付数据无效的catch：'+res.data)
+								if (res.errMsg == 'chooseWXPay:cancel') return that.$util.Tips({
+									title: '取消支付'
+								}, {	
+									tab: 5,
+									url: goPages + '?status=0'
+								});
+							})
+							break;
+						// #endif
+						// #ifdef MP
+						case "routine":
+							jsConfig.timeStamp = jsConfig.timestamp;
+							that.toPay = true;
+							uni.requestPayment({
+								...jsConfig,
+								success: function(res) {
+									uni.hideLoading();
+									this.$emit('onChangeFun', {
+										action: 'payClose'
+									});
+									if (that.BargainId || that.combinationId || that.pinkId || that.seckillId)
+										return that.$util.Tips({
+											title: '支付成功',
+											icon: 'success'
+										}, {	
+											tab: 5,
+											url: goPages + '?status=1'
+										});
+									
+									return that.$util.Tips({
+										title: '支付成功',
+										icon: 'success'
+									}, {		
+										tab: 5,
+										url: goPages + '?status=1'
+									});
+								},
+								fail: function(e) {
+									uni.hideLoading();
+									this.$emit('onChangeFun', {
+										action: 'payClose'
+									});
+									return that.$util.Tips({
+										title: '取消支付'
+									});
+								},
+								complete: function(e) {
+									uni.hideLoading();									
+									//关闭当前页面跳转至订单状态
+									if (res.errMsg == 'requestPayment:cancel') return that.$util.Tips({
+										title: '取消支付'
+									});
+									this.$emit('onChangeFun', {
+										action: 'payClose'
+									});
+								},
+							})
+							break;
+						// #endif
+						case "balance":
+							uni.hideLoading();
+							this.$emit('onChangeFun', {
+								action: 'payClose'
+							});
+							//余额不足
+							return that.$util.Tips({
+								title: res.message
+							});
+							break;
+						// #ifdef H5
+						case 'h5':
+							let host = window.location.protocol+"//"+window.location.host;
+							let url = `${host}/pages/order_pay_status/index?order_id=${orderId}`
+							let eUrl = encodeURIComponent(url)
+							let locations = `${jsConfig.mweb_url}&redirect_url=${eUrl}` 
+							setTimeout(() => {
+								location.href = locations;
+							}, 100);
+							break;
+						// #endif		
 					}
 				}).catch(err => {
 					uni.hideLoading();
 					return that.$util.Tips({
 						title: err
-					}, () => {
-						that.$emit('onChangeFun', {
-							action: 'pay_fail'
-						});
 					});
 				})
 			}

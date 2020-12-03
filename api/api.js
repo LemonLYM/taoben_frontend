@@ -52,15 +52,15 @@ export function getCoupons(data){
  * @param object data
 */
 export function getShopCoupons(id){
-  return request.get('coupon/store/'+id)
+  return request.get('coupon/store/'+id, {}, { noAuth : true})
 }
 
 /**
  * 我的优惠券
  * @param int types 0全部  1未使用 2已使用
 */
-export function getUserCoupons(){
-  return request.get('coupon/list')
+export function getUserCoupons(data){
+  return request.get('coupon/list',data)
 }
 
 /**

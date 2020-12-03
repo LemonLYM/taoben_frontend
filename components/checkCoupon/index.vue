@@ -198,8 +198,12 @@
 				if (parseFloat(tempAllCouponNum) >= parseFloat(this.couponData.order.total_price)) {
 					this.allCouponNum = this.couponData.order.total_price
 				} else {
-					if(this.allNum == 0){
-						this.allCouponNum = this.couponData.order.total_price
+					if(this.allNum !== 0 ){
+						if(sotreTotal || goodsTotal){
+							this.allCouponNum = tempAllCouponNum
+						}else{
+							this.allCouponNum = this.couponData.order.total_price							
+						}						
 					}else{
 						this.allCouponNum = tempAllCouponNum
 					}
@@ -209,7 +213,6 @@
 			confirm() {
 				// 商品类
 				this.couponData.order = this.goodsOrder
-
 				// 店铺类
 				// 支付价格
 				let tempTotal = 0
@@ -222,22 +225,15 @@
 						this.couponData.order.pay_price = this.$util.$h.Add(this.couponData.order.total_price, this.couponData.order.postage_price)
 					}else{
 						this.couponData.order.pay_price = this.couponData.order.postage_price
-					}
-					
+					}					
 				}
 				// 列表的优惠总金额
 				this.couponData.order.coupon_price = this.allCouponNum
-
 				this.couponData.order.use_store_coupon = this.use_store_coupon
 				this.couponData.coupon = this.couponArr
-
-
 				this.active[this.coupon.mer_id].product = this.goodsOrder.use_coupon_product
 				this.subCoupon[this.coupon.mer_id] = this.active[this.coupon.mer_id]
-				
-				
-
-				this.$emit('ChangCoupons');
+				this.$emit('ChangCoupons',this.couponData);
 			}
 		}
 	}

@@ -13,6 +13,10 @@
 				</view>
 			</view>
 			<view class='nav acea-row row-around'>
+				<view class='item' :class='orderStatus==-1 ? "on": ""' @click="statusClick(-1)">
+					<view>全部</view>
+					<view class='num'>{{orderData.all || 0}}</view>
+				</view>
 				<view class='item' :class='orderStatus==0 ? "on": ""' @click="statusClick(0)">
 					<view>待付款</view>
 					<view class='num'>{{orderData.noPay || 0}}</view>
@@ -29,10 +33,6 @@
 					<view>待评价</view>
 					<view class='num'>{{orderData.noComment || 0}}</view>
 				</view>
-				<view class='item' :class='orderStatus==4 ? "on": ""' @click="statusClick(4)">
-					<view>已完成</view>
-					<view class='num'>{{orderData.done || 0}}</view>
-				</view>
 			</view>
 			<view class='list'>
 				<!-- 代付款 -->
@@ -48,7 +48,7 @@
 							<view class='item-info acea-row row-between row-top' v-for="(order,j) in item.orderList" :key="order.order_id+j">
 								<block v-for="(goods,g) in order.orderProduct">
 									<view class='pictrue'>
-										<image :src='goods.cart_info.product.image'></image>
+										<image :src='goods.cart_info.productAttr.image || goods.cart_info.product.image'></image>
 									</view>
 									<view class='text acea-row row-between'>
 										<view class='name line2'>{{goods.cart_info.product.store_name}}</view>
@@ -83,20 +83,24 @@
 								<view v-if="item.status == 1" class='font-color'>待收货</view>
 								<view v-if="item.status == 2" class='font-color'>待评价</view>
 								<view v-if="item.status == 3" class='font-color'>已完成</view>
+								<view v-if="item.status == -1" class='font-color'>已退款</view>
 							</view>
 							<view class='item-info acea-row row-between row-top' v-for="(goods,index) in item.orderProduct" :key="index">
 								<view class='pictrue'>
-									<image :src='goods.cart_info.product.image'></image>
+									<image :src='goods.cart_info.productAttr.image || goods.cart_info.product.image'></image>
 								</view>
 								<view class='text acea-row row-between'>
-									<view class='name line2'>{{goods.cart_info.product.store_name}}</view>
+									<view class='name '>
+										<view class="line2">{{goods.cart_info.product.store_name}}</view>
+										<view style="margin-top: 10rpx; color: red;">{{goods.is_refund==1?'退款中':goods.is_refund==2?'部分退款':goods.is_refund==3?'全部退款':''}}</view>
+									</view>
 									<view class='money'>
 										<view>￥{{goods.cart_info.productAttr.price}}</view>
 										<view>x{{goods.product_num}}</view>
 									</view>
 								</view>
 							</view>
-							<view class='totalPrice'>共{{item.orderProduct.length || 0}}件商品，总金额
+							<view class='totalPrice'>共{{item.orderNum || 0}}件商品，总金额
 								<text class='money font-color'>￥{{item.pay_price}}</text>
 							</view>
 						</view>
@@ -111,10 +115,11 @@
 							</block>
 							<block v-if="item.status == 2">
 								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>再次购买</view>
-								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>去评价</view>
+								<view class='bnt bg-color' @click='goOrderDetails_Evaluation(item.order_id)'>去评价</view>
 							</block>
 							<block v-if="item.status == 3">
-								<view class='bnt bg-color'>再次购买</view>
+								<!-- <view class="bnt cancelBnt"  @click="delOrder(item.order_id,index)">删除记录</view> -->
+								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>再次购买</view>
 							</block>
 
 							<!-- <view class='bnt cancelBnt' v-if="item._status._type==0 || item._status._type == 9" @click='cancelOrder(index,item.order_id)'>取消订单</view>
@@ -132,7 +137,7 @@
 					</view>
 				</block>
 			</view>
-			<view class='loadingicon acea-row row-center-wrapper' v-if="orderList.length>0">
+			<view class='loadingicon acea-row row-center-wrapper' v-if="orderList.length>5">
 				<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
 			</view>
 			<view v-if="orderList.length == 0">
@@ -327,6 +332,7 @@
 			goPay: function(pay_price, order_id) {
 				console.log(order_id)
 				this.$set(this, 'pay_close', true);
+				this.order_id = order_id;
 				this.pay_order_id = order_id.toString()
 				// this.$set(this, 'pay_order_id', );
 				this.$set(this, 'totalPrice', pay_price);
@@ -351,6 +357,7 @@
 			pay_fail: function() {
 				this.pay_close = false;
 				this.pay_order_id = '';
+				
 			},
 			/**
 			 * 去订单详情
@@ -378,6 +385,37 @@
 				}).catch(() => {
 					uni.hideLoading();
 				})
+				// #endif  
+				// #ifndef MP
+				if (self.orderStatus == 0) {
+					uni.navigateTo({
+						url: '/pages/order_details/stay?order_id=' + order_id
+					})
+				} else {
+					uni.navigateTo({
+						url: '/pages/order_details/index?order_id=' + order_id
+					})
+				}
+				// #endif
+			},
+			/**
+			 * 点击去评价
+			 */
+			goOrderDetails_Evaluation: function(order_id) {
+				let self = this
+				if (!order_id) return that.$util.Tips({
+					title: '缺少订单号无法查看订单详情和评价'
+				});
+				// #ifdef MP			
+					if (self.orderStatus == 0) {
+						uni.navigateTo({
+							url: '/pages/order_details/stay?order_id=' + order_id
+						})
+					} else {
+						uni.navigateTo({
+							url: '/pages/order_details/index?order_id=' + order_id
+						})
+					}				
 				// #endif  
 				// #ifndef MP
 				if (self.orderStatus == 0) {
@@ -421,6 +459,7 @@
 						let loadend = list.length < that.limit;
 						that.orderList = that.$util.SplitArray(list, that.orderList);
 						that.$set(that, 'orderList', that.orderList);
+						that.getProductCount();
 						that.loadend = loadend;
 						that.loading = false;
 						that.loadTitle = loadend ? "我也是有底线的" : '加载更多';
@@ -436,6 +475,7 @@
 						let loadend = list.length < that.limit;
 						that.orderList = that.$util.SplitArray(list, that.orderList);
 						that.$set(that, 'orderList', that.orderList);
+						that.getProductCount();
 						that.loadend = loadend;
 						that.loading = false;
 						that.loadTitle = loadend ? "我也是有底线的" : '加载更多';
@@ -445,8 +485,23 @@
 						that.loadTitle = "加载更多";
 					})
 				}
+				
 			},
-
+			/**
+			 * 获取单个订单商品数量
+			 */
+			getProductCount: function(){	
+				if(this.orderStatus !== 0){
+					this.orderList.forEach((item,i) => {
+						let orderNum = 0
+						 item.orderProduct.forEach((val) => {
+						      orderNum += val.product_num
+						  })
+						  this.orderList[i]['orderNum']=orderNum;
+					 })	
+				}
+							 
+			},				
 			/**
 			 * 删除订单
 			 */

@@ -25,7 +25,7 @@ function baseRequest(url, method, data, {
 		if (!store.state.app.token && !checkLogin()) {
 			toLogin();
 			return Promise.reject({
-				msg: '未登陆'
+				msg: '未登录'
 			});
 		}
 	}
@@ -45,6 +45,11 @@ function baseRequest(url, method, data, {
 					reslove(res.data, res);
 				else if ([410000, 410001, 410002, 40000].indexOf(res.data.status) !== -1) {
 					toLogin();
+					reject(res.data);
+				}else if(res.data.status == 501){
+					uni.reLaunch({
+						url:'/pages/error/index'
+					})
 					reject(res.data);
 				} else
 					reject(res.data.message || '系统错误');

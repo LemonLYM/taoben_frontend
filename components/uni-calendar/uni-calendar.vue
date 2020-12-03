@@ -219,6 +219,7 @@
 				this.change()
 			},
 			backtoday() {
+				this.cale.setMultiple('')
 				this.cale.setDate(this.date)
 				this.weeks = this.cale.weeks
 				this.nowDate = this.calendar = this.cale.getInfo(this.date)

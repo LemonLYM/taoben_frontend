@@ -8,8 +8,10 @@
 		</view>
 		<view class="con-box">
 			<view class='aside'>
+				<scroll-view scroll-y="true" style="height: 100%; overflow: hidden;" scroll-with-animation='true'>
 				<view class='item acea-row row-center-wrapper' :class='index==navActive?"on":""' v-for="(item,index) in productList"
-				 :key="index" @click='tap(index,"b"+index)'><text>{{item.cate_name}}</text></view>
+				 :key="index" @click='tap(index,"b"+index)'><text class="item_text">{{item.cate_name}}</text></view>
+				</scroll-view>
 			</view>
 			<view class='conter' v-if="productList.length>0">
 				<scroll-view scroll-y="true" style="height: 100%; overflow: hidden;" @scroll="scroll" scroll-with-animation='true'>
@@ -74,25 +76,11 @@
 			}, {passive:false});
 			// #endif
 		},
-		onShow() {
-			let value = ""
-			try {
-				value = uni.getStorageSync('storeIndex') ? uni.getStorageSync('storeIndex') : this.productList[0].store_category_id
-
-				uni.removeStorageSync('storeIndex')
-
-			} catch (e) {}
-			this.productList.map((item, index) => {
-				if (item.store_category_id == value) {
-					this.navActive = index
-				}
-			})
-		},
 		methods: {
 			infoScroll: function() {
 				let that = this;
 				let len = that.productList.length;
-				this.number = that.productList[len - 1].children.length;
+				//this.number = that.productList[len - 1].children.length;
 				//设置商品列表高度
 				uni.getSystemInfo({
 					success: function(res) {
@@ -213,6 +201,17 @@
 		width: 100%;
 		font-size: 26rpx;
 		color: #424242;
+	}
+	.productSort .aside .item_text{
+		padding-left: 20rpx;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;	
+	}
+	.productSort .aside .item_text .text{
+			
 	}
 
 	.productSort .aside .item.on {

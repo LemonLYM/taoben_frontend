@@ -15,12 +15,12 @@ export function getProductDetail(id){
 */
 // #ifndef MP
 export function getProductCode(id){
-  return request.get('store/product/qrcode/' + id, {type:'wechat'});
+  return request.get('store/product/qrcode/' + id, {type:'wechat'},{ noAuth : true });
 }
 // #endif
 // #ifdef MP
 export function getProductCode(id){
-  return request.get('store/product/qrcode/' + id, {type:'routine'});
+  return request.get('store/product/qrcode/' + id, {type:'routine'},{ noAuth : true });
 }
 // #endif
 
@@ -63,6 +63,12 @@ export function getCategoryList(){
  * @param object data
 */
 export function getProductslist(data){
+  if( data.brand_id  && Array.isArray(data.brand_id)){
+	  data = {
+		  ...data
+	  }
+	  data.brand_id = data.brand_id.toString()
+  }
   return request.get('store/product/lst',data,{noAuth:true});
 }
 
@@ -120,7 +126,7 @@ export function getCollectUserList(data) {
  * 
 */
 export function getReplyList(id,data){
-  return request.get('store/product/reply/lst/'+id,data)
+  return request.get('store/product/reply/lst/'+id,data,{noAuth:true})
 }
 
 /**
@@ -225,7 +231,7 @@ export function express(id) {
  * @returns {*}
  */
 export function storeCategory(pid) {
-  return request.get("store/product/category", pid);
+  return request.get("store/product/category", pid,{ noAuth : true });
 }
 
 /**
@@ -249,23 +255,29 @@ export function bagRecommend() {
  * @returns {*}
  */
 export function productBag(data) {
-  return request.get("store/product/bag",data);
+  return request.get("store/product/bag",data,{ noAuth : true });
 }
 
 /**
  * 商铺二维码
  * @returns {*}
  */
-export function merchantQrcode(id) {
-  return request.get("store/merchant/qrcode/"+id);
-}
 
+export function merchantQrcode(id,data) {
+  return request.get("store/merchant/qrcode/"+id,data,{ noAuth : true });
+}
 /**
  * 推荐商品
  * @returns {*}
  */
 export function merchantProduct(id,data) {
-  return request.get("store/merchant/product/lst/"+id,data);
+	if( data.brand_id  && Array.isArray(data.brand_id)){
+		  data = {
+			  ...data
+		  }
+		  data.brand_id = data.brand_id.toString()
+	}
+  return request.get("store/merchant/product/lst/"+id,data,{ noAuth : true });
 }
 
 /**
@@ -273,6 +285,56 @@ export function merchantProduct(id,data) {
  * @returns {*}
  */
 export function getHotBanner(type) {
-  return request.get("common/hot_banner/"+type);
+  return request.get("common/hot_banner/"+type, {}, { noAuth : true });
 }
 
+/**
+ * 商户入驻表单
+ * @returns {*}
+ */
+export function create(data) {
+  return request.post("intention/create", data);
+}
+/**
+ * 商户入驻短信验证码
+ * @returns {*}
+ */
+export function verify(data) {
+  return request.post("auth/verify", data);
+}
+/**
+ * 获取秒杀商品详情
+ * @param int id
+ * 
+*/
+export function getSeckillProductDetail(id){
+  return request.get('store/product/seckill/detail/' + id, {}, { noAuth : true });
+}
+/**
+ * 秒杀商品列表
+ * @returns {*}
+ */
+export function spikeListApi() {
+  return request.get("store/product/seckill/lst",{},{ noAuth : true });
+}
+/**
+ * 直播推荐列表
+ * @returns {*}
+ */
+export function getLiveList() {
+  return request.get("broadcast/hot",{},{ noAuth : true });
+}
+/**
+ * 直播列表
+ * @returns {*}
+ */
+export function getBroadcastListApi(data) {
+  return request.get("broadcast/lst",data,{ noAuth : true });
+}
+/**
+ * 商户分类
+ * @returns {*}
+ */
+export function merClassifly() {
+  return request.get("intention/cate");
+}

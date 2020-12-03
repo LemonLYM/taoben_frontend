@@ -3,7 +3,7 @@
 		<view class='goodWrapper'>
 			<view class='item acea-row row-between-wrapper' v-for="(item,index) in cartInfo" :key="index">
 				<view class='pictrue' @click="jumpCon(item.product_id)">
-					<image :src='item.cart_info.product.image' ></image>
+					<image :src='item.cart_info.productAttr.image || item.cart_info.product.image' ></image>
 				</view>
 				<view class='text'>
 					<view class='acea-row row-between-wrapper'>

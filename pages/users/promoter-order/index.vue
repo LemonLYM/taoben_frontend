@@ -22,12 +22,13 @@
 									<view class='top acea-row row-between-wrapper'>
 										<view class='pictxt acea-row row-between-wrapper'>
 											<view class='pictrue'>
-												<image :src='item.user.avatar'></image>
+												<image v-if="item.user.avatar" :src='item.user.avatar'></image>
+												<image v-else class="avatar" src="/static/images/f.png"></image>
 											</view>
 											<view class='text line1'>{{item.user.nickname}}</view>
 										</view>
 										<view class='money' v-if="item.status >= 2">返佣：<text class='font-color'>￥{{item.brokerage}}</text></view>
-										<view class='money'else>暂未返佣：<text class='font-color'>￥{{item.brokerage}}</text></view>
+										<view class='money' v-else>暂未返佣：<text class='font-color'>￥{{item.brokerage}}</text></view>
 									</view>
 									<view class='bottom'>
 										<view><text class='name'>订单编号：</text>{{item.order_sn}}</view>

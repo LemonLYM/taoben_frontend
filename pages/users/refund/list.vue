@@ -23,11 +23,11 @@
 				</view>
 				<view class="btn-box" v-if="item.status == 1">
 					<view class="btn gray" @click="goDetail(item)">查看详情</view>
-					<view class="btn">退回商品</view>
+					<view class="btn"  @click="goPage(item.refund_order_id)">退回商品</view>
 				</view>
 				<view class="btn-box" v-else-if="item.status == -1">
 					<view class="btn gray" @click="goDetail(item)">查看详情</view>
-					<view class="btn">再次申请</view>
+					<view class="btn" @click="applyAgain(item)">再次申请</view>
 				</view>
 				<view class="btn-box" v-else>
 					<view class="btn gray" v-if="item.status == 3" @click="bindDetele(item,index)">删除记录</view>
@@ -86,6 +86,16 @@
 			goStore(item){
 				uni.navigateTo({
 					url:`/pages/store/home/index?id=${item.merchant.mer_id}`
+				})
+			},
+			goPage(id){
+				uni.navigateTo({
+					url:'/pages/users/refund/goods/index?id='+id
+				})
+			},
+			applyAgain(item){
+				uni.navigateTo({
+					url:`/pages/order_details/index?order_id=${item.refundProduct[0].product.order_id}`
 				})
 			},
 			bindTab(index){

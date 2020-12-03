@@ -20,10 +20,11 @@
 			recharge_switch: 0, // 充值开关
 			store_user_min_recharge: 0, //最小充值
 			yue_pay_status: 0, //余额支付开关
-			site_logo: '', //首页logo
+			routine_logo: '', //首页logo
+			site_logo: '',
 			site_name: '', //名称
 			fid: '', //一级分类id
-			uid:''
+			uid: '',
 		},
 		onLaunch: function(option) {
 			console.log(this.$store)
@@ -40,9 +41,9 @@
 				switch (option.scene) {
 					//扫描小程序码
 					case 1047:
-						console.log(option,'val')
+						console.log(option, 'val')
 						let val = that.$util.getUrlParams(decodeURIComponent(option.query.scene));
-						
+
 						that.globalData.code = val;
 						break;
 						//长按图片识别小程序码
@@ -68,29 +69,41 @@
 			});
 			// 获取配置
 			getconfig().then(res => {
-
 				this.globalData.balance_func_status = res.data.balance_func_status
 				this.globalData.recharge_switch = res.data.recharge_switch
-				this.globalData.site_logo = res.data.site_logo
+				this.globalData.routine_logo = res.data.routine_logo
+				this.globalData.site_logo = res.data.site_logo,
 				this.globalData.site_name = res.data.site_name
 				this.globalData.store_user_min_recharge = res.data.store_user_min_recharge
 				this.globalData.yue_pay_status = res.data.yue_pay_status
+				this.globalData.sys_intention_agree = res.data.sys_intention_agree
+				this.globalData.mer_intention_open = res.data.mer_intention_open
 				try {
-				  uni.setStorageSync('SUBSCRIBE_MESSAGE', res.data.tempid);
+					uni.setStorageSync('SUBSCRIBE_MESSAGE', res.data.tempid);
 				} catch (e) {
-				  // error
+					// error
 				}
 				// #ifdef H5
 				this.setOpenShare(res.data);
 				// #endif
 			}).catch(err => {})
 		},
-		methods:{
+		onShow() {
+			// 记录H5和公众号
+			if (this.$store.state.app.token) {
+				// 浏览记录
+				history({
+					page: location.pathname + location.search,
+				}).then(() => {});
+			}
+
+		},
+		methods: {
 			// 微信分享；
 			setOpenShare: function(data) {
 				let that = this;
 				let href = location.href;
-				href =href.indexOf("?") === -1 ?href + "?spread=" + this.globalData.uid :href + "&spread=" + this.globalData.uid;
+				href = href.indexOf("?") === -1 ? href + "?spread=" + this.globalData.uid : href + "&spread=" + this.globalData.uid;
 				if (that.$wechat.isWeixin()) {
 					let configAppMessage = {
 						desc: data.share_info,
@@ -99,7 +112,7 @@
 						imgUrl: data.share_pic
 					};
 					that.$wechat.wechatEvevt(["updateAppMessageShareData", "updateTimelineShareData"], configAppMessage);
-			
+
 				}
 			}
 		},
@@ -112,7 +125,7 @@
 				if (this.$store.state.app.token) {
 					// 浏览记录
 					history({
-						page: n.path,
+						page: location.pathname + location.search,
 					}).then(() => {});
 				}
 			},
@@ -130,7 +143,7 @@
 	view {
 		box-sizing: border-box;
 	}
-	
+
 	.bg-color-red {
 		background-color: #e93323 !important;
 	}
@@ -154,13 +167,20 @@
 		color: transparent;
 	}
 
+	::-moz-scrollbar {
+		width: 0;
+		height: 0;
+		color: transparent;
+	}
+
 	.empty-txt {
 		line-height: 100rpx;
 		font-size: 22rpx;
 		color: #999;
 		text-align: center;
 	}
-	.product-con .conter img{
+
+	.product-con .conter img {
 		display: block;
 	}
 </style>

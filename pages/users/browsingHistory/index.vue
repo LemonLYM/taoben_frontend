@@ -12,7 +12,7 @@
 						</block>
 						<block v-else>
 							<view class="tips">该商品已下架</view>
-							<view class="btn" @click="bindDelete(item,index)">删除</view>
+							<view class="btn" @click.stop="bindDelete(item,index)">删除</view>
 						</block>
 					</view>
 				</view>

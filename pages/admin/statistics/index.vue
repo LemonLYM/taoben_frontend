@@ -27,7 +27,8 @@
 			<div class="title">
 				{{ title }}{{ this.where.type == 1 ? "营业额（元）" : "订单量（份）" }}
 			</div>
-			<div class="money">{{ time_price }}</div>
+			<div v-if="this.where.type == 1" class="money">{{ time_price }}</div>
+			<div v-else class="money">{{ time_price }}</div>
 			<div class="increase acea-row row-between-wrapper">
 				<div>
 					{{ title }}增长率：<span :class="increase_time_status === 1 ? 'red' : 'green'">{{ increase_time_status === 1 ? "" : "-" }}{{ growth_rate }}%
@@ -65,13 +66,14 @@
 			</div>
 			<div class="conter">
 				<div class="item acea-row row-between-wrapper" v-for="(item, index) in list" :key="index">
-					<div class="data">{{ item.time }}</div>
-					<div class="browse">{{ item.count }}</div>
-					<div class="turnover">{{ item.price }}</div>
+					<div class="data">{{ item.day }}</div>
+					<div class="browse">{{ item.total }}</div>
+					<div class="turnover">{{ item.pay_price }}</div>
 				</div>
 			</div>
 		</div>
-		<uni-calendar ref="calendar" :date="info.date" :insert="info.insert" :lunar="info.lunar" :startDate="info.startDate" :endDate="info.endDate" :range="info.range" @confirm="confirm" :showMonth="info.showMonth" />
+		<uni-calendar ref="calendar" :date="info.date" :insert="info.insert" :lunar="info.lunar" :startDate="info.startDate"
+		 :endDate="info.endDate" :range="info.range" @confirm="confirm" :showMonth="info.showMonth" />
 		<div class="mask" @touchmove.prevent v-show="current === true" @click="close"></div>
 		<!-- <Loading :loaded="loaded" :loading="loading"></Loading> -->
 	</div>
@@ -87,10 +89,11 @@
 	// #ifdef H5
 	// import 'mpvue-calendar/src/browser-style.css'
 	// #endif
-	
+
 	import {
-		getStatisticsMonth,
-		getStatisticsTime
+		orderPrice,
+		orderNumberStatistics,
+		turnoverStatistics
 	} from "@/api/admin";
 	// import Loading from "@components/Loading";
 	const year = new Date().getFullYear();
@@ -131,6 +134,7 @@
 				increase_time: "", //增长率
 				increase_time_status: "", //增长率
 				time_price: "", //增长率
+				order_num: "", //订单量
 				loaded: false,
 				loading: false,
 				filter: {
@@ -158,7 +162,7 @@
 					range: true,
 					insert: false,
 					selected: [],
-					showMonth:false
+					showMonth: false
 				}
 			};
 		},
@@ -195,7 +199,8 @@
 				let tempDay = []
 				let tempNum = []
 				var that = this;
-				getStatisticsTime(that.where).then(
+				that.where.type == 1 ?
+				turnoverStatistics(that.where).then(
 					res => {
 						var _info = res.data.chart,
 							day = [],
@@ -208,7 +213,6 @@
 						that.increase_time = res.data.increase_time;
 						that.increase_time_status = res.data.increase_time_status;
 						that.time_price = res.data.time;
-
 						res.data.chart.forEach((item, index) => {
 							tempDay.push(item.time)
 							tempNum.push(item.num)
@@ -220,7 +224,31 @@
 					error => {
 						that.$dialog.error(error.msg);
 					}
-				);
+				) : orderNumberStatistics(that.where).then(
+					res => {
+						var _info = res.data.chart,
+							day = [],
+							num = [];
+						_info.forEach(function(item) {
+							day.push(item.time);
+							num.push(item.num);
+						});
+						that.growth_rate = res.data.growth_rate;
+						that.increase_time = res.data.increase_time;
+						that.increase_time_status = res.data.increase_time_status;
+						that.time_price = res.data.time;
+						res.data.chart.forEach((item, index) => {
+							tempDay.push(item.time)
+							tempNum.push(item.num)
+						})
+						that.LineA.categories = tempDay
+						that.LineA.series[0].data = tempNum
+						that.showLineA("canvasLineA", that.LineA);
+					},
+					error => {
+						that.$dialog.error(error.msg);
+					}
+				)
 			},
 			setTime: function(time) {
 				let self = this
@@ -297,6 +325,7 @@
 			dateTitle: function() {
 				this.$refs.calendar.open()
 				this.time = 'date'
+				this.title = "自定义";
 				// this.current = true;
 			},
 			close: function() {
@@ -308,7 +337,7 @@
 				that.loading = true;
 				that.filter.start = that.where.start;
 				that.filter.stop = that.where.stop;
-				getStatisticsMonth(that.filter).then(
+				orderPrice(that.filter).then(
 					res => {
 						that.loading = false;
 						that.loaded = res.data.length < that.filter.limit;
@@ -318,7 +347,7 @@
 					error => {
 						that.$dialog.message(error.msg);
 					}
-				);
+				) 
 			},
 			// 创建charts
 			showLineA(canvasId, chartData) {
@@ -384,16 +413,19 @@
 			// 日历确定
 			confirm(e) {
 				let self = this
-				if(e.range.after && e.range.before){
-					let star = new Date(e.range.after).getTime()/1000
-					let stop = new Date(e.range.before).getTime()/1000
+				if (e.range.after && e.range.before) {
+					// let star = e.range.after ? new Date(e.range.after).getTime()/1000 :  new Date(e.fulldate).getTime()/1000
+					// let stop = e.range.before ? new Date(e.range.before).getTime()/1000 : new Date(e.fulldate).getTime()/1000
+
+					let star = new Date(e.range.after).getTime() / 1000
+					let stop = new Date(e.range.before).getTime() / 1000
 					self.where.start = star
 					self.where.stop = stop
 					self.list = [];
 					self.filter.page = 1;
 					self.loaded = false;
 					self.loading = false;
-					Promise.all([self.getIndex(),self.getInfo()]);
+					Promise.all([self.getIndex(), self.getInfo()]);
 				}
 			},
 		},
@@ -487,9 +519,9 @@
 		margin: 23upx auto 0 auto;
 		/* padding: 25upx 22upx 0 22upx; */
 	}
-	
-	.statistical-page .chart .chart-title{
-		padding:20upx 20upx 10upx;
+
+	.statistical-page .chart .chart-title {
+		padding: 20upx 20upx 10upx;
 		font-size: 26upx;
 		color: #999;
 	}

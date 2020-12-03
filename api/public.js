@@ -92,5 +92,5 @@ export function getconfig() {
 
 // 浏览记录
 export function history(data) {
-	return request.get("user/history",data);
+	return request.post("common/visit",data);
 }

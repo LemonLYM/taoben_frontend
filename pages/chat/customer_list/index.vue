@@ -14,7 +14,7 @@
 					<view class="con line1" v-if="item.last.msn_type == 5 || item.last.msn_type == 6">[订单]</view>
 				</view>
 				<view class="right-box">
-					<view class="time">{{item.create_time}}</view>
+					<view class="time">{{item.last && item.last.create_time}}</view>
 					<view class="num" v-if="item.num>0">{{item.num}}</view>
 				</view>
 			</div>
@@ -22,7 +22,8 @@
 		<block v-if="type == 1 && list.length>0" v-for="(item,index) in list" :key="index">
 			<div class="item acea-row" @click="goPage(item)">
 				<view class="logo">
-					<image :src="item.user.avatar" mode=""></image>
+					<image v-if="item.user.avatar" :src="item.user.avatar" mode=""></image>
+					<image v-else  src="/static/images/f.png" mode=""></image>
 				</view>
 				<view class="info">
 					<view class="name">{{item.user.nickname}}</view>
@@ -33,7 +34,7 @@
 					<view class="con line1" v-if="item.last.msn_type == 5 || item.last.msn_type == 6">[订单]</view>
 				</view>
 				<view class="right-box">
-					<view class="time">{{item.create_time}}</view>
+					<view class="time">{{item.last && item.last.create_time}}</view>
 					<view class="num" v-if="item.num>0">{{item.num}}</view>
 				</view>
 			</div>
@@ -60,14 +61,32 @@
 				list: [],
 				productId: 0,
 				orderId: "",
-				type: 0 // 0 用户 1客服
+				type: 0 ,// 0 用户 1客服
+				timer: null
 			};
 		},
 		onLoad(optios) {
 			this.type = optios.type
 		},
+		onShow(option) {
+			this.getList();
+			this.liveUpdate()
+		},
+		onHide(){  
+		    if(this.timer) {  
+		        clearInterval(this.timer);  
+		        this.timer = null;  
+		    }  
+		},
+		onUnload() {
+			if(this.timer) {
+			    clearInterval(this.timer);  
+			    this.timer = null;  
+			} 
+		},
 		methods: {
 			getList() {
+				
 				if(this.type == 0){
 					serviceList().then(res => {
 						this.list = res.data.list;
@@ -77,6 +96,19 @@
 						this.list = res.data.list;
 					})
 				}
+				
+			},
+			//实时刷新列表
+			liveUpdate(){
+				if(this.timer) {
+					clearInterval(this.timer);
+					this.timer = null;	
+				}  
+				let that = this;
+				this.timer = setInterval(function(){
+					// 用户
+					that.getList();
+				},5000);
 				
 			},
 			goPage(item) {
@@ -91,9 +123,7 @@
 				}
 			}
 		},
-		onShow(option) {
-			this.getList();
-		}
+
 	};
 </script>
 <style lang="scss">

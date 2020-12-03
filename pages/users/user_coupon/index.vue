@@ -1,5 +1,14 @@
 <template>
 	<view>
+		<view class="navTabBox">
+		<!-- 	<view class="longTab">
+				<view class="tab-item" :class='isUsed == 0 ? "" : "on"' @click="getUseCoupons()"><text>未使用</text></view>
+				<view class="tab-item" :class='isUsed !== 0 ? "" : "on"' @click="getUseCoupons()"><text>已使用/已过期</text></view>
+			</view> -->
+			<view class="longTab">
+				<view class="tab-item" v-for="(item,index) in tabList" :key="index" :class="{'on':index == tabIndex-1}" @click="bindTab(index)"><text>{{item.title}}</text></view>
+			</view>
+		</view>
 		<view class='coupon-list' v-if="couponsList.length">
 			<view class='item acea-row row-center-wrapper' v-for='(item,index) in couponsList' :key="index">
 				<view class='money' :class='item.status == 0 ? "" : "moneyGray"'>
@@ -54,10 +63,20 @@
 		},
 		data() {
 			return {
+				tabIndex:1,
 				couponsList: [],
 				loading: false,
 				isAuto: false, //没有授权的不会自动授权
-				isShowAuth: false //是否隐藏授权
+				isShowAuth: false ,//是否隐藏授权
+				isUsed: 0,
+				tabList:[
+					{
+						title:'未使用'
+					},
+					{
+						title:'已使用/已过期'
+					}
+				],
 			};
 		},
 		computed: mapGetters(['isLogin']),
@@ -94,12 +113,19 @@
 			authColse: function(e) {
 				this.isShowAuth = e
 			},
+			bindTab(index){
+				this.tabIndex = index+1
+				// this.page =1
+				// this.isScroll = true
+				// this.goodsList = []
+				this.getUseCoupons()
+			},
 			/**
 			 * 获取领取优惠券列表
 			 */
 			getUseCoupons: function() {
 				let that = this;
-				getUserCoupons(0).then(res => {
+				getUserCoupons({statusTag: this.tabIndex}).then(res => {
 					that.loading = true;
 					that.$set(that, 'couponsList', res.data.list);
 				})
@@ -108,7 +134,40 @@
 	}
 </script>
 
-<style>
+<style scoped lang="scss">
+	.navTabBox{
+		background: #fff;
+		height: 90rpx;
+	}
+	.longTab{
+		display: -webkit-flex; /* Safari */
+		display: flex;
+		text-align: center;
+	}
+	.tab-item{
+		width: 50%;
+		display: inline-block;
+		line-height: 90rpx;	
+		text{
+			position: relative;
+			display: inline-block;
+		}
+	}
+	.tab-item.on{
+		color: #EA3424;
+		text{
+			&:after{
+				content: "";
+				display: inline-block;
+				width: 90%;
+				height: 3rpx;
+				background: #EA3424;
+				position: absolute;
+				left: 5%;
+				bottom: 0;
+			}
+		}
+	}
 	.money {
 		display: flex;
 		flex-direction: column;
@@ -117,7 +176,7 @@
 
 	.pic-num {
 		color: #ffffff;
-		font-size: 0.24rem;
+		font-size: 20rpx;
 	}
 
 	.coupon-list .item .text .condition {

@@ -117,29 +117,13 @@ export function postBargainShare(bargainId) {
   return request.post("bargain/share", { bargainId: bargainId});
 }
 
-/**
- * 秒杀产品时间区间
- * 
-*/
-export function getSeckillIndexTime(){
-  return request.get('seckill/index',{},{noAuth:true});
-}
-
-/**
- * 秒杀产品列表
- * @param int time
- * @param object data
-*/
-export function getSeckillList(time,data){
-  return request.get('seckill/list/'+time,data,{noAuth:true});
-}
 
 /**
  * 秒杀产品详情
  * @param int id
 */
 export function getSeckillDetail(id){
-  return request.get('seckill/detail/'+id);
+  return request.get('store/product/seckill/detail/'+id);
 }
 
 /**
@@ -179,4 +163,19 @@ export function seckillCode(id,data) {
  */
 export function scombinationCode(id) {
   return request.get("combination/code/"+id);
+}
+/**
+ * 秒杀产品时间区间
+ * 
+*/
+export function getSeckillIndexTime(){
+  return request.get('store/product/seckill/select',{},{noAuth:true});
+}
+/**
+ * 秒杀产品列表
+ * @param int time
+ * @param object data
+*/
+export function getSeckillList(data){
+  return request.get('store/product/seckill/lst',data,{noAuth:true});
 }

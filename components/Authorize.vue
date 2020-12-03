@@ -1,7 +1,9 @@
 <template>
 	<view>
 		<view class='Popup' v-if='isShowAuth'>
-		   <image :src='logoUrl'></image>
+			<view class="logo-auth">
+				 <image :src='logoUrl' mode="aspectFit"></image>
+			</view>
 		   <view class='title'>授权提醒</view>
 		   <view class='tip'>请授权头像等信息，以便为您提供更好的服务</view>
 		   <view class='bottom flex'>
@@ -44,7 +46,7 @@
 		},
 		data(){
 			return {
-				logoUrl:''
+				logoUrl: app.globalData.routine_logo
 			}
 		},
 		computed:mapGetters(['isLogin','userInfo']),
@@ -54,7 +56,7 @@
 			}
 		},
 		created() {
-			// this.getLogoUrl();
+			this.getLogoUrl();
 			this.setAuthStatus();
 		},
 		methods:{
@@ -92,7 +94,7 @@
 				})
 			},
 			setUserInfo(){
-				uni.showLoading({title:'正在登陆中'});
+				uni.showLoading({title:'正在登录中'});
 				Routine.getCode().then(code=>{
 					this.getUserInfo(code);
 				}).catch(res=>{
@@ -100,15 +102,16 @@
 				})
 			},
 			getLogoUrl(){
-				let that = this;
-				if (Cache.has(LOGO_URL)) {
-					this.logoUrl = Cache.get(LOGO_URL);
-					return;
-				}
-				getLogo().then(res=>{
-					that.logoUrl = res.data.logo_url
-					Cache.set(LOGO_URL,that.logoUrl);
-				})
+				this.logoUrl = app.globalData.routine_logo
+				// let that = this;
+				// if (Cache.has(LOGO_URL)) {
+				// 	this.logoUrl = Cache.get(LOGO_URL);
+				// 	return;
+				// }
+				// getLogo().then(res=>{
+				// 	that.logoUrl = res.data.logo_url
+				// 	Cache.set(LOGO_URL,that.logoUrl);
+				// })
 			},
 			close(){
 				let pages = getCurrentPages(), currPage  = pages[pages.length - 1];
@@ -127,7 +130,28 @@
 
 <style scoped lang='scss'>
 	.Popup{width:500rpx;background-color:#fff;position:fixed;top:50%;left:50%;margin-left:-250rpx;transform:translateY(-50%);z-index:320;}
-	.Popup image{width:150rpx;height:150rpx;margin:-67rpx auto 0 auto;display:block;border: 8rpx solid #fff;border-radius: 50%}
+	.Popup{
+		.logo-auth{
+			z-index: -1;
+			position: absolute;
+			left: 50%;
+			top: 0%;
+			transform: translate(-50%,-50%);
+			width:150rpx;
+			height:150rpx;
+			display:flex;
+			align-items: center;
+			justify-content: center;
+			border: 8rpx solid #fff;
+			border-radius: 50%;
+			background: #fff;
+		}
+		image{
+				height: 42rpx;
+				margin-top: -54rpx;
+			}
+	}
+	
 	.Popup .title{font-size:28rpx;color:#000;text-align:center;margin-top: 30rpx}
 	.Popup .tip{font-size:22rpx;color:#555;padding:0 24rpx;margin-top:25rpx;}
 	.Popup .bottom .item{width:50%;height:80rpx;background-color:#eeeeee;text-align:center;line-height:80rpx;font-size:24rpx;color:#666;margin-top:54rpx;}

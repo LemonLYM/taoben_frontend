@@ -4,28 +4,28 @@
 			<view class="header"></view>
 			<view class="whiteBg">
 				<view class="input">
-					<input type="number" placeholder="0" v-model="verify_code" />
+					<input type="number" placeholder="请输入核销码" v-model="verify_code" />
 				</view>
 				<view class="bnt" @tap="codeChange">立即核销</view>
 			</view>
 			<!-- #ifdef MP -->
 			<view class="scan" @tap="scanCode">
-				<image src="./scan.gif"></image>
+				<image src="../static/images/scan.gif"></image>
 			</view>
 			<!-- #endif -->
 		</view>
 		<view v-if="iShidden">
 			<view class="WriteOff">
 				<view class="pictrue">
-					<image :src="orderInfo.image" />
+					<image :src="orderInfo.orderProduct[0].cart_info.product.image" />
 				</view>
 				<view class="num acea-row row-center-wrapper">
-					<text>{{ orderInfo.order_id }}</text>
+					<!--<text>{{ orderInfo.order_id }}</text>-->
 					<view class="views" @tap='goOrderDetails(orderInfo.order_id)'>查看<text class='iconfont icon-jiantou views-jian'></text></view>
 				</view>
 				<view class="tip">确定要核销此订单吗？</view>
-				<view class="sure" bindtap="confirm">确定核销</view>
-				<view class="sure cancel" bindtap="cancel">取消</view>
+				<view class="sure" @click="confirm">确定核销</view>
+				<view class="sure cancel" @click="cancel">取消</view>
 			</view>
 			<view class="mask"></view>
 		</view>
@@ -34,7 +34,8 @@
 
 <script>
 	import {
-		orderVerific
+		orderVerific,
+		verifierOrder
 	} from "@/api/admin";
 	export default {
 		data() {
@@ -42,7 +43,21 @@
 				iShidden: false,
 				verify_code: '',
 				iShidden: false,
+				orderInfo:{}
 			}
+		},
+		
+		onLoad: function(options) {
+			// #ifdef MP
+			if (options.scene) {
+				let value = this.$util.getUrlParams(decodeURIComponent(options.scene) || {});
+				if (value.verify_code) options.verify_code = value.verify_code;				
+			}
+			// #endif
+			this.verify_code = options.verify_code;
+			if(this.verify_code){
+				this.codeChange();
+			}		
 		},
 		methods: {
 			/**
@@ -50,13 +65,13 @@
 			 */
 			goOrderDetails: function(id) {
 				uni.navigateTo({
-					url: '/pages/admin/order_details/index?id=' + id + '&goname=look'
+					url: '/pages/admin/orderDetail/index?id=' + id
 				});
 			},
 			// 立即核销
 			codeChange: function() {
 				let self = this
-				let ref = /[0-9]{12}/;
+				let ref = /[0-9]/;
 				if (!this.verify_code) return self.$util.Tips({
 					title: '请输入核销码'
 				});
@@ -67,7 +82,7 @@
 					title: '查询中'
 				});
 				setTimeout(() => {
-					orderVerific(this.verify_code, 0)
+					verifierOrder(this.verify_code)
 						.then(res => {
 							self.orderInfo = res.data
 							self.iShidden = true
@@ -102,16 +117,12 @@
 			 */
 			confirm: function() {
 				let self = this
-				orderVerific(this.data.verify_code, 1)
+				orderVerific(this.verify_code)
 					.then(res => {
-						this.setData({
-							verify_code: '',
-							iShidden: false
-						});
 						self.verify_code = ''
 						self.iShidden = false
 						self.$util.Tips({
-							title: res.msg
+							title: res.message
 						});
 					})
 					.catch(res => {

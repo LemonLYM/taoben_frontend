@@ -1,24 +1,12 @@
 <template>
 	<view>
 		<view class='logistics'>
-			<view class='header acea-row row-between row-top' v-if="product.cart_info">
-				<view class='pictrue' >
-					<image :src='product.cart_info.product.image'></image>
-				</view>
-				<view class='text acea-row row-between'>
-					<view class='name line2'>{{product.cart_info.product.store_name}}</view>
-					<view class='money'>
-						<view>￥{{product.product_price}}</view>
-						<view>x{{product.product_num}}</view>
-					</view>
-				</view>
-			</view>
 			<view class='logisticsCon'>
 				<view class='company acea-row row-between-wrapper'>
 					<view class='picTxt acea-row row-between-wrapper'>
 						<view class='iconfont icon-wuliu'></view>
 						<view class='text'>
-							<view><text class='name line1'>物流公司：</text> {{orderInfo.delivery_name}}</view>
+							<view><text class='name line1'>物流公司：</text> {{orderInfo.delivery_type}}</view>
 							<view class='express line1'><text class='name'>快递单号：</text> {{orderInfo.delivery_id}}</view>
 						</view>
 					</view>
@@ -122,10 +110,8 @@
 			  getExpress:function(){
 			    let that=this;
 			    refundExpress(that.orderId).then(function(res){
-			      let result = res.data || {};
-				  // that.$set(that,'product',res.data.order.orderProduct[0] || {});
-				  // that.$set(that,'orderInfo',res.data.order);
-				  that.$set(that,'expressList',result || []);
+				  that.$set(that, 'expressList', res.data.express || []);
+				  that.$set(that, 'orderInfo', res.data.refund);
 			    });
 			  },
 			  /**
@@ -219,7 +205,7 @@
 
 	.logistics .logisticsCon .company .copy {
 		font-size: 20rpx;
-		width: 106rpx;
+		width: 120rpx;
 		height: 40rpx;
 		text-align: center;
 		line-height: 40rpx;

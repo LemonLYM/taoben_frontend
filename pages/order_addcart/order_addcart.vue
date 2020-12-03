@@ -34,12 +34,12 @@
 									<text v-else class="iconfont icon-xuanzhong1"></text>
 								</view>
 								<view class='pictrue'>
-									<image :src='goods.product.image'></image>
+									<image :src='goods.productAttr.image || goods.product.image'></image>
 									<!-- <image v-else :src='item.productInfo.image'></image> -->
 								</view>
 								<view class='text'>
 									<view class='line1'>{{goods.product.store_name}}</view>
-									<view class='infor line1' v-if="goods.productAttr">属性：{{goods.productAttr.sku}}</view>
+									<view class='infor line1' v-if="goods.productAttr.sku">属性：{{goods.productAttr.sku}}</view>
 									<view class='money'>￥{{goods.productAttr.price}}</view>
 								</view>
 								<view class='carnum acea-row row-center-wrapper'>
@@ -64,7 +64,7 @@
 							<view class='item acea-row row-between-wrapper'>
 								<view class='invalid'>失效</view>
 								<view class='pictrue'>
-									<image :src='item.product.image'></image>
+									<image :src='item.productAttr.image || item.product.image'></image>
 
 								</view>
 								<view class='text acea-row row-column-between'>
@@ -85,6 +85,9 @@
 					<image src='../../static/images/noCart.png'></image>
 				</view>
 				<recommend :hostProduct='hostProduct'></recommend>
+				<view class='loadingicon acea-row row-center-wrapper' v-if="hostProduct.length>5">
+					<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
+				</view>
 			</view>
 			<view style='height:120rpx;'></view>
 			<view class='footer acea-row row-between-wrapper' v-if="cartList.valid.length > 0">
@@ -165,6 +168,9 @@
 		},
 		data() {
 			return {
+				loading: false, //是否加载中
+				loadend: false, //是否加载完毕
+				loadTitle: '加载更多', //提示语
 				cartCount: 0,
 				goodsHidden: true,
 				footerswitch: true,
@@ -348,13 +354,16 @@
 				if (goods.cart_num <= 1) {
 					goods.cart_num = 1;
 					goods.numSub = true;
-
+					status = true;
 					
 				} else {
 					goods.cart_num = Number(goods.cart_num) - 1
 					this.cartTotalCount = Number(this.cartTotalCount) - 1;
 					goods.numSub = false;
 					goods.numAdd = false;
+					if(goods.cart_num <= 1){
+						goods.numSub = true;
+					}
 				}
 				if (false == status) {
 					changeCartNum(goods.cart_id, {
@@ -447,7 +456,7 @@
 					// 总金额 //总数
 					el.list.forEach(e => {
 						if (e.check) {
-							totalMoney += this.$util.$h.Mul(e.productAttr.price, e.cart_num)
+							totalMoney = this.$util.$h.Add(totalMoney, this.$util.$h.Mul(e.productAttr.price, e.cart_num))
 							totalNum += e.cart_num
 						}
 					})
@@ -466,14 +475,20 @@
 			// 推荐列表
 			getHostProduct: function() {
 				let that = this;
-				if (that.hotScroll) return
+				if (that.loadend) return;
+				if (that.hotScroll) return;
+				that.loading = true;
+				that.loadTitle = "加载更多";
 				getProductHot(
 					that.hotPage,
 					that.hotLimit,
 				).then(res => {
+					let list = res.data.list || [];	
 					that.hotPage++
 					that.hotScroll = res.data.list.length < that.hotLimit
 					that.hostProduct = that.hostProduct.concat(res.data.list)
+					that.loading = false;
+					that.loadTitle = that.hotScroll ? "我也是有底线的" : '加载更多';
 				});
 			},
 			// 失效商品展开
@@ -537,9 +552,9 @@
 				uni.showTabBar();
 				let that = this;
 				that.coupon.list[index].issue = true;
+				console.log(that.coupon.list[index])
 				// that.$set(that.coupon, 'list', that.coupon.list);
 				// that.$set(that.coupon, 'coupon', false);
-				// this.getCouponList()
 			},
 		},
 		onReachBottom() {
@@ -847,12 +862,7 @@
 		padding: 0 30rpx;
 		box-sizing: border-box;
 		border-top: 1rpx solid #eee;
-		// 
-		bottom: 0;
-		// 
-		// #ifndef MP
-		bottom: 50px;
-		// #endif
+		bottom: var(--window-bottom);
 	}
 
 	.shoppingCart .footer .checkAll {
@@ -906,5 +916,13 @@
 		.icon-xuanzhong1 {
 			color: $theme-color;
 		}
+	}
+</style>
+<style>
+	@supports (bottom: constant(safe-area-inset-bottom)) or (bottom: env(safe-area-inset-bottom)){
+	.shoppingCart .footer{
+	bottom: calc(var(--window-bottom) + constant(safe-area-inset-bottom));
+	bottom: calc(var(--window-bottom) + env(safe-area-inset-bottom));
+	}
 	}
 </style>

@@ -99,16 +99,31 @@
 						<text>我的余额</text>
 					</navigator>
 					<navigator url="/pages/users/user_spread_user/index" class="item" hover-class="none" v-if="is_promoter == 1">
-						<image src="/static/images/user-menu-001.png"></image>
+						<image src="/static/images/user_menu11.png"></image>
 						<text>分销推广</text>
 					</navigator>
 					<navigator url="/pages/users/distributor/index" class="item" hover-class="none" v-else>
-						<image src="/static/images/user-menu-001.png"></image>
+						<image src="/static/images/user_menu11.png"></image>
 						<text>分销推广</text>
 					</navigator>
-					<navigator class="item" :url="item.url" hover-class="none" v-if="item.url!='#' && item.url!='/pages/service/index'" v-for="(item,index) in MyMenus" :key="index">
-							<image :src="item.pic"></image>
-							<text>{{item.name}}</text>
+					<navigator class="item" :url="item.url" hover-class="none" v-if="item.url!='#' && item.url!='/pages/service/index'"
+					 v-for="(item,index) in MyMenus" :key="index">
+						<image :src="item.pic"></image>
+						<text>{{item.name}}</text>
+					</navigator>
+					<navigator url="/pages/admin/order/index" class="item" hover-class="none" v-if="userInfo.service && userInfo.service.customer === 1">
+						<image src="/static/images/user-menu-002.png"></image>
+						<text>订单管理</text>
+					</navigator>
+					<navigator url="/pages/store/settled/index" class="item" hover-class="none" v-if="mer_intention_open == 1">
+						<image src="/static/images/user-menu-003.png"></image>
+						<text>商家入驻</text>
+					</navigator>
+					<navigator class="item" hover-class="none" url="/pages/admin/order_cancellation/index" v-if="userInfo.service && userInfo.service.is_verify">
+						<block v-if="userInfo.service.is_verify == 1">
+							<image src="/static/images/user_menu10.png"></image>
+							<text>订单核销</text>
+						</block>
 					</navigator>
 					<view class="item" hover-class="none" @click="goChat" v-if="userInfo.service">
 						<image src="/static/images/user_menu08.png"></image>
@@ -136,7 +151,12 @@
 	import {
 		toLogin
 	} from '@/libs/login.js';
-	import { orderData } from '@/api/order.js'
+	import {
+		orderData
+	} from '@/api/order.js'
+	import {
+		getconfig
+	} from '@/api/public.js'
 	import {
 		mapGetters
 	} from "vuex";
@@ -157,31 +177,31 @@
 						img: '/static/images/order1.png',
 						title: '待付款',
 						url: '/pages/users/order_list/index?status=0',
-						num:0
+						num: 0
 					},
 					{
 						img: '/static/images/order2.png',
 						title: '待发货',
 						url: '/pages/users/order_list/index?status=1',
-						num:0
+						num: 0
 					},
 					{
 						img: '/static/images/order3.png',
 						title: '待收货',
 						url: '/pages/users/order_list/index?status=2',
-						num:0
+						num: 0
 					},
 					{
 						img: '/static/images/order4.png',
 						title: '待评价',
 						url: '/pages/users/order_list/index?status=3',
-						num:0
+						num: 0
 					},
 					{
 						img: '/static/images/order5.png',
 						title: '售后/退款',
 						url: '/pages/users/refund/list',
-						num:0
+						num: 0
 					},
 				],
 				imgUrls: [],
@@ -195,18 +215,36 @@
 				orderStatusNum: {},
 				userInfo: {},
 				MyMenus: [],
-				balance_func_status:0, //余额开关 1开
-				is_promoter:0//推广人开关  1开
+				balance_func_status: 0, //余额开关 1开
+				is_promoter: 0, //推广人开关  1开
+				mer_intention_open: 0,
 			}
 		},
 		onLoad() {
-			this.balance_func_status = app.globalData.balance_func_status
+			getconfig().then(res => {
+				this.balance_func_status = res.data.balance_func_status
+				this.mer_intention_open = res.data.mer_intention_open
+				try {
+					uni.setStorageSync('SUBSCRIBE_MESSAGE', res.data.tempid);
+				} catch (e) {
+					// error
+				}
+				// #ifdef H5
+				this.setOpenShare(res.data);
+				// #endif
+			}).catch(err => {})
 			let that = this;
 			// #ifdef H5 || APP-PLUS
 			if (that.isLogin == false) {
 				toLogin();
 			}
 			// #endif
+		},
+		onReady() {
+			this.$nextTick(() => {
+				this.balance_func_status = app.globalData.balance_func_status
+				this.mer_intention_open = app.globalData.mer_intention_open
+			});
 		},
 		onShow: function() {
 			let that = this;
@@ -215,17 +253,20 @@
 				this.orderNum();
 				this.getMyMenus();
 				// this.setVisit();
-				
+			} else {
+				// #ifdef H5 || APP-PLUS
+				toLogin();
+				// #endif
 			}
 		},
 		methods: {
 			// 去聊天列表
-			goChat(){
-				let type = this.userInfo.service?1:0
+			goChat() {
+				let type = this.userInfo.service ? 1 : 0
 				uni.navigateTo({
-					url:`/pages/chat/customer_list/index?type=${type}`
+					url: `/pages/chat/customer_list/index?type=${type}`
 				})
-			
+
 			},
 			// 记录会员访问
 			setVisit() {
@@ -269,12 +310,14 @@
 				let that = this;
 				getUserInfo().then(res => {
 					that.userInfo = res.data,
-					that.is_promoter = res.data.is_promoter
+						that.is_promoter = res.data.is_promoter
 				});
 			},
 			// 订单数字
-			orderNum(){
-				orderData().then(({data})=>{
+			orderNum() {
+				orderData().then(({
+					data
+				}) => {
 					this.orderMenu.forEach((item, index) => {
 						console.log('item')
 						switch (item.title) {
@@ -297,8 +340,7 @@
 					})
 				})
 			},
-			
-			
+
 			/**
 			 * 
 			 * 获取个人中心图标
@@ -469,9 +511,11 @@
 			top: -44rpx;
 			padding: 0 20rpx;
 		}
+
 		.order-wrapper {
 			background-color: #fff;
-			border-radius:12rpx;
+			border-radius: 12rpx;
+
 			.order-hd {
 				height: 80rpx;
 				align-items: center;
@@ -543,12 +587,14 @@
 		.user-menus {
 			padding-bottom: 30rpx;
 			background-color: #fff;
-			.title{
+
+			.title {
 				height: 80rpx;
 				line-height: 80rpx;
 				padding: 0 30rpx;
 				border-bottom: 1px dashed #DDDDDD;
 			}
+
 			.item {
 				position: relative;
 				display: flex;
@@ -556,18 +602,27 @@
 				align-items: center;
 				justify-content: space-between;
 				width: 25%;
+				line-height: 28rpx;
 				height: 90rpx;
 				margin-top: 30rpx;
-				image{
-					width: 53rpx;
-					height: 53rpx;
-					margin-bottom: 10rpx;
+				text-align: center;
+
+				image {
+					width: 52rpx;
+					height: 52rpx;
+
 				}
-				text{
-					
+
+				text {
+					margin-top: 10rpx;
 					font-size: 26rpx;
 					color: #282828;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+					width: 78%;
 				}
+
 				&:last-child::before {
 					display: none;
 				}
@@ -596,22 +651,26 @@
 			border: 1px solid #ee5a52;
 		}
 	}
-	.copy-right{
+
+	.copy-right {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		color: #CCCCCC;
 		font-size: 22rpx;
-		.iconfont{
+
+		.iconfont {
 			font-size: 60rpx;
 		}
 	}
-	.menu-box{
+
+	.menu-box {
 		display: flex;
 		flex-wrap: wrap;
 	}
-	.right-btn{
+
+	.right-btn {
 		z-index: 99;
 		position: absolute;
 		right: 30rpx;
@@ -619,14 +678,17 @@
 		display: flex;
 		align-items: center;
 		color: #fff;
-		.iconfont{
+
+		.iconfont {
 			font-size: 40rpx;
 			margin-left: 33rpx;
 		}
-		.btn{
+
+		.btn {
 			position: relative;
 		}
-		.iconnum{
+
+		.iconnum {
 			min-width: 6px;
 			background-color: #fff;
 			color: $theme-color;

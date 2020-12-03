@@ -42,7 +42,7 @@
 		<!-- 首页展示 -->
 		<view class="page_content" v-if="navIndex == 0">
 			<!-- #ifdef MP -->
-			<view class="mp-bg"></view>
+			<!-- <view class="mp-bg"></view> -->
 			<!-- #endif -->
 			<!-- banner -->
 			<view class="swiper" v-if="imgUrls.length">
@@ -61,44 +61,119 @@
 			<!-- menu -->
 			<view class='nav acea-row' v-if="menus.length">
 				<block v-for="(item,index) in menus" :key="index">
-					<!-- <navigator class='item' v-if="item.show == '1'" :url='item.url' open-type='switchTab' hover-class='none'>
-						<view class='pictrue'>
-							<image :src='item.pic'></image>
-						</view>
-						<view class="menu-txt">{{item.name}}</view>
-					</navigator>
-					<navigator class='item' v-else :url='item.url' hover-class='none'>
-						<view class='pictrue'>
-							<image :src='item.pic'></image>
-						</view>
-						<view class="menu-txt">{{item.name}}</view>
-					</navigator> -->
 					<view class="item" @click="goMenuDetail(item)">
 						<view class='pictrue'>
 							<image :src='item.pic'></image>
 						</view>
-						<view class="menu-txt">{{item.name}}</view>
+						<view class="menu-txt area-row">{{item.name}}</view>
 					</view>
-					
-					
+
+
 				</block>
 			</view>
 			<navigator class="ad" :url="ad.home_ad_url" hover-class="none">
-				<image :src="ad.home_ad_pic"></image>
+				<image mode="" :src="ad.home_ad_pic"></image>
 			</navigator>
+			<!--秒杀-->
+			<view class="main" v-if="spikeList.length > 0">
+				<view class="seckill-count">
+					<view class="spike-bd">
+						<view class="title line1">限时秒杀</view>
+						<view class="spike-distance">
+							<text class="text bg-red">距结束</text>
+							<countDown :is-day="false" :tip-text="' '" :day-text="' '" :hour-text="':'" :minute-text="':'" :second-text="' '"
+							 :datatime="datatime"></countDown>
+						</view>
+						<navigator url="/pages/activity/goods_seckill/index" class="more-btn" hover-class="none">更多<text class="iconfont icon-jiantou"
+							 hover-class='none'></text></navigator>
+					</view>
+					<view class="spike-wrapper">
+						<scroll-view scroll-x="true" style="white-space: nowrap; display: flex" show-scrollbar="false">
+							<navigator class="spike-item" v-for="(item,index) in spikeList" :key="index" :url="'/pages/activity/goods_seckill_details/index?id='+item.product_id+'&time='+item.stop+''"
+							 hover-class='none'>
+								<view class="img-box">
+									<image :src="item.image" mode=""></image>
+								</view>
+								<view class="info">
+									<view class="name line1">{{item.store_name}}</view>
+									<view class="stock-box">
+										<view class="grabbed" :style="'width:'+item.sales+';'"></view>
+										<text class="stock-sales">{{item.sales}}</text>
+									</view>
+									<view class="price-box">
+										<text class="price"><text>￥</text>{{item.price}}</text>
+										<text class="old-price"><text>￥</text>{{item.ot_price}}</text>
+									</view>
+								</view>
+							</navigator>
+						</scroll-view>
+					</view>
+				</view>
+
+			</view>
+			<!-- #ifdef MP -->
+
+
+			<!--直播-->
+
+			<view class="main" v-if="liveList.length > 0">
+				<view class="live-count">
+					<view>
+						<!-- 直播 -->
+						<block>
+							<view class="spike-bd">
+								<view class="title line1">直播专场</view>
+								<!-- <navigator url="/pages/activity/liveBroadcast/index" class="more-btn" hover-class="none">更多<text class="iconfont icon-jiantou"
+									 hover-class='none'></text></navigator> -->
+							</view>
+							<view class="live-wrapper mores">
+								<scroll-view scroll-x="true" style="white-space: nowrap; display: flex">
+									<view class="item" v-for="(item, index) in liveList" :key="index">
+										<navigator hover-class="none" :url="item.link">
+											<view class="live-top" :style="'background:' + (item.live_status == 101 ? playBg : (item.live_status != 101 && item.live_status != 102) ? endBg : notBg) + ';'"
+											 :class="item.live_status == 102 ? 'playRadius' : 'notPlayRadius'">
+												<block v-if="item.live_status == 101">
+													<image src="/static/images/live-01.png" mode=""></image>
+													<text>直播中</text>
+												</block>
+												<block v-if="item.live_status == 103 && item.replay_status === 1">
+													<image src="/static/images/live-02.png" mode=""></image>
+													<text>回放</text>
+												</block>
+												<block v-if="(item.live_status != 101 && item.live_status != 102 && item.live_status != 103) ||  (item.live_status == 103 && item.replay_status == 0)">
+													<image src="/static/images/live-02.png" mode=""></image>
+													<text>已结束</text>
+												</block>
+												<block v-if="item.live_status == 102">
+													<image src="/static/images/live-03.png" mode=""></image>
+													<text>预告</text>
+												</block>
+											</view>
+											<view v-if="item.live_status == 101 || item.live_status == 102" class="broadcast-time">{{ item.show_time }}</view>
+											<image :src="item.share_img"></image>
+											<!-- <view class="live-title">{{ item.live_status }}</view> -->
+										</navigator>
+									</view>
+								</scroll-view>
+							</view>
+						</block>
+					</view>
+				</view>
+			</view>
+			<!-- #endif -->
 			<view class="main">
 				<!-- 热点菜单 -->
 				<view class="hot-img" style="margin-top:20rpx">
 					<navigator :url="item.url" class="item" v-for="(item,index) in hot" :key="index" hover-class="none">
-						<view class="title">{{item.title}}</view>
-						<view class="msg">{{item.s_title}}</view>
+						<view class="title area-row">{{item.title}}</view>
+						<view class="msg area-row" :style="'color:'+item.color+';'">{{item.s_title}}</view>
 						<view class="img">
 							<image :src="item.pic" mode=""></image>
 						</view>
 					</navigator>
 				</view>
 				<!-- 品牌好店 -->
-				<view class="explosion" v-if="brandList.length">
+				<view class="explosion" v-if="brandList.length && hide_mer_status !=1">
 					<view class="common-hd">
 						<view class="title">品牌好店</view>
 					</view>
@@ -109,6 +184,7 @@
 								<view class="mer-name">
 									<image :src="item.mer_avatar"></image>
 									<view class="txt line1">{{item.mer_name}}</view>
+									<text v-if="item.is_trader" class="font-bg-red ml8">自营</text>
 								</view>
 							</view>
 							<view class="pro-box">
@@ -131,7 +207,6 @@
 						<text class='loading iconfont icon-jiazai' :hidden='hotLoading==false'></text>{{hotTitle}}
 					</view>
 				</view>
-
 			</view>
 		</view>
 		<!-- 分类页 -->
@@ -139,17 +214,17 @@
 		<view class="productList" v-if="navIndex>0" :style="'margin-top:'+prodeuctTop+'px;'">
 			<view class="sort acea-row">
 				<navigator hover-class='none' :url="'/pages/columnGoods/goods_list/index?id='+item.store_category_id+'&title='+item.cate_name"
-				 class="item" v-for="(item,index) in sortList" :key="index" v-if="sortList.length<9">
+				 class="item" v-for="(item,index) in sortList" :key="index">
 					<view class="pictrue">
 						<image :src="item.pic"></image>
 					</view>
 					<view class="text">{{item.cate_name}}</view>
 				</navigator>
-				<view class="item" @click="bindMore()">
+				<view class="item" @click="bindMore()" v-if="sortList.length">
 					<view class="pictrues acea-row row-center-wrapper">
 						<text class="iconfont icon-gengduo1"></text>
 					</view>
-					<view class="text">更多</view>
+					<view class="text" style="margin-top: 22rpx;">更多</view>
 				</view>
 			</view>
 			<block v-if="sortProduct.length>0">
@@ -159,8 +234,9 @@
 						<view class='pictrue'>
 							<image :src='item.image'></image>
 						</view>
-						<view class='text'>
-							<view class='name line1'>{{item.store_name}}</view>
+						<view class='text'>							
+							<view class='name line1'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
+							
 							<view class="acea-row row-middle">
 								<view class='money font-color-red'>￥<text class='num'>{{item.price}}</text></view>
 								<text class="coupon font-color-red" v-if="item.issetCoupon">领券</text>
@@ -201,19 +277,24 @@
 	// #ifdef MP-WEIXIN
 	import {
 		getTemlIds,
-		getLiveList
 	} from '@/api/api.js';
 	import {
 		SUBSCRIBE_MESSAGE,
 		TIPS_KEY
 	} from '@/config/cache';
+	import {
+		getLiveList
+	} from '@/api/store.js';
 	// #endif
- 
+
 	import {
 		getShare,
 		follow,
 		getconfig,
 	} from '@/api/public.js';
+	import {
+		getSeckillIndexTime
+	} from '@/api/activity.js';
 
 	import goodList from '@/components/goodList';
 	import promotionGood from '@/components/promotionGood';
@@ -225,16 +306,14 @@
 		mapGetters
 	} from "vuex";
 	import tabNav from '@/components/tabNav.vue'
-	import {
-		getSeckillList,
-	} from '@/api/activity.js';
-	import countDown from '@/components/countDown';
+	import countDown from '@/components/countDown'
 	import {
 		getCategoryList,
 		getProductslist,
 		getProductHot,
 		storeCategory,
-		storeMerchantList
+		storeMerchantList,
+		spikeListApi,
 	} from '@/api/store.js';
 	import {
 		setVisit
@@ -246,6 +325,7 @@
 	import {
 		silenceBindingSpread
 	} from '@/utils';
+
 	export default {
 		computed: mapGetters(['isLogin', 'uid']),
 		components: {
@@ -261,6 +341,10 @@
 		},
 		data() {
 			return {
+				countDownHour: "00",
+				countDownMinute: "00",
+				countDownSecond: "00",
+				datatime: '',
 				ad: '',
 				userInfo: '',
 				loading: false,
@@ -298,6 +382,7 @@
 				couponList: [],
 				lovely: [],
 				spikeList: [],
+				liveList: [],
 				combinationList: [],
 				hotList: [{
 					pic: '/static/images/hot_001.png'
@@ -306,6 +391,7 @@
 				}, {
 					pic: '/static/images/hot_003.png'
 				}],
+				spikeList: [],
 				bargList: [],
 				ProductNavindex: 0,
 				marTop: 0,
@@ -324,7 +410,7 @@
 				hostProduct: [],
 				hotPage: 1,
 				hotLimit: 8,
-				hotScroll: false,
+				hotScroll: true,
 				hotLoading: false,
 				hotTitle: '加载更多',
 				explosiveMoney: [],
@@ -341,10 +427,20 @@
 				pageInfo: '', // 精品推荐全数据
 				site_name: app.globalData.site_name, //首页title
 				swiperCur: 0,
-				brandList: []
+				brandList: [],
+				d: '',
+				h: '',
+				m: '',
+				s: '',
+				sum_h: '',
+				endBg: 'linear-gradient(#666666, #999999)',
+				notBg: 'rgb(26, 163, 246)',
+				playBg: 'linear-gradient(#FF0000, #FF5400)',
+				hide_mer_status: ''
 			}
 		},
 		onLoad() {
+
 			uni.getLocation({
 				type: 'wgs84',
 				success: function(res) {
@@ -369,65 +465,68 @@
 			this.isLogin && silenceBindingSpread();
 			//   
 			// this.setVisit()
-			
-			
-			Promise.all([this.getIndexConfig(), this.storeMerchant(), this.get_host_product()]);
-			
-			
-			
-			
-			
+
+			Promise.all([this.getIndexConfig(), this.storeMerchant(), this.get_host_product(), this.getSpeckillCutTime(), this.getSpikeProduct()]);
+
 			// #ifdef MP
-			// this.getLiveList()
+			this.getLiveList()
 			// #endif
 			if (this.isLogin) {
 				this.getUserInfo();
 			};
+			this.setViewport(`width=device-width, initial-scale=1.0`);
 		},
 		onShow() {
 			this.getConfig()
 		},
 
 		methods: {
+			  setViewport(content) {
+			      const meta = document.querySelector('meta[name=viewport]');
+			      if (!meta) return;
+			      meta.setAttribute('content', content);
+			    },
+			
 			// 菜单详情
-			goMenuDetail(item){
-				let url = this.$util.stringIntercept(item.url,0,"\?")
-				if(url == '/pages/goods_cate/goods_cate'){
-					let data = this.$util.stringIntercept(item.url,1,"\?")
-					data = this.$util.stringIntercept(data,1,"\=")
+			goMenuDetail(item) {
+				let url = this.$util.stringIntercept(item.url, 0, "\?")
+				if (url == '/pages/goods_cate/goods_cate') {
+					let data = this.$util.stringIntercept(item.url, 1, "\?")
+					data = this.$util.stringIntercept(data, 1, "\=")
 					try {
 						uni.setStorageSync('storeIndex', data);
 						uni.switchTab({
-							url:'/pages/goods_cate/goods_cate'
+							url: '/pages/goods_cate/goods_cate'
 						})
 					} catch (e) {}
-				}else{
+				} else {
 					uni.navigateTo({
-						url:item.url
+						url: item.url
 					})
 				}
-			},			
-			getConfig(){
+			},
+			getConfig() {
 				// 获取配置
 				getconfig().then(res => {
 					let self = this
 					this.logoUrl = res.data.site_logo
 					this.site_name = res.data.site_name
+					this.hide_mer_status = res.data.hide_mer_status
 					uni.setNavigationBarTitle({
 						title: self.site_name
 					})
 				}).catch(err => {})
 			},
-			
-			
-			
+
+
+
 			// 分类页更多
 			bindMore() {
 				console.log(this.navTop[this.navIndex])
 				try {
 					uni.setStorageSync('storeIndex', this.navTop[this.navIndex].pid);
 					uni.switchTab({
-						url:'/pages/goods_cate/goods_cate'
+						url: '/pages/goods_cate/goods_cate'
 					})
 				} catch (e) {}
 			},
@@ -450,14 +549,52 @@
 			storeMerchant() {
 				storeMerchantList({
 					page: 1,
-					limit: 3
+					limit: 3,
+					is_best: 1
 				}).then(res => {
 					this.brandList = res.data.list;
 				})
 			},
+			// 获取秒杀截止时间
+			getSpeckillCutTime() {
+				getSeckillIndexTime().then(res => {
+
+					this.datatime = res.data.seckillEndTime;
+
+				});
+			},
+			// 获取秒杀商品
+			getSpikeProduct() {
+				let that = this;
+				spikeListApi().then(res => {
+					that.spikeList = res.data.list;
+					that.spikeList.map((item) => {
+						item.sales = item.stock === 0 ? '0%' : (item.sales * 100 / item.stock).toFixed(2) + '%'
+					})
+				}).catch((e) => {});
+			},
+			// #ifdef MP
+			// 直播
+			getLiveList() {
+				let that = this;
+				// getLiveList().then(res => {
+				// 	that.liveList = res.data.list;
+				// 	that.liveList.forEach((val) => {
+				// 		val.link = ((val.live_status == 103 && val.replay_status) || val.live_status === 101 || val.live_status ===
+				// 			102) ? 'plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin?room_id=' + val.room_id : ''
+				// 	});
+
+				// }).catch((e) => {});;
+			},
+			// #endif
 			// swiper
 			swiperChange(e) {
-				this.swiperCur = e.detail.current
+				// this.swiperCur = e.detail.current
+				 let {current, source} = e.detail
+				    if(source === 'autoplay' || source === 'touch') {
+				    //根据官方 source 来进行判断swiper的change事件是通过什么来触发的，autoplay是自动轮播。touch是用户手动滑动。其他的就是未知问题。抖动问题主要由于未知问题引起的，所以做了限制，只有在自动轮播和用户主动触发才去改变current值，达到规避了抖动bug
+				       this.swiperCur = e.detail.current				      
+				    }
 			},
 			// 记录会员访问
 			setVisit() {
@@ -474,7 +611,7 @@
 					storeCategory({
 						pid: e.pid
 					}).then(res => {
-						this.sortList = res.data;
+						this.sortList = res.data.length > 9 ? res.data.splice(0, 9) : res.data;
 					});
 					this.where.pid = e.pid;
 					this.where.page = 1;
@@ -488,7 +625,7 @@
 			get_product_list: function() {
 				console.log(123);
 				let that = this;
-				if (that.loadend) return;
+				// if (!that.loadend) return;
 				if (that.loading) return;
 				that.loading = true;
 				that.loadTitle = '';
@@ -511,7 +648,8 @@
 			 */
 			get_host_product: function() {
 				let that = this;
-				if (that.hotScroll) return;
+				let num = that.hotLimit
+				if (!that.hotScroll) return;
 				if (that.hotLoading) return;
 				that.hotLoading = true;
 				that.hotTitle = '';
@@ -521,15 +659,14 @@
 				).then(res => {
 					let list = res.data.list;
 					let productList = that.$util.SplitArray(list, that.hostProduct);
-					let hotScroll = list.length < that.hotLimit;
+					let hotScroll = list.length <= num && list.length != 0;
 					that.hotScroll = hotScroll;
 					that.hotLoading = false;
-					that.hotTitle = hotScroll ? '已全部加载' : '加载更多';
+					that.hotTitle = !hotScroll ? '已全部加载' : '加载更多';
 					that.$set(that, 'hostProduct', productList);
 					that.$set(that, 'hotPage', that.hotPage + 1);
 				});
 			},
-
 			// 首页数据
 			getIndexConfig: function() {
 				let that = this;
@@ -580,7 +717,7 @@
 					// #ifdef H5
 					uni.showModal({
 						title: '提示',
-						content: '您未登陆，请登陆！',
+						content: '您未登录，请登录！',
 						success: function(res) {
 							if (res.confirm) {
 								uni.navigateTo({
@@ -610,7 +747,7 @@
 					// #ifdef H5
 					uni.showModal({
 						title: '提示',
-						content: '您未登陆，请登陆！',
+						content: '您未登录，请登录！',
 						success: function(res) {
 							if (res.confirm) {
 								uni.navigateTo({
@@ -641,14 +778,30 @@
 					})
 				})
 			},
-			// 直播
-			getLiveList: function() {
-				getLiveList(1, 20).then(res => {
-					this.liveList = res.data
-				}).catch(res => {
-
-				})
-			},
+			countTime: function() {
+				// 获取当前时间
+				var date = new Date();
+				var now = date.getTime();
+				//设置截止时间
+				var endDate = new Date("2020-10-22 23:23:23");
+				var end = endDate.getTime();
+				//时间差
+				var leftTime = end - now;
+				//定义变量 d,h,m,s保存倒计时的时间
+				if (leftTime >= 0) {
+					this.d = Math.floor(leftTime / 1000 / 60 / 60 / 24);
+					this.h = Math.floor(leftTime / 1000 / 60 / 60 % 24);
+					this.m = Math.floor(leftTime / 1000 / 60 % 60);
+					this.s = Math.floor(leftTime / 1000 % 60);
+					this.sum_h = this.d * 24 + this.h
+				}
+				// console.log(this.h)
+				// console.log(this.m)
+				// console.log(this.s)
+				// console.log(this.s);
+				//递归每秒调用countTime方法，显示动态时间效果
+				setTimeout(this.countTime, 1000);
+			}
 		},
 		mounted() {
 			let self = this
@@ -662,6 +815,7 @@
 		},
 		// 滚动到底部
 		onReachBottom() {
+			console.log('到底了')
 			if (this.navIndex == 0) {
 				// 首页加载更多
 				this.get_host_product();
@@ -676,12 +830,14 @@
 		},
 		// 滚动监听
 		onPageScroll(e) {
+			// #ifdef H5
 			let self = this
 			if (e.scrollTop >= self.searchH) {
 				self.isFixed = true
 			} else {
 				self.isFixed = false
 			}
+			// #endif
 		}
 	}
 </script>
@@ -697,6 +853,212 @@
 	}
 </style>
 <style lang="scss">
+	.font-bg-red{
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 34rpx;
+		border-radius: 20rpx;
+		margin-right: 8rpx;
+		&.ml8{
+			margin-left: 8rpx;
+			margin-right: 0;
+		}
+	}
+	
+	.area-row {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+	.seckill-count {
+		background-color: #fff;
+		margin-bottom: 20rpx;
+		border-radius: 16rpx;
+		padding: 20rpx 0 26rpx 20rpx;
+		box-shadow: 4rpx 2rpx 12rpx 2rpx rgba(0, 0, 0, 0.03);
+	}
+
+	.spike-bd {
+		margin-bottom: 20rpx;
+
+		border-radius: 16rpx;
+		padding-left: 20rpx;
+		display: flex;
+		position: relative;
+
+
+		.title {
+			font-weight: bold;
+			color: #282828;
+			font-size: 32rpx;
+		}
+
+		.spike-distance {
+			margin-left: 15rpx;
+			position: relative;
+			top: 1.4rpx;
+			display: flex;
+			border: 1px solid #E93323;
+			border-radius: 4rpx;
+			height: 40rpx;
+			.bg-red {
+				font-size: 20rpx;
+				color: #fff;
+				background-color: #E93323;
+				padding: 0 10rpx;
+				line-height: 38rpx;
+				height: 38rpx;
+			}
+
+			.time {
+				font-size: 22rpx;
+				padding: 0 12rpx;
+				color: #E93323;
+				height: 38rpx;
+				line-height: 38rpx;
+				/deep/.red {
+					margin: 0;
+				}
+			}
+
+			.red-color {
+				color: #E93323;
+			}
+
+		}
+
+		.more-btn {
+			position: absolute;
+			right: 20rpx;
+			top: 0;
+			color: #999;
+			font-size: 28rpx;
+
+			.iconfont {
+				font-size: 26rpx;
+			}
+		}
+	}
+
+	.spike-wrapper {
+		width: 100%;
+		margin-top: 27rpx;
+
+		.spike-item {
+			display: inline-block;
+			width: 222rpx;
+			margin-right: 20rpx;
+
+			.img-box {
+				position: relative;
+				height: 222rpx;
+
+				image {
+					width: 100%;
+					height: 222rpx;
+					border-radius: 16rpx;
+				}
+
+				.msg {
+					position: absolute;
+					left: 10rpx;
+					bottom: 16rpx;
+					width: 86rpx;
+					height: 30rpx;
+					background: rgba(255, 255, 255, 1);
+					border: 1px solid rgba(255, 109, 96, 1);
+					border-radius: 6rpx;
+					font-size: 20rpx;
+					color: $theme-color;
+				}
+			}
+
+
+			.info {
+				margin-top: 10rpx;
+
+				.name {
+					font-size: 26rpx;
+				}
+
+				.stock-box {
+					width: 100%;
+					height: 20rpx;
+					background-color: #FFDCD9;
+					border-radius: 20rpx;
+					margin-top: 13rpx;
+					position: relative;
+					color: #fff;
+					font-size: 18rpx;
+					line-height: 20rpx;
+					text-align: center;
+					.grabbed {
+						height: 20rpx;
+						background: linear-gradient(#FF0000, #FF5400);
+						position: absolute;
+						top: 0;
+						left: 0;
+						border-radius: 20rpx;
+					}
+					.stock-sales{
+						position: absolute;
+						left: 50%;
+						margin-left: -40rpx;
+					}
+				}
+
+				.price-box {
+					display: flex;
+					align-items: center;
+					justify-content: start;
+					margin-top: 4rpx;
+
+					.tips {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						width: 28rpx;
+						height: 28rpx;
+						background-color: $theme-color;
+						color: #fff;
+						font-size: 20rpx;
+						border-radius: 2px;
+					}
+
+					.price {
+						display: flex;
+						color: $theme-color;
+						font-size: 28rpx;
+						font-weight: bold;
+
+						text {
+							font-size: 18rpx;
+						}
+					}
+
+					.old-price {
+						display: flex;
+						margin-left: 10rpx;
+						color: #AAAAAA;
+						text-decoration: line-through;
+						font-size: 20rpx;
+
+						text {
+							font-size: 18rpx;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/deep/.spike-box .styleAll {
 		display: inline-block;
 		width: 44rpx;
@@ -767,7 +1129,8 @@
 				.input {
 					display: flex;
 					align-items: center;
-					width: 490rpx;
+					max-width: 490rpx;
+					min-width: 460rpx;
 					height: 64rpx;
 					padding: 0 0 0 30rpx;
 					background: rgba(237, 237, 237, 1);
@@ -787,6 +1150,123 @@
 			}
 		}
 
+		/*直播*/
+		.live-count {
+			background-color: #fff;
+			margin-bottom: 20rpx;
+			border-radius: 16rpx;
+			padding: 20rpx 0 26rpx 20rpx;
+			box-shadow: 4rpx 2rpx 12rpx 2rpx rgba(0, 0, 0, 0.03);
+		}
+
+		.live-wrapper {
+			position: relative;
+			width: 100%;
+			overflow: hidden;
+			border-radius: 16rpx;
+
+			image {
+				width: 100%;
+				height: 400rpx;
+			}
+
+			.live-top {
+				z-index: 20;
+				position: absolute;
+				left: 0;
+				top: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				width: 120rpx;
+				height: 32rpx;
+
+				&.playRadius {
+					border-radius: 0;
+				}
+
+				&.notPlayRadius {
+					border-radius: 0rpx 0px 18rpx 0px;
+				}
+
+				image {
+					width: 30rpx;
+					height: 30rpx;
+					margin-right: 6rpx;
+					/* #ifdef H5 */
+					display: block;
+					/* #endif */
+				}
+			}
+
+			.broadcast-time {
+				z-index: 20;
+				position: absolute;
+				left: 110rpx;
+				top: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				width: 160rpx;
+				height: 36rpx;
+				background: rgba(0, 0, 0, .4);
+				font-size: 22rpx;
+				border-radius: 0 0 18rpx 0;
+			}
+
+			.live-title {
+				position: absolute;
+				left: 0;
+				bottom: 6rpx;
+				width: 100%;
+				height: 70rpx;
+				line-height: 70rpx;
+				text-align: center;
+				font-size: 30rpx;
+				color: #fff;
+				background: rgba(0, 0, 0, 0.35);
+			}
+
+			&.mores {
+				width: 100%;
+
+				.item {
+					position: relative;
+					width: 280rpx;
+					height: 224rpx;
+					display: inline-block;
+					border-radius: 16rpx;
+					overflow: hidden;
+					margin-right: 20rpx;
+					image {
+						width: 320rpx;
+						height: 180rpx;
+						border-radius: 16rpx;
+					}
+
+					.live-title {
+						height: 40rpx;
+						line-height: 40rpx;
+						text-align: center;
+						font-size: 22rpx;
+					}
+
+					.live-top {
+						width: 110rpx;
+						height: 32rpx;
+						font-size: 22rpx;
+
+						image {
+							width: 20rpx;
+							height: 20rpx;
+						}
+					}
+				}
+			}
+		}
+
 		/* #ifdef MP */
 		.mp-header {
 			z-index: 999;
@@ -794,6 +1274,7 @@
 			left: 0;
 			top: 0;
 			width: 100%;
+			height: 220rpx;
 			/* #ifdef H5 */
 			padding-bottom: 20rpx;
 			/* #endif */
@@ -833,16 +1314,18 @@
 		/* #endif */
 
 		.page_content {
-			overflow-x: hidden;
+
 			/* #ifdef MP */
-			margin-top: 260rpx;
+			margin-top: 240rpx;
+
 			/* #endif */
 			.swiper {
 				position: relative;
 				width: 100%;
-				height: 280rpx;
+				height: 320rpx;
 				margin: 0 auto;
 				border-radius: 10rpx;
+				overflow-x: hidden;
 				/* #ifdef MP */
 				z-index: 10;
 
@@ -910,9 +1393,16 @@
 					align-items: center;
 					justify-content: center;
 					color: #fff;
-					width: 180rpx;
-					height: 54rpx;
-					border-radius: 0rpx 0px 18rpx 0px;
+					width: 110rpx;
+					height: 36rpx;
+
+					&.playRadius {
+						border-radius: 0;
+					}
+
+					&.notPlayRadius {
+						border-radius: 0rpx 0px 18rpx 0px;
+					}
 
 					image {
 						width: 30rpx;
@@ -929,10 +1419,10 @@
 					left: 0;
 					bottom: 6rpx;
 					width: 100%;
-					height: 70rpx;
-					line-height: 70rpx;
+					height: 36rpx;
+					line-height: 36rpx;
 					text-align: center;
-					font-size: 30rpx;
+					font-size: 22rpx;
 					color: #fff;
 					background: rgba(0, 0, 0, .35);
 				}
@@ -942,27 +1432,27 @@
 
 					.item {
 						position: relative;
-						width: 320rpx;
+						width: 280rpx;
 						display: inline-block;
 						border-radius: 16rpx;
 						overflow: hidden;
 						margin-right: 20rpx;
 
 						image {
-							width: 320rpx;
-							height: 180rpx;
+							width: 280rpx;
+							height: 224rpx;
 							border-radius: 16rpx;
 						}
 
 						.live-title {
-							height: 40rpx;
-							line-height: 40rpx;
+							height: 36rpx;
+							line-height: 36rpx;
 							text-align: center;
 							font-size: 22rpx;
 						}
 
 						.live-top {
-							width: 120rpx;
+							width: 110rpx;
 							height: 36rpx;
 							font-size: 22rpx;
 
@@ -988,7 +1478,8 @@
 					background-color: #FEFEFF;
 					padding: 20rpx 0 4rpx;
 					border-radius: 8rpx;
-					box-shadow: 2px 1px 6px 1px rgba(0,0,0,0.03);
+					box-shadow: 2px 1px 6px 1px rgba(0, 0, 0, 0.03);
+
 					.title {
 						font-weight: bold;
 						color: #282828;
@@ -1061,20 +1552,18 @@
 								width: 100%;
 								height: 100%;
 							}
-
 							.mer-name {
 								position: absolute;
 								left: 20rpx;
 								top: 20rpx;
 								display: flex;
 								align-items: center;
-								width: 260rpx;
+								width: 300rpx;
 								height: 50rpx;
-								padding: 0 5rpx;
-								border-radius: 23rpx;
+								padding: 0 10rpx;
+								border-radius: 26rpx;
 								background: #fff;
 								font-weight: bold;
-
 								image {
 									width: 38rpx;
 									height: 38rpx;
@@ -1094,7 +1583,7 @@
 							padding: 20rpx 20rpx 30rpx;
 
 							.pro-item {
-								width: 214rpx;
+								width: 218rpx;
 								margin-right: 14rpx;
 
 								image {
@@ -1244,7 +1733,6 @@
 				height: 478rpx;
 				margin-top: 20rpx;
 				padding-left: 20rpx;
-				background-image: url('~@/static/images/barg002.png');
 				background-size: 100% 100%;
 
 				.title {
@@ -1608,6 +2096,7 @@
 			padding-top: 8rpx;
 			/* #ifdef MP */
 			margin-top: 230rpx;
+
 			/* #endif */
 			.item {
 				.pictrues {
@@ -1631,6 +2120,9 @@
 					color: #272727;
 					font-size: 24rpx;
 					margin-top: 10rpx;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
 				}
 			}
 		}

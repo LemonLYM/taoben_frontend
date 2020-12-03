@@ -2,9 +2,9 @@
 	<view class="deliver-goods">
 		<header>
 			<view class="order-num acea-row row-between-wrapper">
-				<view class="num line1">订单号：{{ order_id }}</view>
+				<view class="num line1">订单号：{{ delivery.order_sn }}</view>
 				<view class="name line1">
-					<span class="iconfont icon-yonghu2"></span>{{ delivery.nickname }}
+					<span class="iconfont icon-yonghu2"></span>{{ delivery.user.nickname }}
 				</view>
 			</view>
 			<view class="address">
@@ -14,7 +14,9 @@
 				</view>
 				<view>{{ delivery.user_address }}</view>
 			</view>
-			<view class="line"><image src="@/static/images/line.jpg" /></view>
+			<view class="line">
+				<image src="@/static/images/line.jpg" />
+			</view>
 		</header>
 		<view class="wrapper">
 			<view class="item acea-row row-between-wrapper">
@@ -28,11 +30,11 @@
 			<block v-if="logistics.length>0">
 				<view class="list" v-show="active === 0">
 					<view class="item acea-row row-between-wrapper">
-						<view>发货方式</view>
+						<view>快递名称</view>
 						<view class="select-box">
-							<picker class="pickerBox" @change="bindPickerChange" :value="seIndex" :range="logistics" range-key="name">
+							<picker class="pickerBox" @change="bindPickerChange" :value="seIndex" :range="logistics" range-key="label">
 								<!-- <view></view> -->
-								<view class="uni-input">{{logistics[seIndex].name}}</view>
+								<view class="uni-input">{{logistics[seIndex].label}}</view>
 							</picker>
 						</view>
 					</view>
@@ -42,7 +44,7 @@
 					</view>
 				</view>
 			</block>
-			
+
 			<view class="list" v-show="active === 1">
 				<view class="item acea-row row-between-wrapper">
 					<view>送货人</view>
@@ -60,11 +62,15 @@
 </template>
 <script>
 	import {
-		getAdminOrderDelivery,
+		getAdminOrderDetail,
 		setAdminOrderDelivery,
-		getLogistics
 	} from "@/api/admin";
-	import { checkPhone } from '@/utils/validate.js'
+	import {
+		expressList
+	} from "@/api/order";
+	import {
+		checkPhone
+	} from '@/utils/validate.js'
 	export default {
 		name: "GoodsDeliver",
 		components: {},
@@ -72,26 +78,28 @@
 		data: function() {
 			return {
 				types: [{
-						type: "express",
+						type: 1,
 						title: "发货"
 					},
 					{
-						type: "send",
+						type: 2,
 						title: "送货"
 					},
 					{
-						type: "fictitious",
+						type: 3,
 						title: "无需发货"
 					}
 				],
 				active: 0,
 				order_id: "",
-				delivery: [],
+				delivery: {
+					user: {}
+				},
 				logistics: [],
-				delivery_type: "express",
+				delivery_type: 1,
 				delivery_name: "",
 				delivery_id: "",
-				seIndex:0,
+				seIndex: 0,
 			};
 		},
 		watch: {
@@ -106,7 +114,7 @@
 		onLoad: function(option) {
 			this.order_id = option.id;
 			this.getIndex();
-			this.getLogistics();
+			this.expressList();
 		},
 		methods: {
 			changeType: function(item, index) {
@@ -117,62 +125,68 @@
 			},
 			getIndex: function() {
 				let that = this;
-				getAdminOrderDelivery(that.order_id).then(
+				getAdminOrderDetail(that.order_id).then(
 					res => {
 						that.delivery = res.data;
+						console.log(this.active);
 					},
 					error => {
-						that.$dialog.error(error.msg);
+						that.$util.Tips({
+							title: error
+						})
 					}
 				);
 			},
-			getLogistics: function() {
+			expressList: function() {
 				let that = this;
-				getLogistics().then(
+				expressList().then(
 					res => {
 						that.logistics = res.data;
+						console.log(that.logistics)
 					},
 					error => {
-						that.$dialog.error(error.msg);
+						that.$util.Tips({
+							title: error
+						})
 					}
 				);
 			},
 			async saveInfo() {
 				let that = this,
 					delivery_type = that.delivery_type,
-					delivery_name = that.logistics[that.seIndex].name,
+					delivery_name = that.logistics[that.seIndex].value,
 					delivery_id = that.delivery_id,
 					userName = that.delivery_name,
 					save = {};
 				save.order_id = that.order_id;
 				save.delivery_type = that.delivery_type;
 				switch (delivery_type) {
-					case "send":
-						if(!userName){
+					case 2:
+						if (!userName) {
 							return that.$util.Tips({
-								title:'请填写送货人姓名'
+								title: '请填写送货人姓名'
 							})
 						}
-						if(!delivery_id || !checkPhone(delivery_id)){
+						if (!delivery_id || !checkPhone(delivery_id)) {
 							return that.$util.Tips({
-								title:'请填写正确的手机号码'
+								title: '请填写正确的手机号码'
 							})
 						}
 						save.delivery_name = userName;
 						save.delivery_id = delivery_id;
 						that.setInfo(save);
 						break;
-					case "express":
-						if(!delivery_id){
+					case 1:
+						if (!delivery_id) {
 							return this.$util.Tips({
-								title:'请填写快递单号'
+								title: '请填写快递单号'
 							})
-						}	
+						}
 						save.delivery_name = delivery_name;
 						save.delivery_id = delivery_id;
 						that.setInfo(save);
 						break;
-					case "fictitious":
+					case 3:
 						that.setInfo(save);
 						break;
 				}
@@ -180,24 +194,29 @@
 			setInfo: function(item) {
 				let that = this;
 				console.log(item);
-				setAdminOrderDelivery(item).then(
+				setAdminOrderDelivery(that.order_id,item).then(
 					res => {
 						that.$util.Tips({
-							title:res.msg,
-							icon:'success',
-							mask:true
+							title: res.message,
+							icon: 'success',
+							mask: true
 						})
-						setTimeout(res=>{
-							uni.navigateBack();
-						},2000)
+						setTimeout(res => {
+							uni.navigateTo({
+								url:`/pages/admin/orderList/index?types=2`
+							})
+						}, 2000)
 					},
 					error => {
-						that.$dialog.error(error.msg);
+						console.log(error)
+						that.$util.Tips({
+							title: error
+						})
 					}
 				);
 			},
-			bindPickerChange(e){
-				console.log(e,'tar')
+			bindPickerChange(e) {
+				console.log(e, 'tar')
 				this.seIndex = e.detail.value
 			}
 		}
@@ -206,6 +225,13 @@
 
 <style lang="scss">
 	/*发货*/
+	.uni-input{
+		display: block;
+		width: 400rpx;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
 	.deliver-goods header {
 		width: 100%;
 		background-color: #fff;
@@ -344,17 +370,18 @@
 		position: fixed;
 		bottom: 0;
 	}
-	.select-box{
+
+	.select-box {
 		flex: 1;
 		height: 100%;
-		
-		.pickerBox{
+
+		.pickerBox {
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
 			width: 100%;
 			height: 100%;
+			text-align: right;
 		}
 	}
-	
 </style>

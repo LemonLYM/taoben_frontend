@@ -3,9 +3,9 @@
 		<view class="header acea-row row-middle">
 			<view class="state">{{ title }}</view>
 			<view class="data">
-				<view class="order-num">订单：{{ orderInfo.order_id }}</view>
+				<view class="order-num">订单：{{ orderInfo.order_sn }}</view>
 				<view>
-					<span class="time">{{ orderInfo.add_time }}</span>
+					<span class="time">{{ orderInfo.create_time }}</span>
 				</view>
 			</view>
 		</view>
@@ -17,7 +17,7 @@
 			 @click="modify('1')" />
 		</view>
 		<view class="orderingUser acea-row row-middle">
-			<span class="iconfont icon-yonghu2"></span>{{ orderInfo.nickname }}
+			<span class="iconfont icon-yonghu2"></span>{{ orderInfo.user.nickname }}
 		</view>
 		<view class="address">
 			<view class="name">
@@ -30,22 +30,22 @@
 			<image src="/static/images/line.jpg" />
 		</view>
 		<view class="pos-order-goods">
-			<navigator :url="`/pages/goods_details/index?id=${item.cart_info.productInfo.product_id}`" hover-class="none" class="goods acea-row row-between-wrapper" v-for="(item, index) in orderInfo._info" :key="index">
+			<navigator :url="`/pages/goods_details/index?id=${item.cart_info.product.product_id}`" hover-class="none" class="goods acea-row row-between-wrapper" v-for="(item, index) in orderInfo.orderProduct" :key="index">
 				<view class="picTxt acea-row row-between-wrapper">
 					<view class="pictrue">
-						<image :src="item.cart_info.productInfo.image" />
+						<image :src="item.cart_info.product.image" />
 					</view>
 					<view class="text acea-row row-between row-column">
 						<view class="info line2">
-							{{ item.cart_info.productInfo.store_name }}
+							{{ item.cart_info.product.store_name }}
 						</view>
-						<view class="attr">{{ item.cart_info.productInfo.suk }}</view>
+						<view class="attr">{{ item.cart_info.product.suk }}</view>
 					</view>
 				</view>
 				<view class="money">
-					<view class="x-money">￥{{ item.cart_info.productInfo.price }}</view>
-					<view class="num">x{{ item.cart_info.cart_num }}</view>
-					<view class="y-money">￥{{ item.cart_info.productInfo.ot_price }}</view>
+					<view class="x-money">￥{{ item.cart_info.product.price }}</view>
+					<view class="num">x{{ item.cart_info.product_num }}</view>
+					<view class="y-money">￥{{ item.cart_info.product.ot_price }}</view>
 				</view>
 			</navigator>
 		</view>
@@ -60,19 +60,19 @@
 			<view class="item acea-row row-between">
 				<view>订单编号：</view>
 				<view class="conter acea-row row-middle row-right">
-					{{ orderInfo.order_id
+					{{ orderInfo.order_sn
           }}
 					<!-- #ifdef H5 -->
-					<span class="copy copy-data" :data-clipboard-text="orderInfo.order_id">复制</span>
+					<span class="copy copy-data" :data-clipboard-text="orderInfo.order_sn">复制</span>
 					<!-- #endif -->
 					<!-- #ifdef MP -->
-					<span class="copy copy-data" @click="copyNum(orderInfo.order_id)">复制</span>
+					<span class="copy copy-data" @click="copyNum(orderInfo.order_sn)">复制</span>
 					<!-- #endif -->
 				</view>
 			</view>
 			<view class="item acea-row row-between">
 				<view>下单时间：</view>
-				<view class="conter">{{ orderInfo.add_time }}</view>
+				<view class="conter">{{ orderInfo.create_time }}</view>
 			</view>
 			<view class="item acea-row row-between">
 				<view>支付状态：</view>
@@ -82,7 +82,7 @@
 			</view>
 			<view class="item acea-row row-between">
 				<view>支付方式：</view>
-				<view class="conter">{{ payType }}</view>
+				<view class="conter">{{ orderInfo.pay_type == 0 ? "余额支付" : "微信支付" }}</view>
 			</view>
 			<view class="item acea-row row-between">
 				<view>买家留言：</view>
@@ -100,14 +100,14 @@
 			</view>
 			<view class="item acea-row row-between">
 				<view>运费：</view>
-				<view class="conter">￥{{ orderInfo.freight_price }}</view>
+				<view class="conter">￥{{ orderInfo.pay_postage }}</view>
 			</view>
 			<view class="actualPay acea-row row-right">
 				实付款：<span class="money font-color-red">￥{{ orderInfo.pay_price }}</span>
 			</view>
 		</view>
 		<view class="wrapper" v-if="
-        orderInfo.delivery_type != 'fictitious' && orderInfo._status._type === 2
+        orderInfo.delivery_type != 'fictitious' && orderInfo._status === 2
       ">
 			<view class="item acea-row row-between">
 				<view>配送方式：</view>
@@ -133,7 +133,7 @@
 		<view style="height:120upx;"></view>
 		<view class="footer acea-row row-right row-middle" v-if="goname != 'looks'">
 			<view class="more"></view>
-			<view class="bnt cancel" @click="modify('0')" v-if="types == 0">
+			<view class="bnt cancel" @click="modify('0')" v-if="types == 0 && orderInfo.paid == 0">
 				一键改价
 			</view>
 			<view class="bnt cancel" @click="modify('0')" v-if="types == -1">
@@ -143,7 +143,7 @@
 			<view class="bnt cancel" v-if="orderInfo.pay_type === 'offline' && orderInfo.paid === 0" @click="offlinePay">
 				确认付款
 			</view>
-			<navigator class="bnt delivery" v-if="types == 1" :url="'/pages/admin/delivery/index?id='+orderInfo.order_id">去发货</navigator>
+			<navigator class="bnt delivery" v-if="types == 1" :url="'/pages/admin/delivery/index?id='+orderInfo.order_sn">去发货</navigator>
 		</view>
 		<PriceChange :change="change" :orderInfo="orderInfo" v-on:closechange="changeclose($event)" v-on:savePrice="savePrice"
 		 :status="status"></PriceChange>
@@ -179,7 +179,8 @@
 				change: false,
 				order_id: "",
 				orderInfo: {
-					_status: {}
+					_status: {},
+					user: {}
 				},
 				status: "",
 				title: "",
@@ -238,9 +239,9 @@
 				getAdminOrderDetail(that.order_id).then(
 					res => {
 						that.orderInfo = res.data;
-						that.types = res.data._status._type;
-						that.title = res.data._status._title;
-						that.payType = res.data._status._payType;
+						// that.types = res.data._status._type;
+						// that.title = res.data._status._title;
+						// that.payType = res.data._status._payType;
 					},
 					err => {
 						that.$util.Tips({
@@ -260,14 +261,14 @@
 					refund_status = that.orderInfo.refund_status,
 					remark = opt.remark;
 				data.order_id = that.orderInfo.order_id;
-				if (that.status == 0 && refund_status === 0) {
+				if (that.status == 0) {
 					if (!isMoney(price)) {
 						return that.$util.Tips({
 							title: '请输入正确的金额'
 						});
 					}
 					data.price = price;
-					setAdminOrderPrice(data).then(
+					setAdminOrderPrice(data.order_id, {pay_price: price} ).then(
 						function() {
 							that.change = false;
 							that.$util.Tips({
@@ -296,7 +297,7 @@
 						res => {
 							that.change = false;
 							that.$util.Tips({
-								title: res.msg
+								title: res.message
 							});
 							that.getIndex();
 						},
@@ -314,12 +315,13 @@
 							title: '请输入备注'
 						})
 					}
-					data.remark = remark;
-					setAdminOrderRemark(data).then(
+					// data.remark = remark;
+					console.log(data);
+					setAdminOrderRemark(data.order_id,{ remark: remark }).then(
 						res => {
 							that.change = false;
 							this.$util.Tips({
-								title: res.msg,
+								title: res.message,
 								icon: 'success'
 							})
 							that.getIndex();

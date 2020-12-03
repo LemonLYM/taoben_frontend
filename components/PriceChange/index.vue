@@ -3,18 +3,13 @@
     <view class="priceChange" :class="change === true ? 'on' : ''">
       <view class="priceTitle">
         {{
-          status == 0
-            ? orderInfo.refund_status === 1
-              ? "立即退款"
-              : "一键改价"
-            : "订单备注"
+          status == 0 ? "一键改价" :  status == 1  ?   "订单备注" : "立即退款"
         }}
         <span class="iconfont icon-guanbi" @click="close"></span>
       </view>
-      <view class="listChange" v-if="status == 0">
+     <view class="listChange" v-if="status == 0">
         <view
           class="item acea-row row-between-wrapper"
-          v-if="orderInfo.refund_status === 0"
         >
           <view>商品总价(¥)</view>
           <view class="money">
@@ -23,7 +18,6 @@
         </view>
         <view
           class="item acea-row row-between-wrapper"
-          v-if="orderInfo.refund_status === 0"
         >
           <view>原始邮费(¥)</view>
           <view class="money">
@@ -32,7 +26,6 @@
         </view>
         <view
           class="item acea-row row-between-wrapper"
-          v-if="orderInfo.refund_status === 0"
         >
           <view>实际支付(¥)</view>
           <view class="money">
@@ -44,9 +37,8 @@
             />
           </view>
         </view>
-        <view
+       <!-- <view
           class="item acea-row row-between-wrapper"
-          v-if="orderInfo.refund_status === 1"
         >
           <view>实际支付(¥)</view>
           <view class="money">
@@ -55,7 +47,6 @@
         </view>
         <view
           class="item acea-row row-between-wrapper"
-          v-if="orderInfo.refund_status === 1"
         >
           <view>退款金额(¥)</view>
           <view class="money">
@@ -66,7 +57,7 @@
               @focus="priceChange"
             />
           </view>
-        </view>
+        </view> -->
       </view>
       <view class="listChange" v-else>
         <textarea
@@ -78,16 +69,16 @@
       </view>
       <view class="modify" @click="save">
         {{
-          status === 1 || orderInfo.refund_status == 0 ? "立即修改" : "确认退款"
+          status == 0 ? "立即修改" : "确认提交"
         }}
       </view>
-      <view
+  <!--    <view
         class="modify1"
         @click="refuse"
         v-if="orderInfo.refund_status == 1 && status == 0"
       >
         拒绝退款
-      </view>
+      </view> -->
     </view>
     <view class="mask" @touchmove.prevent v-show="change === true"></view>
   </view>
@@ -137,7 +128,7 @@ export default {
     orderInfo: function(nVal) {
       this.price = this.orderInfo.pay_price;
       this.refund_price = this.orderInfo.pay_price;
-      this.remark = "";
+      this.remark = this.orderInfo.remark;
     }
   },
   mounted: function() {

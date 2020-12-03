@@ -17,7 +17,7 @@
 					<span class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '3'">拼团</span>
 				</view>
 				<view class="text">
-					<view class='name line1'>{{item.store_name}}</view>
+					<view class='name line1'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 					<view class="acea-row row-middle">
 						<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
 						<text class="coupon font-color-red" v-if="item.issetCoupon">领券</text>
@@ -64,6 +64,17 @@
 </script>
 
 <style scoped lang="scss">
+	.font-bg-red{
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 34rpx;
+		border-radius: 5rpx;
+		margin-right: 8rpx;
+	}
 	.common-hd {
 		display: flex;
 		align-items: center;
@@ -106,6 +117,7 @@
 
 	.recommend .recommendList {
 		padding: 0 20rpx;
+		// width: 710rpx;
 	}
 	
 	.recommend .recommendList.on{
@@ -113,7 +125,7 @@
 	}
 
 	.recommend .recommendList .item {
-		width: 345rpx;
+		width: 340rpx;
 		margin-bottom: 30rpx;
 		background-color: #fff;
 		border-radius: 16rpx;

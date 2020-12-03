@@ -16,7 +16,10 @@
 			</block>
 			<block v-if="type == 2">
 				<view class="txt">请等待商家收货并退款</view>
-				<view class="time">还剩：{{detail.status_time}}</view>
+				<view class="time">还剩：				
+				<countDown :is-day="true" :tip-text="' '" :day-text="' '" :hour-text="':'" :minute-text="':'" :second-text="' '"
+				 :datatime="datatime"></countDown>
+				</view>
 			</block>
 			<block v-if="type == 3">
 				<view class="txt">退款成功，金额 ¥{{detail.refund_price}}</view>
@@ -32,8 +35,9 @@
 		<view class="info-box" v-if="type == 1">
 			<view class="title">商家已同意您的退货申请，请尽早退货</view>
 			<view class="store-info">
-				<view class="info">{{detail.mer_delivery_user}}</view>
-				<view class="des">{{detail.mer_delivery_address}}</view>
+				<view class="text">收货人姓名：<text class="info">{{detail.mer_delivery_user}}</text></view>
+				<view class="text">收货人联系方式：<text class="info">{{detail.phone}}</text></view>
+				<view class="text">收货人地址：<text class="des">{{detail.mer_delivery_address}}</text></view>
 				<view class="red-txt">
 					<text class="iconfont icon-zhuyi-copy"></text>请按以上收货信息将商品退回
 				</view>
@@ -43,8 +47,9 @@
 		<view class="info-box" v-if="type == 2">
 			<view class="title" style="color:#E93323">商家收货并验货无误，将操作退款给您</view>
 			<view class="store-info">
-				<view class="info">{{detail.mer_delivery_user}}</view>
-				<view class="des">{{detail.mer_delivery_address}}</view>
+				<view class="text">收货人姓名：<text class="info">{{detail.mer_delivery_user}}</text></view>
+				<view class="text">收货人联系方式：<text class="info">{{detail.phone}}</text></view>
+				<view class="text">收货人地址：<text class="des">{{detail.mer_delivery_address}}</text></view>
 			</view>
 		</view>
 		<view class="info-box">
@@ -101,7 +106,7 @@
 			<view class="btn-wrapper">
 				<block v-if="type==-1">
 					<view class="btn gray" @click="goService">联系商家</view>
-					<view class="btn">再次申请</view>
+					<view class="btn" @click="applyAgain(detail)">再次申请</view>
 				</block>
 				<block v-else-if="type==1">
 					<view class="btn gray" @click="goService">联系商家</view>
@@ -121,12 +126,20 @@
 <script>
 	import { refundDetail } from '@/api/order.js'
 	import ClipboardJS from "@/plugin/clipboard/clipboard.js";
+	import countDown from '@/components/countDown'
 	export default{
+		components: {
+			countDown,	
+		},
 		data(){
 			return{
 				type:0,
 				refund_order_id:0,
-				detail:''
+				detail:'',
+				// countDownHour: "00",
+				// countDownMinute: "00",
+				// countDownSecond: "00",
+				datatime: 0
 			}
 		},
 		onLoad(optios) {
@@ -138,7 +151,7 @@
 		},
 		onReady: function() {
 			// #ifdef H5
-			this.$nextTick(function() {
+			this.$nextTick(function() {				
 				const clipboard = new ClipboardJS(".copy-data");
 				clipboard.on("success", () => {
 					this.$util.Tips({
@@ -154,11 +167,18 @@
 					// status 0审核中 1待发货 2待收货 3已退款 -1已拒绝 
 					this.type = res.data.status
 					this.detail = res.data
+					this.datatime = res.data.auto_refund_time;
+					
 				})
 			},
 			goPage(){
 				uni.navigateTo({
 					url:'/pages/users/refund/goods/index?id='+this.detail.refund_order_id
+				})
+			},
+			applyAgain(item){
+				uni.navigateTo({
+					url:`/pages/order_details/index?order_id=${item.refundProduct[0].product.order_id}`
 				})
 			},
 			go(){
@@ -206,8 +226,16 @@
 			margin-top: 10rpx;
 			font-size: 24rpx;
 			opacity: .8;
+			.time{
+				display: inline-block;
+				width: 600rpx;
+				/deep/ .red{
+					color: #fff;
+				}
+			}
 		}
 	}
+
 	.info-box{
 		margin-top: 12rpx;
 		background-color: #fff;
@@ -257,9 +285,6 @@
 		}
 		.store-info{
 			padding: 30rpx;
-			.info{
-				font-size: 30rpx;
-			}
 			.des{
 				margin-top: 10rpx;
 				font-size: 26rpx;

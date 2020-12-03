@@ -55,7 +55,7 @@
 					<view class='item acea-row row-between-wrapper'>
 						<view class="picTxt acea-row row-between-wrapper">
 							<view class='pictrue'>
-								<image :src='item.avatar'></image>
+								<image :src='item.avatar ? item.avatar : "/static/images/f.png"'></image>
 							</view>
 							<view class='text'>
 								<view class='name line1'>{{item.nickname}}</view>
@@ -63,9 +63,9 @@
 							</view>
 						</view>
 						<view class="right">
-							<view><text class='num font-color'>{{item.childCount ? item.childCount : 0}}</text>人</view>
-							<view><text class="num">{{item.orderCount ? item.orderCount : 0}}</text>单</view>
-							<view><text class="num">{{item.numberCount ? item.numberCount : 0}}</text>元</view>
+							<view><text class='num font-color'>{{item.spread_count ? item.spread_count : 0}}</text>人</view>
+							<view><text class="num">{{item.pay_count ? item.pay_count : 0}}</text>单</view>
+							<view><text class="num">{{item.pay_price ? item.pay_price : 0}}</text>元</view>
 						</view>
 					</view>
 				</block>

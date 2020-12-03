@@ -29,7 +29,29 @@
 <script>
 import emptyPage from '@/components/emptyPage.vue'
 import GoodList from "@/components/goodList";
+import { getIndexData } from '@/api/api.js';
 import { getGroomList,getHotBanner } from "@/api/store";
+import util from "@/utils/util";
+
+const typeData = {
+	best:{
+		icon:'icon-jingpintuijian',
+		name:'精品推荐'
+	},
+	hot:{
+		icon:'icon-remen',
+		name:'热门榜单'
+	},
+	new:{
+		icon:'icon-xinpin',
+		name:'首页新品'
+	},
+	good:{
+		icon:'icon-xinpin',
+		name:'推荐单品'
+	},
+}
+
 export default {
   name: "HotNewGoods",
   components: {
@@ -42,6 +64,8 @@ export default {
       imgUrls: [],
       goodsList: [],
       name: "",
+	  hotData:[],
+	  loaded:false,
       icon: "",
 			type:0,
 			autoplay:true,
@@ -55,37 +79,35 @@ export default {
   },
   onLoad: function(option) {
 	this.type = option.type
-    this.titleInfo();
     this.getIndexGroomList();
-		this.getHotBanner();
+	this.getHotBanner();
+	getIndexData().then(res=>{
+		this.hotData = res.data.hot;
+	}).finally(e=>{
+		this.loaded = true;
+		this.titleInfo();
+	});
+  },
+  watch:{
+	name(n){
+		uni.setNavigationBarTitle({
+			title:n||'加载中'
+		})
+	}  
   },
   methods: {
     titleInfo: function() {
-      if (this.type === "best") {
-        this.name = "精品推荐";
-        this.icon = "icon-jingpintuijian";
-        // document.title = "精品推荐";
-				uni.setNavigationBarTitle({
-					title:"精品推荐"
-				})
-      } else if (this.type === "hot") {
-        this.name = "热门榜单";
-        this.icon = "icon-remen";
-				uni.setNavigationBarTitle({
-					title:"热门榜单"
-				})
-      } else if (this.type === "new") {
-        this.name = "首页新品";
-        this.icon = "icon-xinpin";
-				uni.setNavigationBarTitle({
-					title:"首页新品"
-				})
-      }else if (this.type === "good") {
-        this.name = "推荐单品";
-        this.icon = "icon-xinpin";
-				uni.setNavigationBarTitle({
-					title:"推荐单品"
-				})
+      if(!this.loaded){
+      	this.name = '';
+      	this.icon = '';
+      }else{
+      	let name = (typeData[this.type]||{}).name || '精品推荐';
+		let url = this.$route ? this.$route.fullPath : ('/' + util.getNowUrl());
+      	this.hotData.forEach(data=>{
+      		if(data.url == url) name = data.title;
+      	})
+      	this.name = name;
+      	this.icon = (typeData[this.type]||{}).icon || 'icon-jingpintuijian';
       }
     },
     getIndexGroomList: function() {
@@ -105,11 +127,11 @@ export default {
           that.$util.Tips({ title: res });
         });
     },
-		getHotBanner(){
-			let that = this
-			getHotBanner(this.type).then(res=>{
-				 that.imgUrls = res.data;
-			})
+	getHotBanner(){
+		let that = this
+		getHotBanner(this.type).then(res=>{
+			that.imgUrls = res.data;
+		})
 		}
   },
 	onReachBottom() {

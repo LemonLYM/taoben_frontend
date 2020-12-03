@@ -38,7 +38,7 @@
 			</view> -->
 			<!-- <button @click="goPink(order_pay_info.pink_id)" class='returnBnt cart-color' formType="submit" hover-class='none' v-if="order_pay_info.pink_id && order_pay_info.paid!=0 && status!=2 && status!=1">邀请好友参团</button> -->
 			<button @click="goIndex" class='returnBnt cart-color' formType="submit" hover-class='none'>返回首页</button>
-			<view class="coupon-wrapper" v-if="couponList.length>0">
+			<view class="coupon-wrapper" v-if="couponList.length>0 && order_pay_info.paid">
 				<view class="hd">
 					<view class="line"></view>
 					<view class="txt">赠送优惠券</view>
@@ -62,7 +62,7 @@
 					</block>
 				</view>
 				<view class="more" v-if="couponList.length>2" @click="bindMore">
-					展开更多
+					{{ text }}
 					<text v-if="!isOpen" class="iconfont icon-xiangxia"></text>
 					<text v-else class="iconfont icon-xiangshang"></text>
 				</view>
@@ -113,7 +113,8 @@
 				status: 0,
 				msg: '',
 				couponList:[], //优惠券列表
-				isOpen:false //展开
+				isOpen:false ,//展开
+				text: '展开更多'
 			};
 		},
 		computed: mapGetters(['isLogin']),
@@ -143,6 +144,7 @@
 			// 优惠券展开
 			bindMore(){
 				this.isOpen = !this.isOpen
+				this.text = this.text == '展开更多' ? '收起' : '展开更多';
 			},
 			onLoadFun: function() {
 				this.isShowAuth = false;
@@ -211,7 +213,7 @@
 					
 					// // #endif
 					uni.redirectTo({
-						url: '/pages/users/order_list/index??status=1'
+						url: '/pages/users/order_list/index?status=1'
 					})
 				}
 

@@ -5,7 +5,7 @@
 			<view class='text font-color'>
 				<view class="title">分享赚佣金</view>
 				<!-- <view class='money'><text class='label'>￥</text>{{sharePacket.priceName}}</view> -->
-				<view class='money'><text class='label'>￥</text>{{sharePacket.min}}~{{sharePacket.max}}</view>
+				<view class='money'><text class='label'>￥</text>{{parseFloat(sharePacket.max)}}</view>
 				<view class='tip'>下单即返佣金</view>
 				<view class='shareBut'>立即分享</view>
 			</view>
@@ -16,7 +16,7 @@
 <script>
 	export default {
 
-		props: {
+		props: { 
 			sharePacket: {
 				type: Object,
 				default: function() {
@@ -33,7 +33,6 @@
 		},
 		watch:{
 			showAnimate(nVal,oVal){
-				console.log(nVal,'wtch')
 				setTimeout(res=>{
 					this.isAnimate = nVal
 				},1000)
@@ -128,7 +127,7 @@
 	}
 
 	.sharing-packets .sharing-con .text .money .label {
-		font-size: 20rpx;
+		font-size: 16rpx;
 	}
 
 	.sharing-packets .sharing-con .text .tip {

@@ -3,7 +3,7 @@
 		<view class="item" v-for="(item,index) in storeList" :key="index" @click="goStore(item)">
 			<image :src="item.merchant.mer_avatar" mode=""></image>
 			<view class="info">
-				<view class="name line1">{{item.merchant.mer_name}}</view>
+				<view class="name line1">{{item.merchant.mer_name}}<text v-if="item.merchant.is_trader" class="font-bg-red ml8">自营</text></view>
 				<view class="des">{{item.merchant.care_count || 0}}人关注</view>
 				<view class="btn" @click.stop="bindDetele(item,index)">取消关注</view>
 			</view>
@@ -65,6 +65,21 @@
 
 <style lang="scss">
 .user_store_attention{
+	.font-bg-red{
+		display: inline-block;
+		background: #E93424;
+		color: #fff;
+		font-size: 20rpx;
+		width: 58rpx;
+		text-align: center;
+		line-height: 34rpx;
+		border-radius: 5rpx;
+		margin-right: 8rpx;
+		&.ml8{
+			margin-left: 8rpx;
+			margin-right: 0;
+		}
+	}
 	.item{
 		position: relative;
 		display: flex;

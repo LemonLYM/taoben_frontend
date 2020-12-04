@@ -25,7 +25,7 @@
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
 						</view>
-						<view class="phone" v-if="!userInfo.phone && isLogin" @tap="bindPhone">绑定手机号</view>
+						<view class="phone" v-if="!userInfo.phone && isLogin" @tap="bindPhone">身份认证</view>
 					</view>
 				</view>
 				<view class="num-wrapper">

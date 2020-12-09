@@ -101,7 +101,16 @@
 				// #endif
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/publish/publish",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"subPackages": [{
 			"root": "pages/users",
 			"name": "users",
@@ -219,7 +228,7 @@
 				{
 					"path": "user_phone/index",
 					"style": {
-						"navigationBarTitleText": "绑定手机",
+						"navigationBarTitleText": "身份认证",
 						"navigationBarBackgroundColor": "#e93323"
 							// #ifdef MP
 							,
@@ -598,27 +607,33 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "crmeb",
+		"navigationBarTitleText": "淘本",
 		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#F8F8F8",
 		"titleNView": false
 	},
 	"tabBar": {
 		"color": "#282828",
-		"selectedColor": "#ff3366",
+		"selectedColor": "#d74432",
 		"borderStyle": "white",
 		"backgroundColor": "#ffffff",
 		"list": [{
 				"pagePath": "pages/index/index",
 				"iconPath": "static/images/1-001.png",
 				"selectedIconPath": "static/images/1-002.png",
-				"text": "首页"
+				"text": "淘本"
 			},
 			{
 				"pagePath": "pages/goods_cate/goods_cate",
 				"iconPath": "static/images/2-001.png",
 				"selectedIconPath": "static/images/2-002.png",
 				"text": "分类"
+			},
+			{
+				"pagePath": "pages/publish/publish",
+				"iconPath": "static/images/5-001.png",
+				"selectedIconPath": "static/images/5-002.png",
+				"text": "发布"
 			},
 			{
 				"pagePath": "pages/order_addcart/order_addcart",

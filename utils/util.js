@@ -293,7 +293,7 @@ import {
 						[TOKENNAME]: 'Bearer ' + store.state.app.token
 					},
 					success: function(res) {
-						console.log(res,'res22222222222222')
+						//取消上传中的提示
 						uni.hideLoading();
 						if (res.statusCode == 403) {
 							that.Tips({
@@ -329,6 +329,49 @@ import {
  			}
  		})
  	},
+	//多图片上传获取上传到服务器的图片路径
+	async uploadfiles(filePath){
+		const result = await uni.uploadFile(({
+			filePath:filePath
+		}))
+		console.log(result)
+		return result
+	},
+	//多图片上传
+	uploadImages:async function(opt, successCallback, errorCallback) {
+		let that = this;
+		let count = opt.count || 1,
+			sizeType = opt.sizeType || ['compressed'],
+			sourceType = opt.sourceType || ['album', 'camera'],
+			is_load = opt.is_load || true,
+			uploadUrl = opt.url || '',
+			inputName = opt.name || 'field';
+			
+		uni.chooseImage({
+			count: count, //最多可以选择的图片总数  
+			sizeType: sizeType, // 可以指定是原图还是压缩图，默认二者都有  
+			sourceType: sourceType, // 可以指定来源是相册还是相机，默认二者都有  
+			success: function(res) {
+				const imageList = []
+				//启动上传等待中...  
+				uni.showLoading({
+					title: '图片上传中',
+				});
+				const tempfilepaths  = res.tempFilePaths
+				tempfilepaths.forEach((item,index)=>{
+					imageList.push({
+						url:item
+					})
+				})
+				//上传图片
+				for(let i = 0;i<imageList.length;i++){
+					uploadfiles(imageList[i].url)
+				}
+			}
+		})
+	},
+
+	
 	
 	serialize: function(obj) {
 	  var str = [];

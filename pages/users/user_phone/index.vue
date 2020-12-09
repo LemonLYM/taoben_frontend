@@ -22,7 +22,7 @@
 									<image :src='item'></image>
 									<text class='iconfont icon-guanbi1' @click.stop='DelPic(index)'></text>
 								</view>
-								<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 6">
+								<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 2">
 									<text class='iconfont icon-icon25201'></text>
 									<view>上传图片</view>
 								</view>
@@ -65,8 +65,8 @@
 		},
 		data() {
 			return {
-				phone:'',
-				captcha:'',
+				phone:'',   //手机号
+				captcha:'',//验证码
 				isAuto: false, //没有授权的不会自动授权
 				isShowAuth: false, //是否隐藏授权
 				key: '',
@@ -93,10 +93,9 @@
 			//点击上传照片
 			uploadpic: function() {
 				let that = this;
-				that.$util.uploadImageOne({url:'upload/image',count:6}, function(res) {
-					console.log(res);
+				that.$util.uploadImageOne('upload/image', function(res) {
 					that.pics.push(res.data.path);
-					that.$set(that, 'pics', that.pics);
+					// that.$set(that, 'pics', that.pics);
 				});
 			
 			},
@@ -129,6 +128,7 @@
 			authColse: function(e) {
 				this.isShowAuth = e
 			},
+			//认证的方法
 			editPwd: function() {
 				let that = this;
 				if (!that.phone) return that.$util.Tips({
@@ -142,18 +142,21 @@
 				});
 				bindingPhone({
 					phone: that.phone,
-					sms_code: that.captcha
+					sms_code: that.captcha,
+					idCardImages:this.pics //身份证正反面的照片
 				}).then(res => {
+					//
 					if (res.data !== undefined && res.data.is_bind) {
 						uni.showModal({
-							title: '是否绑定账号',
+							title: '是否进行认证',
 							content: res.msg,
-							confirmText: '绑定',
+							confirmText: '认证',
 							success(res) {
 								if (res.confirm) {
 									bindingPhone({
 										phone: that.phone,
 										captcha: that.captcha,
+										idCardImages:this.pics,
 										step: 1
 									}).then(res => {
 										return that.$util.Tips({
@@ -170,7 +173,7 @@
 									})
 								} else if (res.cancel) {
 									return that.$util.Tips({
-										title: '您已取消绑定！'
+										title: '您已取消认证！'
 									}, {
 										tab: 5,
 										url: '/pages/users/user_info/index'
@@ -192,27 +195,27 @@
 					});
 				})
 			},
-			/**
-			 * 发送验证码
-			 * 
-			 */
+			
+      //发送验证码
 			async code() {
 				let that = this;
-				if (!that.phone) return that.$util.Tips({
+				if (!this.phone) return that.$util.Tips({
 					title: '请填写手机号码！'
 				});
-				if (!(/^1(3|4|5|7|8|9|6)\d{9}$/i.test(that.phone))) return that.$util.Tips({
+				if (!(/^1(3|4|5|7|8|9|6)\d{9}$/i.test(this.phone))) return that.$util.Tips({
 					title: '请输入正确的手机号码！'
 				});
+				
 				await registerVerify({
-					phone:that.phone,
-					key:that.key, 
-					code:that.captcha,
-					type: 'binding'
+					phone:this.phone,
+					key:this.key, 
+					code:this.captcha,
+					type: 'binding',
 				}).then(res => {
 					that.$util.Tips({
 						title: res.msg
 					});
+					//这个函数通过mixin的方式加入
 					that.sendCode();
 				}).catch(err => {
 					return that.$util.Tips({

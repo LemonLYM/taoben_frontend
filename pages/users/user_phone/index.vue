@@ -140,6 +140,11 @@
 				if (!that.captcha) return that.$util.Tips({
 					title: '请填写验证码'
 				});
+				if(this.pics.length === 0){
+					return this.$util.Tips({
+					title: '请上传身份证正反面照片'
+				  });
+				}
 				bindingPhone({
 					phone: that.phone,
 					sms_code: that.captcha,

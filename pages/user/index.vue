@@ -19,8 +19,9 @@
 									<view style="margin-left: 10rpx;" class="vip-txt">{{userInfo.vip_name}}</view>
 							</view>
 						</view>
-						<view class="num" v-if="userInfo.phone" @click="goEdit()">
-							<view class="num-txt">ID：{{userInfo.uid}}</view>
+						<!-- <view class="num" v-if="userInfo.phone" @click="goEdit()"> -->
+						<view class="num" v-if="true" @click="goEdit()">
+							<view class="num-txt">ID：{{userInfo.uid}}+{{'审核结果'}}</view>
 							<view class="icon">
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>

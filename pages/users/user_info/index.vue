@@ -42,7 +42,7 @@
 					<view class='item acea-row row-between-wrapper'>
 						<view>手机号码</view>
 						<navigator url="/pages/users/user_phone/index" hover-class="none" class="input" v-if="!userInfo.phone">
-							点击绑定手机号<text class="iconfont icon-xiangyou"></text>
+							点击绑定<text class="iconfont icon-xiangyou"></text>
 						</navigator>
 						<view class='input acea-row row-between-wrapper' v-else>
 							<input type='text' disabled='true' name='phone' :value='userInfo.phone' class='id'></input>

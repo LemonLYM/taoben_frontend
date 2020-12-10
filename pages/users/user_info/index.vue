@@ -37,7 +37,9 @@
 				<view class='list'>
 					<view class='item acea-row row-between-wrapper'>
 						<view>昵称</view>
-						<view class='input'><input type='text' name='nickname' :value='userInfo.nickname' disabled></input></view>
+						<view class='input'>
+							<input type='text' name='nickname' :value='userInfo.nickname'></input>
+						</view>
 					</view>
 					<view class='item acea-row row-between-wrapper'>
 						<view>手机号码</view>
@@ -70,8 +72,24 @@
 							点击修改密码<text class="iconfont icon-xiangyou"></text>
 						</navigator>
 					</view> -->
+					<view class="item-new no-border id-card-edit">
+						<view class='acea-row row-middle'>
+							<view class="item-title">身份证信息</view>
+							<view class="item-desc">(图片格式支持JPG、PNG、JPEG)</view>
+							<view class="upload">
+								<view class='pictrue' v-for="(item,index) in pics" :key="index" :data-index="index" @click="getPhotoClickIdx">
+									<image :src='item'></image>
+									<text class='iconfont icon-guanbi1' style="display: none;" @click.stop='DelPic(index)'></text>
+								</view>
+								<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadidpic' v-if="pics.length < 2">
+									<text class='iconfont icon-icon25201'></text>
+									<view>上传图片</view>
+								</view>
+							</view>
+						</view>
+					</view>
 				</view>
-				<!-- 	<button class='modifyBnt bg-color' formType="submit">保存修改</button> -->
+					<button class='modifyBnt bg-color' formType="submit">保存修改</button>
 				<!-- #ifdef H5 -->
 				<view class="logOut cart-color acea-row row-center-wrapper" @click="outLogin" v-if="!this.$wechat.isWeixin()">退出登录</view>
 				<!-- #endif -->
@@ -116,7 +134,8 @@
 				userIndex: 0,
 				switchUserInfo: [],
 				isAuto: false, //没有授权的不会自动授权
-				isShowAuth: false //是否隐藏授权
+				isShowAuth: false, //是否隐藏授权
+				pics:[]
 			};
 		},
 		computed: mapGetters(['isLogin']),
@@ -134,6 +153,37 @@
 			}
 		},
 		methods: {
+			//点击上传照片
+			uploadidpic: function() {
+				let that = this;
+				that.$util.uploadImageOne('upload/image', function(res) {
+					that.pics.push(res.data.path);
+					// that.$set(that, 'pics', that.pics);
+				});
+			
+			},
+			getPhotoClickIdx(e) {
+				let _this = this;
+				let idx = e.currentTarget.dataset.index;
+				_this.imgPreview(_this.pics, idx);
+			},
+			// 图片预览
+			imgPreview: function(list, idx) {
+				// list：图片 url 数组
+				if (list && list.length > 0) {
+					uni.previewImage({
+						current: list[idx], //  传 Number H5端出现不兼容 
+						urls: list
+					});
+				}
+			},
+			//删除照片
+			DelPic: function(index) {
+				let that = this,
+					pic = this.pics[index];
+				that.pics.splice(index, 1);
+				that.$set(that, 'pics', that.pics);
+			},
 			/**
 			 * 授权回调
 			 */
@@ -157,8 +207,8 @@
 			},
 			switchAccounts: function(item, index) {
 				let userInfo = this.switchUserInfo[index],
-					that = this;
-				that.userIndex = index;
+					  that = this;
+				    that.userIndex = index;
 				if (that.switchUserInfo.length <= 1) return true;
 				if (userInfo === undefined) return that.$util.Tips({
 					title: '切换的账号不存在'
@@ -246,6 +296,7 @@
 				let that = this;
 				getUserInfo().then(res => {
 					that.$set(that, 'userInfo', res.data);
+					this.pics = (res.data&&res.data.pic) || ['http://apis.taoben888.cn/uploads/def/20201210/a81c4f092935c387724a95cc951e73fc.png','http://apis.taoben888.cn/uploads/def/20201210/3824d4ebaf9967caee92bf6bb168cdfe.png']
 					that.userAcc();
 				});
 			},
@@ -270,18 +321,19 @@
 			 */
 			formSubmit: function(e) {
 				let that = this,
-					value = e.detail.value,
-					userInfo = that.switchUserInfo[that.userIndex];
+					  value = e.detail.value,
+					  userInfo = that.switchUserInfo[that.userIndex];
 				if (!value.nickname) return that.$util.Tips({
 					title: '用户姓名不能为空'
 				});
-				value.avatar = userInfo.avatar;
+				value.avatar = this.userInfo.avatar;
+				value.idCardImages = this.pics,
 				userEdit(value).then(res => {
 					return that.$util.Tips({
 						title: res.msg,
 						icon: 'success'
 					}, {
-						tab: 3,
+						tab: 3, //tab =3 url=1表示返回上一页
 						url: 1
 					});
 				}).catch(msg => {
@@ -298,6 +350,79 @@
 </script>
 
 <style scoped lang="scss">
+	.id-card-edit{
+		padding: 30rpx;
+		.item-title{
+			color: #282828;
+			font-size: 32rpx;
+		}
+		.item-desc{
+			color: #B2B2B2;
+			font-size: 22rpx;
+			margin-top: 9rpx;
+			line-height: 36rpx;
+			width: 100%;
+		}
+		.upload {
+			display: -webkit-box;
+			display: -moz-box;
+			display: -webkit-flex;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-lines: multiple;
+			-moz-box-lines: multiple;
+			-o-box-lines: multiple;
+			-webkit-flex-wrap: wrap;
+			-ms-flex-wrap: wrap;
+			flex-wrap: wrap;
+			margin-top: 20rpx;
+		}
+		.pictrue{
+			width: 130rpx;
+			height: 130rpx;
+			margin: 24rpx 22rpx 0 0;
+			position: relative;
+			font-size: 11px;
+			color: #bbb;
+			
+			&:nth-child(4n) {
+				margin-right: 0;
+			}
+			
+			&:nth-last-child(1) {
+				border: 0.5px solid #ddd;
+				box-sizing: border-box;
+			}
+			
+			
+			uni-image,
+			image {
+				width: 100%;
+				height: 100%;
+				border-radius: 1px;
+			
+				img {
+					-webkit-touch-callout: none;
+					-webkit-user-select: none;
+					-moz-user-select: none;
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					opacity: 0;
+					width: 100%;
+					height: 100%;
+				}
+			}
+			
+			.icon-guanbi1 {
+				font-size: 33rpx;
+				position: absolute;
+				top: -10px;
+				right: -10px;
+			}
+		}
+	}
 	.personal-data .wrapper {
 		margin: 10rpx 0;
 		background-color: #fff;

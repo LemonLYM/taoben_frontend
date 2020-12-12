@@ -133,10 +133,6 @@
 				</view>
 			</view>
 		</view>
-		<view class="copy-right">
-			<view class="iconfont icon-crmeb"></view>
-			<view class="text">众邦科技提供技术支持</view>
-		</view>
 		<view style="height: 50rpx;"></view>
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>

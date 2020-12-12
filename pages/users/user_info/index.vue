@@ -79,7 +79,7 @@
 							<view class="upload">
 								<view class='pictrue' v-for="(item,index) in pics" :key="index" :data-index="index" @click="getPhotoClickIdx">
 									<image :src='item'></image>
-									<text class='iconfont icon-guanbi1' style="display: none;" @click.stop='DelPic(index)'></text>
+									<text class='iconfont icon-guanbi1'  @click.stop='DelPic(index)'></text>
 								</view>
 								<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadidpic' v-if="pics.length < 2">
 									<text class='iconfont icon-icon25201'></text>
@@ -108,6 +108,7 @@
 		getLogout,
 		userAcc
 	} from '@/api/user.js';
+	
 	import {
 		switchH5Login
 	} from '@/api/api.js';

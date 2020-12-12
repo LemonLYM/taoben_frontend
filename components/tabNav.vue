@@ -1,9 +1,22 @@
 <template>
 	<view class="navTabBox">
 		<view class="longTab">
-			<scroll-view scroll-x="true" style="white-space: nowrap; display: flex;" scroll-with-animation :scroll-left="tabLeft" show-scrollbar="true">
-				<view class="longItem" :style='"width:"+isWidth+"px"' :data-index="index" :class="index===tabClick?'click':''" v-for="(item,index) in tabTitle" :key="index" :id="'id'+index" @click="longClick(index,item.store_category_id,item.pid)">{{item.cate_name}}</view>
-				<view class="underlineBox" :style='"transform:translateX("+isLeft+"px);width:"+isWidth+"px"'>
+			<scroll-view 
+			  scroll-x="true" 
+				style="white-space: nowrap; display: flex;" 
+				scroll-with-animation 
+				:scroll-left="tabLeft" 
+				show-scrollbar="true">
+				<view class="longItem" 
+				      :style='"width:"+isWidth+"rpx"' 
+							:data-index="index" 
+							:class="index===tabClick?'click':''"
+							v-for="(item,index) in tabTitle"
+							:key="index" :id="'id'+index" 
+							@click="longClick(index,item.store_category_id,item.pid)">
+							{{item.cate_name}}
+							</view>
+				<view class="underlineBox" :style='"transform:translateX("+isLeft+"rpx);width:"+isWidth+"rpx"'>
 					<view class="underline bg-color-red"></view>
 				</view>
 			</scroll-view>
@@ -36,7 +49,7 @@
 			return {
 				tabClick: 0, //导航栏被点击
 				isLeft: 0, //导航栏下划线位置
-				isWidth: 0, //每个导航栏占位
+				isWidth: 100, //每个导航栏占位
 				tabLeft:0,
 				swiperIndex:0,
 				childIndex:0,
@@ -49,7 +62,7 @@
 			// 获取设备宽度
 			uni.getSystemInfo({
 				success(e) {
-					that.isWidth = e.windowWidth / 5 
+					// that.isWidth = e.windowWidth / 5 
 				}
 			})
 		},
@@ -113,6 +126,7 @@
 			padding-bottom: 12rpx;
 			/* #endif */
 			.longItem{ 
+				vertical-align: bottom;
 				height: 50upx; 
 				display: inline-block;
 				line-height: 50upx;

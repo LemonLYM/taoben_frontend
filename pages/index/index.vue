@@ -28,15 +28,16 @@
 						<!-- <image class="logo" src="/static/images/crmeb.png"></image> -->
 						<image :src="logoUrl" mode=""></image>
 					</view>
-					<navigator url="/pages/columnGoods/goods_search/index" class="input" hover-class="none"><text class="iconfont icon-xiazai5"></text>
-						搜索商品</navigator>
+<!-- 					<navigator url="/pages/columnGoods/goods_search/index" class="input" hover-class="none"><text class="iconfont icon-xiazai5"></text>
+						搜索商品</navigator> -->
+					<tabNav class="tabNav" :tabTitle="navTop" @changeTab='changeTab'></tabNav>
 					<!-- <navigator class="btn" url="/pages/customer_list/index?type=0" hover-class="none">
 						<view class="iconfont icon-xiaoxi"></view>
 						<text class="iconnum bg-color-red" v-if="userInfo.total_unread">{{userInfo.total_unread}}</text>
 					</navigator> -->
 				</view>
 			</view>
-			<tabNav class="tabNav" :tabTitle="navTop" @changeTab='changeTab'></tabNav>
+			<!-- <tabNav class="tabNav" :tabTitle="navTop" @changeTab='changeTab'></tabNav> -->
 		</view>
 		<!-- #endif -->
 		<!-- 首页展示 -->
@@ -352,7 +353,19 @@
 				isShowAuth: false, //是否隐藏授权
 				statusBarHeight: statusBarHeight,
 				navIndex: 0,
-				navTop: [],
+				navTop: [
+					{cate_name: "关注",
+           pid: 186,
+           store_category_id: 162
+					},{
+					 cate_name: "推荐",
+					 pid: 186,
+					 store_category_id: 239
+					},{
+					 cate_name: "北京",
+					 pid: 186,
+					 store_category_id: 240
+					 }],
 				subscribe: false,
 				followUrl: "",
 				followHid: true,
@@ -678,7 +691,7 @@
 					res.data.category.unshift({
 						'cate_name': '首页'
 					})
-					that.$set(that, "navTop", res.data.category);
+					// that.$set(that, "navTop", res.data.category);
 
 
 					that.lovely = res.data.lovely

@@ -28,7 +28,7 @@
 						<!-- <image class="logo" src="/static/images/crmeb.png"></image> -->
 						<image :src="logoUrl" mode=""></image>
 					</view>
-<!-- 					<navigator url="/pages/columnGoods/goods_search/index" class="input" hover-class="none"><text class="iconfont icon-xiazai5"></text>
+		<!-- 			<navigator url="/pages/columnGoods/goods_search/index" class="input" hover-class="none"><text class="iconfont icon-xiazai5"></text>
 						搜索商品</navigator> -->
 					<tabNav class="tabNav" :tabTitle="navTop" @changeTab='changeTab'></tabNav>
 					<!-- <navigator class="btn" url="/pages/customer_list/index?type=0" hover-class="none">
@@ -38,6 +38,12 @@
 				</view>
 			</view>
 			<!-- <tabNav class="tabNav" :tabTitle="navTop" @changeTab='changeTab'></tabNav> -->
+			<view class="new-search">
+			  <navigator url="/pages/columnGoods/goods_search/index" class="input" hover-class="none"><text class="iconfont icon-xiazai5"></text>
+				搜索商品
+				</navigator>	
+			</view>
+
 		</view>
 		<!-- #endif -->
 		<!-- 首页展示 -->
@@ -855,6 +861,7 @@
 	}
 </script>
 <style>
+
 	page {
 		display: flex;
 		flex-direction: column;
@@ -866,6 +873,25 @@
 	}
 </style>
 <style lang="scss">
+	.new-search{
+		.input {
+			display: flex;
+			align-items: center;
+			// max-width: 490rpx;
+			min-width: 460rpx;
+			height: 64rpx;
+			padding: 0 0 0 30rpx;
+			background: rgba(237, 237, 237, 1);
+			border: 1px solid rgba(241, 241, 241, 1);
+			border-radius: 32rpx;
+			color: #BBBBBB;
+			font-size: 28rpx;
+		  margin: 10rpx 40rpx 0 40rpx;
+			.iconfont {
+				margin-right: 20rpx;
+			}
+		}
+	}
 	.font-bg-red{
 		display: inline-block;
 		background: #E93424;

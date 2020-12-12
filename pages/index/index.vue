@@ -1395,7 +1395,6 @@
 			.nav {
 				padding: 0 0rpx 30rpx;
 				flex-wrap: wrap;
-				margin-top: 40rpx;
 
 				.item {
 					display: flex;

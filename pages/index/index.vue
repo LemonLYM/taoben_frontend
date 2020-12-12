@@ -360,11 +360,11 @@
 				statusBarHeight: statusBarHeight,
 				navIndex: 0,
 				navTop: [
-					{cate_name: "关注",
+					{cate_name: "推荐",
            pid: 186,
            store_category_id: 162
 					},{
-					 cate_name: "推荐",
+					 cate_name: "关注",
 					 pid: 186,
 					 store_category_id: 239
 					},{
@@ -627,11 +627,11 @@
 			changeTab(e) {
 				this.navIndex = e.index;
 				if (e.index > 0) {
-					storeCategory({
-						pid: e.pid
-					}).then(res => {
-						this.sortList = res.data.length > 9 ? res.data.splice(0, 9) : res.data;
-					});
+					// storeCategory({
+					// 	pid: e.pid
+					// }).then(res => {
+					// 	this.sortList = res.data.length > 9 ? res.data.splice(0, 9) : res.data;
+					// });
 					this.where.pid = e.pid;
 					this.where.page = 1;
 					this.loadend = false;

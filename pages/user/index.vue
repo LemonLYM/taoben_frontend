@@ -5,7 +5,7 @@
 				<view class="bg"></view>
 				<view class="user-info">
 					<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" @click="goEdit()"></image>
-					<image v-else class="avatar" src="/static/images/f.png" mode="" @click="goEdit()"></image>
+					<image v-else class="avatar" src="/static/images/collection.png" mode="" @click="goEdit()"></image>
 					<view class="info">
 						<!-- #ifdef MP -->
 						<view class="name" v-if="!userInfo.uid" @tap="openAuto">

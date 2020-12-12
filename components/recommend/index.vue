@@ -9,20 +9,62 @@
 			<view class="title">为你推荐</view>
 		</view>
 		<view class='recommendList acea-row row-between-wrapper' :class="indexP?'on':''">
-			<view class='item' v-for="(item,index) in hostProduct" :key="index" hover-class='none' @tap="goDetail(item)">
-				<view class='pictrue'>
-					<image :src='item.image'></image>
-					<span class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '1'">秒杀</span>
-					<span class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '2'">砍价</span>
-					<span class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '3'">拼团</span>
-				</view>
-				<view class="text">
-					<view class='name line1'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
-					<view class="acea-row row-middle">
-						<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
-						<text class="coupon font-color-red" v-if="item.issetCoupon">领券</text>
+			<view  class='left'>
+			<view v-for="(item,index) in hostProduct" :key="index" hover-class='none' @tap="goDetail(item)">
+				<view class="item" v-if="index%2 ==0">
+					<view class='pictrue'>
+						<image :src='item.image'></image>
+						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '1'">秒杀</text>
+						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '2'">砍价</text>
+						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '3'">拼团</text>
+					</view>
+					<view class="text">
+						<view class='name'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
+						<view class="tag">
+							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+						</view>
+						<view class="acea-row row-middle price-favor">
+							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
+							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
+							<text class="favor-num">9999人想要</text>
+						</view>
+						<view class="user-info">
+							<view class="avatr-img-wrapper">
+								<image class="avatr-img" src='../../static/images/f.png'></image>
+								<text>嘻嘻嘻李</text>
+							</view>
+							<text class=" credibility">信誉极好</text>
+						</view>
 					</view>
 				</view>
+			</view>
+			</view>
+			<view  class=' right'>
+			<view v-for="(item,index) in hostProduct" :key="index" hover-class='none' @tap="goDetail(item)">
+				<view class="item" v-if="index%2 ==1">
+					<view class='pictrue'>
+						<image :src='item.image'></image>
+						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '1'">秒杀</text>
+						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '2'">砍价</text>
+						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '3'">拼团</text>
+					</view>
+					<view class="text">
+						<view class='name'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
+						<view class="acea-row row-middle price-favor">
+							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
+							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
+							<text class="favor-num">9999人想要</text>
+						</view>
+						<view class="user-info">
+							<view class="avatr-img-wrapper">
+								<image class="avatr-img" src='../../static/images/f.png'></image>
+								<text>嘻嘻嘻李</text>
+							</view>
+							<text class=" credibility">信誉极好</text>
+						</view>
+					</view>
+				</view>
+			</view>
 			</view>
 		</view>
 	</view>
@@ -118,8 +160,15 @@
 	.recommend .recommendList {
 		padding: 0 20rpx;
 		// width: 710rpx;
+		display: flex;
+		align-items: start;
 	}
-	
+	.recommend .recommendList .left{
+		// width: 340rpx;
+	}
+	.recommend .recommendList .right{
+		// width: 340rpx;
+	}
 	.recommend .recommendList.on{
 		padding: 0;
 	}
@@ -134,6 +183,30 @@
 	
 	.recommend .recommendList .item .text{
 		padding: 0 20rpx;
+		margin-top: 10rpx;
+		.user-info{
+			.credibility{
+				color: #5ab5ef;
+				border: 1px solid #5ab5ef;
+				border-radius: 50rpx;
+				padding: 0 10rpx;
+			}
+			.avatr-img-wrapper{
+				display: flex;
+				align-items: center;
+			}
+			margin-top: 10rpx;
+			font-size: 26rpx;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			.avatr-img{
+				width: 36rpx;
+				height: 36rpx;
+				border-radius: 50%;
+				margin-right: 6rpx;
+			}
+		}
 	}
 	
 	.recommend .recommendList .item .coupon{
@@ -160,9 +233,21 @@
 	.recommend .recommendList .item .name {
 		font-size: 28rpx;
 		color: #282828;
-		margin: 20rpx 0 10rpx 0;
+		margin: 20rpx 0 0rpx 0;
+		font-weight: bold;
+	}
+	.recommend .recommendList .item {
+		.price-favor{
+			justify-content: space-between;
+		}
+		.tag{
+			font-size:24rpx
+		}
 	}
 
+	.recommend .recommendList .item .favor-num{
+		font-size: 22rpx;
+	}
 	.recommend .recommendList .item .money {
 		font-size: 20rpx;
 		font-weight: bold;

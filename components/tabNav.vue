@@ -14,9 +14,23 @@
 							v-for="(item,index) in tabTitle"
 							:key="index" :id="'id'+index" 
 							@click="longClick(index,item.store_category_id,item.pid)">
-							{{item.cate_name}}
+							<view class="seleced-address" v-if='item.store_category_id ===240'>
+								{{region[1].length===3?region[1].slice(0,2) : '同城'}}
+								<view class="address">
+									<picker mode="multiSelector" @change="bindRegionChange" @columnchange="bindMultiPickerColumnChange" :value="valueRegion"
+									 :range="multiArray">
+										<view class='acea-row'>
+											<view class="picker"></view>
+											<view class='iconfont icon-dizhi font-color'></view>
+										</view>
+									</picker>
+								</view>
 							</view>
-				<view class="underlineBox" :style='"transform:translateX("+isLeft+"rpx);width:"+isWidth+"rpx"'>
+							<text v-else>
+								{{item.cate_name}}
+							</text>
+							</view>
+				<view class="underlineBox" :style='"transform:translateX("+isLeft+"rpx);width:"+50+"rpx"'>
 					<view class="underline bg-color-red"></view>
 				</view>
 			</scroll-view>
@@ -35,6 +49,9 @@
 </template>
 
 <script>
+	import {
+		getCity
+	} from '@/api/api.js';
 	let app = getApp();
 	export default {
 		name: 'navTab',
@@ -47,9 +64,13 @@
 		},
 		data() {
 			return {
+				valueRegion: [0, 0, 0],
+				multiArray:[],
+				multiIndex: [0, 0, 0],
+				region: ['北京市','北京市'],
 				tabClick: 0, //导航栏被点击
 				isLeft: 0, //导航栏下划线位置
-				isWidth: 100, //每个导航栏占位
+				isWidth: 90, //每个导航栏占位
 				tabLeft:0,
 				swiperIndex:0,
 				childIndex:0,
@@ -59,6 +80,7 @@
 		created() {
 			
 			var that = this
+			this.getCityList();
 			// 获取设备宽度
 			uni.getSystemInfo({
 				success(e) {
@@ -67,6 +89,99 @@
 			})
 		},
 		methods: {
+			// 地址数据
+			getCityList: function() {
+				let that = this;
+				getCity().then(res => {
+					this.district = res.data
+					that.initialize();
+				})
+			},
+			initialize: function() {
+				let that = this,
+					province = [],
+					city = [],
+					area = [];
+				if (that.district.length) {
+					let cityChildren = that.district[0].children || [];
+					let areaChildren = cityChildren.length ? (cityChildren[0].children || []) : [];
+					that.district.forEach(function(item) {
+						province.push(item.name);
+					});
+					cityChildren.forEach(function(item) {
+						city.push(item.name);
+					});
+					areaChildren.forEach(function(item) {
+						area.push(item.name);
+					});
+					this.multiArray = [province, city, area]
+				}
+			},
+			bindRegionChange: function(e) {
+				let multiIndex = this.multiIndex,
+					province = this.district[multiIndex[0]] || {
+						children: []
+					},
+					city = province.children[multiIndex[1]] || {
+						city_id: 0
+					},
+					multiArray = this.multiArray,
+					value = e.detail.value;
+			
+				this.region = [multiArray[0][value[0]], multiArray[1][value[1]], multiArray[2][value[2]]]
+				// this.$set(this.region,0,multiArray[0][value[0]]);
+				// this.$set(this.region,1,multiArray[1][value[1]]);
+				// this.$set(this.region,2,multiArray[2][value[2]]);
+				this.cityId = city.city_id
+				this.valueRegion = [0, 0, 0]
+				this.initialize();
+			},
+			bindMultiPickerColumnChange: function(e) {
+				let that = this,
+					column = e.detail.column,
+					value = e.detail.value,
+					currentCity = this.district[value] || {
+						children: []
+					},
+					multiArray = that.multiArray,
+					multiIndex = that.multiIndex;
+				multiIndex[column] = value;
+				switch (column) {
+					case 0:
+						let areaList = currentCity.children[0] || {
+							children: []
+						};
+						multiArray[1] = currentCity.children.map((item) => {
+							return item.name;
+						});
+						multiArray[2] = areaList.children.map((item) => {
+							return item.name;
+						});
+						break;
+					case 1:
+						let cityList = that.district[multiIndex[0]].children[multiIndex[1]].children || [];
+						multiArray[2] = cityList.map((item) => {
+							return item.name;
+						});
+						break;
+					case 2:
+			
+						break;
+				}
+				// #ifdef MP
+				this.$set(this.multiArray, 0, multiArray[0]);
+				this.$set(this.multiArray, 1, multiArray[1]);
+				this.$set(this.multiArray, 2, multiArray[2]);
+				// #endif
+				// #ifdef H5
+				this.multiArray = multiArray;
+				// #endif
+			
+			
+			
+				this.multiIndex = multiIndex
+				// this.setData({ multiArray: multiArray, multiIndex: multiIndex});
+			},
 			// 导航栏点击
 			longClick(index,id,fid){
 				app.globalData.fid = fid;
@@ -110,6 +225,12 @@
 </script>
 
 <style lang="scss">
+	.seleced-address{
+		display: flex;
+		.iconfont{
+			font-size: 12px;
+		}
+	}
 	.navTabBox {
 		width: 100%;
 		color: rgba(255, 255, 255, 1);
@@ -130,10 +251,10 @@
 				height: 50upx; 
 				display: inline-block;
 				line-height: 50upx;
-				text-align: center;
+				text-align: left;
 				font-size: 28rpx;
 				color: #333333;
-				max-width: 160rpx;
+				max-width: 180rpx;
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -143,6 +264,9 @@
 					color: #E93323;
 				}
 			}
+			// .longItem:last{
+			// 	width: 50px !important;
+			// }
 			.underlineBox {
 				height: 3px;
 				width: 20%;

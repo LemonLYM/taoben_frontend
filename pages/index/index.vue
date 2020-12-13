@@ -873,6 +873,10 @@
 	}
 </style>
 <style lang="scss">
+	.mp-header .tabNav{
+		// background-color: blue;
+		// width: 300rpx !important;
+	}
 	.new-search{
 		.input {
 			display: flex;
@@ -1186,6 +1190,8 @@
 
 			.tabNav {
 				padding-top: 24rpx;
+				// width:300rpx;
+				// background-color: blue;
 			}
 		}
 

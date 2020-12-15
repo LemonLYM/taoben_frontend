@@ -33,7 +33,7 @@
 								<image class="avatr-img" src='../../static/images/f.png'></image>
 								<text>嘻嘻嘻李</text>
 							</view>
-							<text class=" credibility">信誉极好</text>
+							<text class="credibility">信誉极好</text>
 						</view>
 					</view>
 				</view>

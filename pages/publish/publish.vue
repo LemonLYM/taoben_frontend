@@ -1,10 +1,46 @@
 <template>
-	<view>
-		<view class="publish-title">发布</view>
+	<view class="publish-wrapper">
+		<view class="publish-item">
+			<view class="name">
+				剧本名称
+			</view>
+			<input class='bookName rightbox' name='bookName' v-model="name" placeholder="请输入剧本名称"/>
+		</view>
+		<view class="publish-item">
+			<view class="name">
+				售价
+			</view>
+			<input class='curPrice rightbox' name='curPrice' type='number' v-model="curPrice" placeholder="请输入售价"/>
+		</view>
+		<text class="tips">平台会收取5%的服务费，实际到手价格</text>
+		<view class="publish-item">
+			<view class="name">
+				入手价
+			</view>
+			<input class='prePrice rightbox' name='prePrice' type="number" v-model="prePrice" placeholder="请输入入手价"/>
+		</view>
+		<view class="publish-item">
+			<view class="name">
+				数量
+			</view>
+			<input class='num rightbox' name='num' type="number" v-model="num" placeholder="请输入数量"/>
+		</view>
+		<view class="publish-item">
+			<view class="name">
+				新旧程度
+			</view>
+			<view class="rightbox">
+				  <picker @change="bindPickerChange" :value="index" :range="array">
+				    <view class="uni-input">{{array[index]}}</view>
+				  </picker>
+			</view>
+		</view>
+		
+		<view class="publish-title">商品描述</view>
 		<view class="publish-content">
 			<textarea class="publish-textarea" value="" placeholder="请输入您要发布的商品介绍" />
-			</view>
-		<view class="publish-title">商品图片</view>
+		</view>
+		<view class="publish-title-pic">商品图片</view>
 		<view class="publish-desc">(图片格式支持JPG、PNG、JPEG)</view>
 		<view class=" item-new no-border publish-image-box">
 				<view class='acea-row row-middle'>
@@ -13,26 +49,67 @@
 							<image :src='item'></image>
 							<text class='iconfont icon-guanbi1' @click.stop='DelPic(index)'></text>
 						</view>
-						<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 6">
+						<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic' v-if="pics.length < 10">
 							<text class='iconfont icon-icon25201'></text>
 							<view>上传图片</view>
 						</view>
 					</view>
 				</view>		
 		</view>
+		<view class="publish-item">
+			<view class="name">
+				运费
+			</view>
+			<view class="deliverPriceWrapper">
+				<input class="deliverPrice" name='deliverPrice'/>
+				<label >
+					<checkbox value="" /><text>包邮</text>
+				</label>
+			</view>
+
+		</view>
+		<view class="publish-item">
+			<view class="name">
+				所在城市
+			</view>
+			<view class="address">
+				{{region[1]}}
+				<picker mode="multiSelector" @change="bindRegionChange" @columnchange="bindMultiPickerColumnChange" :value="valueRegion"
+				 :range="multiArray">
+					<view class='acea-row'>
+						<view class="picker"></view>
+						<view class='iconfont icon-dizhi font-color'></view>
+					</view>
+				</picker>
+			</view>
+		</view>
 		<button type="primary" >发布</button>
 	</view>
 </template>
 
 <script>
+	import {
+		getCity
+	} from '@/api/api.js';
 	export default {
 		data() {
 			return {
-				pics:[]  //商品上传的图片
+				name:'',
+				index:0,
+				curPrice:0,//售价
+				prePrice:0,//原价
+				num:0,//数量
+				array:['三成新','五成新','七成新','九成新','全新'],
+				pics:[],  //商品上传的图片
+				valueRegion: [0, 0, 0],
+				multiArray:[],
+				multiIndex: [0, 0, 0],
+				region: ['北京市','北京市'],
  			}
 		},
 		onLoad() {
 			console.log('onload')
+			this.getCityList();
 		},
 		//tabbar点击就会触发
 		onTabItemTap(e){
@@ -43,6 +120,102 @@
 			console.log('onshow')
 		},
 		methods: {
+			// 地址数据
+			getCityList: function() {
+				let that = this;
+				getCity().then(res => {
+					this.district = res.data
+					that.initialize();
+				})
+			},
+			initialize: function() {
+				let that = this,
+					province = [],
+					city = [],
+					area = [];
+				if (that.district.length) {
+					let cityChildren = that.district[0].children || [];
+					let areaChildren = cityChildren.length ? (cityChildren[0].children || []) : [];
+					that.district.forEach(function(item) {
+						province.push(item.name);
+					});
+					cityChildren.forEach(function(item) {
+						city.push(item.name);
+					});
+					areaChildren.forEach(function(item) {
+						area.push(item.name);
+					});
+					this.multiArray = [province, city, area]
+				}
+			},
+			bindRegionChange: function(e) {
+				let multiIndex = this.multiIndex,
+					province = this.district[multiIndex[0]] || {
+						children: []
+					},
+					city = province.children[multiIndex[1]] || {
+						city_id: 0
+					},
+					multiArray = this.multiArray,
+					value = e.detail.value;
+			
+				this.region = [multiArray[0][value[0]], multiArray[1][value[1]], multiArray[2][value[2]]]
+				// this.$set(this.region,0,multiArray[0][value[0]]);
+				// this.$set(this.region,1,multiArray[1][value[1]]);
+				// this.$set(this.region,2,multiArray[2][value[2]]);
+				this.cityId = city.city_id
+				this.valueRegion = [0, 0, 0]
+				this.initialize();
+			},
+			bindMultiPickerColumnChange: function(e) {
+				let that = this,
+					column = e.detail.column,
+					value = e.detail.value,
+					currentCity = this.district[value] || {
+						children: []
+					},
+					multiArray = that.multiArray,
+					multiIndex = that.multiIndex;
+				multiIndex[column] = value;
+				switch (column) {
+					case 0:
+						let areaList = currentCity.children[0] || {
+							children: []
+						};
+						multiArray[1] = currentCity.children.map((item) => {
+							return item.name;
+						});
+						multiArray[2] = areaList.children.map((item) => {
+							return item.name;
+						});
+						break;
+					case 1:
+						let cityList = that.district[multiIndex[0]].children[multiIndex[1]].children || [];
+						multiArray[2] = cityList.map((item) => {
+							return item.name;
+						});
+						break;
+					case 2:
+			
+						break;
+				}
+				// #ifdef MP
+				this.$set(this.multiArray, 0, multiArray[0]);
+				this.$set(this.multiArray, 1, multiArray[1]);
+				this.$set(this.multiArray, 2, multiArray[2]);
+				// #endif
+				// #ifdef H5
+				this.multiArray = multiArray;
+				// #endif
+			
+			
+			
+				this.multiIndex = multiIndex
+				// this.setData({ multiArray: multiArray, multiIndex: multiIndex});
+			},
+			bindPickerChange:function(){
+				
+			},
 			//点击上传照片
 			uploadpic: function() {
 				let that = this;
@@ -79,11 +252,59 @@
 </script>
 
 <style lang="scss">
+.publish-wrapper{
+	padding: 0 30rpx;
+	// font-size: 32rpx;
+	.publish-item{
+		justify-content: space-between;
+		display: flex;
+		padding: 30rpx;
+		border-top: 1rpx solid #eee;
+		align-items: center;
+		// width: 475rpx;
+		font-size: 30rpx;
+		.deliverPriceWrapper{
+			flex: 1;
+			display: flex;
+			input{
+				flex: 1;
+			}
+			label{
+				width: 200rpx;
+			}
+		}
+	}
+	.name{
+		    width: 195rpx;
+		    font-size: 30rpx;
+		    color: #333;
+	}
+	.address{
+		display: flex;
+		flex: 1;
+	}
+	.bookName{
+		// width: 400rpx;
+	}
+	.rightbox{
+		flex:1;
+	}
+	.tips{
+		margin-left: 30rpx;
+	}
+}
 .publish-title{
-	margin: 30rpx;
 	margin-bottom: 0;
-	font-size: 32rpx;
-	color: #666;
+	padding: 30rpx;
+	font-size: 30rpx;
+	border-top: 1rpx solid #eee;
+	
+}
+.publish-title-pic{
+	margin-bottom: 0;
+	padding: 30rpx;
+	padding-bottom: 0;
+	font-size: 30rpx;
 }
 .publish-desc{
 	color: #B2B2B2;
@@ -94,20 +315,22 @@
 	margin-left: 30rpx;
 }	
 .publish-content{
-	margin: 30rpx;
 	padding: 20rpx;
 	box-sizing: border-box;
 	border: 1px solid #eee;
+	// margin-left: 30rpx;
 	.publish-textarea{
 		font-size: 24rpx;
 		width: 100%;
 		height: 200rpx;
+
 	}
 }
 .publish-image-box{
 	display: flex;
 	flex-wrap: wrap;
-	padding: 20rpx 30rpx;
+	padding: 20rpx 0rpx;
+	margin-left: 30rpx;
 	.upload {
 		display: -webkit-box;
 		display: -moz-box;

@@ -23,6 +23,9 @@
 							<view class='iconfont icon-fenxiang' @click="listenerActionSheet"></view>
 						</view>
 						<view class='introduce'><text v-if="storeInfo.merchant.is_trader" class="font-bg-red">自营</text>{{storeInfo.store_name}}</view>
+						<view class="tag">
+							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+						</view>
 						<view class='label acea-row row-between-wrapper'>
 							<view>原价:￥{{storeInfo.ot_price ? storeInfo.ot_price : ''}}</view>
 							<view>库存:{{storeInfo.stock}}{{storeInfo.unit_name}}</view>
@@ -88,7 +91,11 @@
 								<image :src="storeInfo.merchant.mer_avatar" mode=""></image>
 							</view>
 							<view class="info">
-								<view class="name">{{storeInfo.merchant.mer_name}}<text v-if="storeInfo.merchant.is_trader" class="font-bg-red ml8">自营</text></view>
+								<view class="name">
+								{{storeInfo.merchant.mer_name}}
+								<text class="credibility">信誉极好</text>
+								<text v-if="storeInfo.merchant.is_trader" class="font-bg-red ml8">自营</text>
+								</view>
 								<view class="txt">{{storeInfo.merchant.care_count}}人关注</view>
 							</view>
 							<navigator :url="'/pages/store/home/index?id='+storeInfo.merchant.mer_id" class="link" hover-class="none">进店</navigator>
@@ -1343,6 +1350,10 @@
 </script>
 
 <style scoped lang="scss">
+	#past0  .wrapper .tag{
+			font-size:24rpx;
+			margin: 10rpx 30rpx 0 30rpx;
+		}
 	.font-bg-red{
 		display: inline-block;
 		background: #E93424;
@@ -1576,9 +1587,12 @@
 		border-radius: 6rpx;
 	}
 
-	.product-con .superior .slider-banner .list .item .name {
+	.product-con .superior .slider-banner .list .item  {
+		.name{
 		color: #282828;
-		margin-top: 12rpx;
+		margin-top: 12rpx;	
+		}
+
 	}
 
 	.product-con .superior .slider-banner .swiper-pagination-bullet {
@@ -1810,7 +1824,16 @@
 						font-size: 28rpx;
 						color: #282828;
 						font-weight: bold;
+						.credibility{
+								color: #5ab5ef;
+								border: 1px solid #5ab5ef;
+								border-radius: 50rpx;
+								padding: 0 10rpx;
+								margin-left:10rpx;
+								font-weight: normal;
+							}
 					}
+					
 					.txt{
 						margin-top: 8rpx;
 						color: #666666;

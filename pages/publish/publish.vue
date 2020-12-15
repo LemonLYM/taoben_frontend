@@ -4,7 +4,7 @@
 			<view class="name">
 				剧本名称
 			</view>
-			<input class='bookName rightbox' name='bookName' v-model="name" placeholder="请输入剧本名称"/>
+			<input class='bookName rightbox' name='bookName' v-model="bookName" placeholder="请输入剧本名称"/>
 		</view>
 		<view class="publish-item">
 			<view class="name">
@@ -12,7 +12,7 @@
 			</view>
 			<input class='curPrice rightbox' name='curPrice' type='number' v-model="curPrice" placeholder="请输入售价"/>
 		</view>
-		<text class="tips">平台会收取5%的服务费，实际到手价格</text>
+		<text class="tips" v-if='curPrice'>平台会收取5%的服务费，实际到手价格{{curPrice*0.95}}</text>
 		<view class="publish-item">
 			<view class="name">
 				入手价
@@ -38,7 +38,7 @@
 		
 		<view class="publish-title">商品描述</view>
 		<view class="publish-content">
-			<textarea class="publish-textarea" value="" placeholder="请输入您要发布的商品介绍" />
+			<textarea class="publish-textarea" v-model="textContext" placeholder="请输入您要发布的商品介绍" />
 		</view>
 		<view class="publish-title-pic">商品图片</view>
 		<view class="publish-desc">(图片格式支持JPG、PNG、JPEG)</view>
@@ -61,12 +61,13 @@
 				运费
 			</view>
 			<view class="deliverPriceWrapper">
-				<input class="deliverPrice" name='deliverPrice'/>
+				<input class="deliverPrice" type="number" name='deliverPrice' v-model="deliverPrice"/>
+				<checkbox-group @change="checkboxChange">
 				<label >
-					<checkbox value="" /><text>包邮</text>
+					<checkbox value="0"  /><text>包邮</text>
 				</label>
+				</checkbox-group>
 			</view>
-
 		</view>
 		<view class="publish-item">
 			<view class="name">
@@ -83,7 +84,7 @@
 				</picker>
 			</view>
 		</view>
-		<button type="primary" >发布</button>
+		<button type="primary" @click="formSubmit">发布</button>
 	</view>
 </template>
 
@@ -94,17 +95,20 @@
 	export default {
 		data() {
 			return {
-				name:'',
+				bookName:'',//剧本名称
+				curPrice:'',//售价
+				prePrice:'',//原价
+				num:'',//数量
 				index:0,
-				curPrice:0,//售价
-				prePrice:0,//原价
-				num:0,//数量
-				array:['三成新','五成新','七成新','九成新','全新'],
+				array:['请选择','三成新','五成新','七成新','九成新','全新'],
+				textContext:'',//商品描述
 				pics:[],  //商品上传的图片
+				deliverPrice:'',//运费
 				valueRegion: [0, 0, 0],
 				multiArray:[],
 				multiIndex: [0, 0, 0],
-				region: ['北京市','北京市'],
+				region: ['',''],
+				validate:false //校验状态
  			}
 		},
 		onLoad() {
@@ -120,6 +124,75 @@
 			console.log('onshow')
 		},
 		methods: {
+			checkboxChange:function(e){
+				debugger
+				let value =  e.detail.value
+				if(value.length == 0){
+					this.deliverPrice = ''
+				}else{
+					this.deliverPrice = value[0]
+				}
+
+			},
+			validateForm: function() {
+				debugger
+				let that = this
+				if (!this.bookName) return that.$util.Tips({
+					title: '请请输入剧本名称'
+				});
+				if (!this.curPrice) return that.$util.Tips({
+					title: '请输入售价'
+				});
+				if (!this.prePrice) return that.$util.Tips({
+					title: '请输入入手价'
+				});
+				if (!this.num) return that.$util.Tips({
+					title: '请输入数量'
+				});
+				if (!this.index) return that.$util.Tips({
+					title: '请选择新旧程度'
+				});
+				if (!this.textContext) return that.$util.Tips({
+					title: '请输入商品描述'
+				});
+				if (this.pics.length === 0) return that.$util.Tips({
+					title: '请上传商品图片'
+				});
+				if (this.deliverPrice === '') return that.$util.Tips({
+					title: '请输入运费'
+				});
+				if(!this.region[1])return that.$util.Tips({
+					title: '请选择所在城市'
+				});
+				that.validate = true;
+				return true;
+			},
+			formSubmit: function(e) {
+				let that = this;
+				if (that.validateForm() && that.validate) {
+			// 		create({
+			// 			phone: that.merchantData.phone,
+			// 			mer_name: that.merchantData.enterprise_name,
+			// 			name: that.merchantData.user_name,
+			// 			code: that.merchantData.yanzhengma,
+			// 			merchant_category_id: that.merchantData.classification,
+			// 			images: that.pics
+			// 		}).then(data => {
+			// 			if (data.status == 200) {
+			// 				title: '发布成功',
+			// 				that.loading = true;
+			// 				this.timer = setTimeout(() => {
+			// 					that.successful = true;
+			// 				}, 1000)
+			// 			}
+			
+			// 		}).catch(res=>{
+			// 			that.$util.Tips({
+			// 				title: res
+			// 			});
+			// 		})
+				}
+			},
 			// 地址数据
 			getCityList: function() {
 				let that = this;
@@ -213,8 +286,8 @@
 				this.multiIndex = multiIndex
 				// this.setData({ multiArray: multiArray, multiIndex: multiIndex});
 			},
-			bindPickerChange:function(){
-				
+			bindPickerChange:function(e){
+				this.index = e.detail.value
 			},
 			//点击上传照片
 			uploadpic: function() {

@@ -84,6 +84,19 @@
 				</picker>
 			</view>
 		</view>
+		<view class="publish-item">
+			<view class="name">
+				剧本分类
+			</view>
+		</view>
+		<view v-if='productList.length!==0'>
+		<view class="kind" v-for="(item,idx) in productList" :key='idx'>
+			<text class="title">{{item.cate_name}}</text>
+			<view class="tag-wrapper" >
+				  <tag  :key='index'  :list='item.children' @change='tagClick'></tag>
+			</view>
+		</view>
+		</view>
 		<button type="primary" @click="formSubmit">发布</button>
 	</view>
 </template>
@@ -92,7 +105,14 @@
 	import {
 		getCity
 	} from '@/api/api.js';
+	import tag from '../../components/axb-checkbox/axb-checkbox.vue';
+	import {
+		getCategoryList
+	} from '@/api/store.js';
 	export default {
+		components:{
+			tag
+		},
 		data() {
 			return {
 				bookName:'',//剧本名称
@@ -108,13 +128,17 @@
 				multiArray:[],
 				multiIndex: [0, 0, 0],
 				region: ['',''],
-				validate:false //校验状态
+				validate:false, //校验状态
+				productList:[], //商品分类标签
+				category:{}//选中的分类
  			}
 		},
 		onLoad() {
 			console.log('onload')
 			this.getCityList();
+			this.getAllCategory(); //获取分类标签数据
 		},
+		
 		//tabbar点击就会触发
 		onTabItemTap(e){
 			console.log(e)
@@ -124,8 +148,16 @@
 			console.log('onshow')
 		},
 		methods: {
+			getAllCategory:function(){
+				let that = this;
+				getCategoryList().then(res => {
+					that.productList = res.data;
+				})
+			},
+			tagClick:function(val){
+				Object.assign(this.category,val)
+			},
 			checkboxChange:function(e){
-				debugger
 				let value =  e.detail.value
 				if(value.length == 0){
 					this.deliverPrice = ''
@@ -135,7 +167,6 @@
 
 			},
 			validateForm: function() {
-				debugger
 				let that = this
 				if (!this.bookName) return that.$util.Tips({
 					title: '请请输入剧本名称'
@@ -164,33 +195,48 @@
 				if(!this.region[1])return that.$util.Tips({
 					title: '请选择所在城市'
 				});
+				if(Object.keys(this.category).length === 0)return that.$util.Tips({
+					title: '请选择商品分类'
+				});
 				that.validate = true;
 				return true;
 			},
 			formSubmit: function(e) {
+				let categoryId = []
+
+				Object.keys(this.category).forEach(item=>{
+					if(this.category[item]){
+						categoryId.push(item)
+					}
+				})
 				let that = this;
 				if (that.validateForm() && that.validate) {
-			// 		create({
-			// 			phone: that.merchantData.phone,
-			// 			mer_name: that.merchantData.enterprise_name,
-			// 			name: that.merchantData.user_name,
-			// 			code: that.merchantData.yanzhengma,
-			// 			merchant_category_id: that.merchantData.classification,
-			// 			images: that.pics
-			// 		}).then(data => {
-			// 			if (data.status == 200) {
-			// 				title: '发布成功',
-			// 				that.loading = true;
-			// 				this.timer = setTimeout(() => {
-			// 					that.successful = true;
-			// 				}, 1000)
-			// 			}
+					create({
+						bookName: this.bookName, //剧本名称
+						curPrice: this.curPrice, //售价
+						prePrice: this.prePrice, //入手价
+						num: this.num, //商品数量
+						newDegree: this.index,//新旧程度
+						textContext: this.textContext,//商品描述
+						pics:this.pics, //商品图片
+						deliverPrice:this.deliverPrice,//运费
+						city: region[1],//城市名称
+						cityid:valueRegion[1], //城市id
+						category: categoryId//商品分类
+					}).then(data => {
+						if (data.status == 200) {
+							title: '发布成功',
+							that.loading = true;
+							this.timer = setTimeout(() => {
+								that.successful = true;
+							}, 1000)
+						}
 			
-			// 		}).catch(res=>{
-			// 			that.$util.Tips({
-			// 				title: res
-			// 			});
-			// 		})
+					}).catch(res=>{
+						that.$util.Tips({
+							title: res
+						});
+					})
 				}
 			},
 			// 地址数据
@@ -351,6 +397,26 @@
 		    width: 195rpx;
 		    font-size: 30rpx;
 		    color: #333;
+	}
+	.kind{
+		display: flex;
+		flex-wrap: wrap;
+		padding-left: 30rpx;
+		.title{
+			margin-right: 10rpx;
+		}
+		.tag-wrapper{
+			display: flex;
+			flex-wrap: wrap;
+			flex: 1;
+		}
+		tag{
+			margin-right: 10rpx;
+			margin-bottom: 10rpx;
+		}
+	}
+	.tag{
+		width: 100rpx;
 	}
 	.address{
 		display: flex;

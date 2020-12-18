@@ -97,7 +97,7 @@
 			</view>
 		</view>
 		</view>
-		<button type="primary" @click="formSubmit">发布</button>
+		<button type="primary" @click="formSubmit" class="publish-btn">发布</button>
 	</view>
 </template>
 
@@ -374,6 +374,17 @@
 .publish-wrapper{
 	padding: 0 30rpx;
 	// font-size: 32rpx;
+	.publish-btn{
+		font-size: 32rpx;
+		    width: 580rpx;
+		    height: 90rpx;
+		    border-radius: 45rpx;
+		    color: #fff;
+		    margin: 50rpx auto 30rpx auto;
+		    text-align: center;
+		    line-height: 90rpx;
+		    background: #e93323;
+	}
 	.publish-item{
 		justify-content: space-between;
 		display: flex;

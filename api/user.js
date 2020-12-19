@@ -7,7 +7,10 @@ import request from "@/utils/request.js";
 export function getUserInfo(){
   return request.get('user');
 }
-
+//获取审核信息
+export function getUserCat(){
+	return request.get('user/ca')
+}
 /**
  * 设置用户分享
  * 

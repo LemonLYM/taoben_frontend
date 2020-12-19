@@ -19,14 +19,15 @@
 									<view style="margin-left: 10rpx;" class="vip-txt">{{userInfo.vip_name}}</view>
 							</view>
 						</view>
-						<!-- <view class="num" v-if="userInfo.phone" @click="goEdit()"> -->
-						<view class="num" v-if="true" @click="goEdit()">
-							<view class="num-txt">ID：{{userInfo.uid}}+{{'审核结果'}}</view>
+						<view class="num" v-if="userInfo.phone" @click="goEdit()">
+						<!-- <view class="num" v-if="true" @click="goEdit()"> -->
+							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
+							<view class="num-txt">{{userInfo.user_ca ? "审核成功" : catInfo.msg}}</view>
 							<view class="icon">
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
 						</view>
-						<view class="phone" v-if="!userInfo.phone && isLogin" @tap="bindPhone">身份认证</view>
+						<view class="phone" v-if="!userInfo.phone && isLogin && !userInfo.user_ca" @tap="bindPhone">身份认证</view>
 					</view>
 				</view>
 				<view class="num-wrapper">
@@ -143,7 +144,8 @@
 	import {
 		getMenuList,
 		getUserInfo,
-		setVisit
+		setVisit,
+		getUserCat
 	} from '@/api/user.js';
 	import {
 		toLogin
@@ -215,6 +217,7 @@
 				balance_func_status: 0, //余额开关 1开
 				is_promoter: 0, //推广人开关  1开
 				mer_intention_open: 0,
+				catInfo:{} //获取认证结果信息
 			}
 		},
 		onLoad() {
@@ -249,6 +252,7 @@
 				this.getUserInfo();
 				this.orderNum();
 				this.getMyMenus();
+				this.getUserCat() //获取用户认证结果信息
 				// this.setVisit();
 			} else {
 				// #ifdef H5 || APP-PLUS
@@ -281,6 +285,7 @@
 				this.getUserInfo();
 				this.getMyMenus();
 				this.orderNum();
+				this.getUserCat() //获取用户认证结果信息
 				this.isShowAuth = false
 			},
 			Setting: function() {
@@ -298,6 +303,12 @@
 			bindPhone() {
 				uni.navigateTo({
 					url: '/pages/users/user_phone/index'
+				})
+			},
+			getUserCat:function(){
+				let that = this
+				getUserCat().then(res=>{
+					that.catInfo = res.data
 				})
 			},
 			/**

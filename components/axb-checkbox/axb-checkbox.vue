@@ -30,7 +30,6 @@
 			};
 		},
 		created(){
-debugger
 		},
 		computed:{
 		},
@@ -39,10 +38,8 @@ debugger
 				const arr = []
 				// 是否为全部
 				if(val==='all'){
-					debugger
 					let allr = this.items.find((n) => n.store_category_id === val)
 					this.items.forEach(function(item){
-						debugger
 						let re = {}
 						re.cate_name = item.cate_name
 						re.store_category_id = item.store_category_id
@@ -84,7 +81,6 @@ debugger
 				this.items = arr
 			},
 			radioChange: function (e) {
-				debugger
 				console.log('radio发生change事件，携带value值为：' + e)
 				// 改变单击项 
 				this.handleChange(e)

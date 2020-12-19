@@ -106,7 +106,8 @@
 		getUserInfo,
 		userEdit,
 		getLogout,
-		userAcc
+		userAcc,
+		getUserCat
 	} from '@/api/user.js';
 	
 	import {
@@ -143,6 +144,7 @@
 		onLoad() {
 			if (this.isLogin) {
 				this.getUserInfo();
+				this.getUserCat();
 			} else {
 				// #ifdef H5 || APP-PLUS
 				toLogin();
@@ -191,6 +193,7 @@
 			onLoadFun: function() {
 				this.isShowAuth = false;
 				this.getUserInfo();
+				this.getUserCat();
 			},
 			// 授权关闭
 			authColse: function(e) {
@@ -232,6 +235,7 @@
 					that.$store.commit("SETUID", data.user.uid);
 					that.$store.commit('UPDATE_USERINFO', data.user);
 					that.getUserInfo();
+					this.getUserCat();
 
 				}).catch(err => {
 					uni.hideLoading();
@@ -297,9 +301,15 @@
 				let that = this;
 				getUserInfo().then(res => {
 					that.$set(that, 'userInfo', res.data);
-					this.pics = (res.data&&res.data.pic) || ['http://apis.taoben888.cn/uploads/def/20201210/a81c4f092935c387724a95cc951e73fc.png','http://apis.taoben888.cn/uploads/def/20201210/3824d4ebaf9967caee92bf6bb168cdfe.png']
+					// this.pics = (res.data&&res.data.pic) || ['http://apis.taoben888.cn/uploads/def/20201210/a81c4f092935c387724a95cc951e73fc.png','http://apis.taoben888.cn/uploads/def/20201210/3824d4ebaf9967caee92bf6bb168cdfe.png']
 					that.userAcc();
 				});
+			},
+			getUserCat:function(){
+				let that = this
+				getUserCat().then(res=>{
+					this.pics = res.data && res.data.idCardImages
+				})
 			},
 			/**
 			 * 上传文件

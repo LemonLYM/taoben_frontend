@@ -5,7 +5,7 @@
 				<view class="bg"></view>
 				<view class="user-info">
 					<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" @click="goEdit()"></image>
-					<image v-else class="avatar" src="/static/images/collection.png" mode="" @click="goEdit()"></image>
+					<image v-else class="avatar" src="/static/images/f.png" mode="" @click="goEdit()"></image>
 					<view class="info">
 						<!-- #ifdef MP -->
 						<view class="name" v-if="!userInfo.uid" @tap="openAuto">
@@ -22,7 +22,7 @@
 						<view class="num" v-if="userInfo.phone" @click="goEdit()">
 						<!-- <view class="num" v-if="true" @click="goEdit()"> -->
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
-							<view class="num-txt">{{userInfo.user_ca ? "审核成功" : catInfo.msg}}</view>
+							<view class="num-txt">{{userInfo.user_ca ? "身份认证成功" : "catInfo.msg"}}</view>
 							<view class="icon">
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>

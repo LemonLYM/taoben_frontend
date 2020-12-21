@@ -70,7 +70,22 @@
 							</view>
 						</view>
 					</view>
-
+					<view class="item no-border">
+						<view class='acea-row row-middle'>
+							<text class="item-title">请上传身份证正反面照片</text>
+							<text class="item-desc">(图片格式支持JPG、PNG、JPEG)</text>
+							<view class="upload">
+								<view class='pictrue' v-for="(item,index) in idpics" :key="index" :data-index="index" @click="getPhotoClickIdx1">
+									<image :src='item'></image>
+									<text class='iconfont icon-guanbi1' @click.stop='DelPic1(index)'></text>
+								</view>
+								<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadpic1' v-if="idpics.length < 2">
+									<text class='iconfont icon-icon25201'></text>
+									<view>上传图片</view>
+								</view>
+							</view>
+						</view>
+					</view>
 					<view class="item no-border">
 						<checkbox-group @change='ChangeIsAgree'>
 							<checkbox class="checkbox" :checked="isAgree ? true : false" />已阅读并同意</checkbox-group>
@@ -171,6 +186,7 @@
 					merchant_category_id: ''
 				}],
 				pics: [],
+				idpics:[],//身份证照片
 				tagStyle: {
 					img: 'width:100%;'
 				},
@@ -222,6 +238,11 @@
 				let idx = e.currentTarget.dataset.index;
 				_this.imgPreview(_this.pics, idx);
 			},
+			getPhotoClickIdx1(e) {
+				let _this = this;
+				let idx = e.currentTarget.dataset.index;
+				_this.imgPreview(_this.idpics, idx);
+			},
 			// 图片预览
 			imgPreview: function(list, idx) {
 				// list：图片 url 数组
@@ -266,6 +287,16 @@
 				});
 
 			},
+			uploadpic1: function() {
+				let that = this;
+				console.log('地方');
+				that.$util.uploadImageOne('upload/image', function(res) {
+					console.log(res);
+					that.idpics.push(res.data.path);
+					that.$set(that, 'idpics', that.idpics);
+				});
+			
+			},
 			/**
 			 * 删除图片
 			 * 
@@ -275,6 +306,12 @@
 					pic = this.pics[index];
 				that.pics.splice(index, 1);
 				that.$set(that, 'pics', that.pics);
+			},
+			DelPic1: function(index) {
+				let that = this,
+					pic = this.idpics[index];
+				that.idpics.splice(index, 1);
+				that.$set(that, 'idpics', that.idpics);
 			},
 			getCode() {
 				let that = this
@@ -362,7 +399,8 @@
 						name: that.merchantData.user_name,
 						code: that.merchantData.yanzhengma,
 						merchant_category_id: that.merchantData.classification,
-						images: that.pics
+						images: that.pics,
+						idCardImages:this.idpics
 					}).then(data => {
 						if (data.status == 200) {
 							title: '提交成功',
@@ -419,6 +457,12 @@
 				});
 				if (!value.classification) return that.$util.Tips({
 					title: '请选择商户分类'
+				});
+				if (this.pics.length === 0) return that.$util.Tips({
+					title: '请上传营业执照'
+				});
+				if (this.idpics.length === 0) return that.$util.Tips({
+					title: '请上传身份证照片'
 				});
 				if (!that.isAgree) return that.$util.Tips({
 					title: '请勾选并同意入驻协议'
@@ -496,6 +540,7 @@
 			display: block;
 			margin-top: 9rpx;
 			line-height: 36rpx;
+			width: 100%;
 		}
 	}
 

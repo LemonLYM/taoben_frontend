@@ -132,7 +132,17 @@
 						<text>联系客服</text>
 					</view>
 				</view>
+			  <view class="title marginTop60">我的交易</view>
+				<view class="menu-box" v-if="isLogin">
+					<navigator class="item" hover-class="none" url="/pages/publish/published/published">
+						<block>
+							<image src="/static/images/user_menu10.png"></image>
+							<text>我发布的</text>
+						</block>
+					</navigator>
+				</view>
 			</view>
+			
 		</view>
 		<view style="height: 50rpx;"></view>
 		<!-- #ifdef MP -->
@@ -595,7 +605,9 @@
 		.user-menus {
 			padding-bottom: 30rpx;
 			background-color: #fff;
-
+       .marginTop60{
+				 margin-top: 60rpx;
+			 }
 			.title {
 				height: 80rpx;
 				line-height: 80rpx;

@@ -1,23 +1,8 @@
 <template>
-	<view :style="{ 'background-image': `linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 40%),url(${store.mer_banner})` }"
+	<view :style="{ 'background-color': `#E93323` }"
 	 class="store-home">
-		<!-- 搜索 -->
 		<!-- #ifdef MP -->
 		<view :style="{ height: `${systemInfo.statusBarHeight}px` }"></view>
-		<view :style="{ height: `${(menuButtonInfo.top - systemInfo.statusBarHeight) * 2 + menuButtonInfo.height}px`, 'padding-right': `${(systemInfo.windowWidth - menuButtonInfo.left) * 2 + 34}rpx`}"
-		 class="header">
-			<view class="iconfont icon-xiangzuo" @click="goback"></view>
-			<navigator :url="'/pages/store/list/index?mer_id='+id" hover-class="none" class="search"><text class="iconfont icon-xiazai5"></text>搜索商品</navigator>
-		</view>
-		<!-- #endif -->
-		<!-- #ifdef H5 -->
-		<view class="header">
-			<view class="head-menu">
-				<view class="iconfont icon-xiangzuo" @click="goback"></view>
-				<view class="iconfont icon-shouye4" @click="goHome"></view>
-			</view>
-			<navigator :url="'/pages/store/list/index?mer_id='+id" hover-class="none" class="search"><text class="iconfont icon-xiazai5"></text>搜索商品</navigator>
-		</view>
 		<!-- #endif -->
 		<view v-show="navShow && tabActive === 0" class="nav">
 			<view class="nav-cont">
@@ -59,11 +44,14 @@
 			<view id="store" class="store">
 				<image :src="store.mer_avatar"></image>
 				<view class="text">
-					<navigator :url="`/pages/store/detail/index?id=${id}`" hover-class="none">
+					<view class="navigator">
 						<text v-if="store.is_trader" class="font-bg-red">自营</text>
 						<text class="name">{{ store.mer_name }}</text>
-						<text class="iconfont icon-xiangyou"></text>
-					</navigator>
+						<!-- <text class="iconfont icon-xiangyou"></text> -->
+					</view>
+<!-- 					<navigator :url="`/pages/store/detail/index?id=${id}`" hover-class="none">
+
+					</navigator> -->
 					<view class="score" style="display: none;">
 						<view class="star">
 							<view :style="{ width: `${score.star.toFixed(2)}%` }"></view>
@@ -115,11 +103,6 @@
 							新品
 						</view>
 					</view>
-					<view :class="{ active: navActive === 4 }" class="item" @click="select.show = false;navActive = 4;isColumn = !isColumn">
-						<view class="cont">
-							<text :class="['layout-icon', 'iconfont', isColumn ? 'icon-pailie' : 'icon-tupianpailie']"></text>
-						</view>
-					</view>
 				</view>
 				<view v-show="select.show && !navShow" class="select">
 					<view v-for="item in select.options" :key="item.id" :class="{ active: item.id === select.selected }" class="item"
@@ -145,7 +128,13 @@
 										</view>
 										<view class="ticket" v-if="item.issetCoupon">领券</view>
 									</view>
-									<view class="score">{{ item.rate }}评分 {{ item.reply_count }}条评论</view>
+									<view class="edit-wrapper" @click.stop="toEdit" >
+										<view class="score">{{ item.rate }}评分 {{ item.reply_count }}条评论</view>
+										<view class="edit-good">
+											编辑
+										</view>
+									</view>
+									
 								</view>
 								<view v-if="item.max_extension" class="foot">
 									<text v-show="!isColumn" class="iconfont"></text>
@@ -218,7 +207,7 @@
 				</view>
 			</view>
 		</scroll-view>
-		<view class="footer">
+		<view class="footer" style="display: none;">
 			<view v-for="(item, index) in tabs" :key="index" :class="{ active: tabActive === index }" class="item" @click="tab(index)">
 				<view :class="['iconfont', item.icon]"></view>
 				<view>{{ item.name }}</view>
@@ -411,6 +400,12 @@
 			}).exec();
 		},
 		methods: {
+			toEdit(e){
+				console.log('编辑')
+				uni.redirectTo({
+						url: '/pages/publish/publishedEdit/publishedEdit'
+					})
+			},
 			// 授权回调
 			onLoadFun() {	
 				this.isShowAuth = false
@@ -448,7 +443,7 @@
 			},
 			// 获取商品详情
 			getStore: function() {
-				getStoreDetail(this.id).then(res => {
+				getStoreDetail(this.id || 65).then(res => {
 					this.store = res.data;
 					// #ifdef H5
 					this.ShareInfo();
@@ -471,7 +466,7 @@
 				if (that.loading) return;
 				that.goodsLoading = true;
 				that.loadTitle = '';
-				getStoreGoods(this.id, this.where).then(res => {
+				getStoreGoods(this.id||65, this.where).then(res => {
 					that.goodsLoading = false;
 					let list = res.data.list;
 					let goodsList = that.$util.SplitArray(list, that.goods);
@@ -654,7 +649,7 @@
 		left: 0;
 		display: flex;
 		flex-direction: column;
-		padding-bottom: 100rpx;
+		// padding-bottom: 100rpx;
 		background: left top/750rpx 360rpx no-repeat fixed;
 		overflow: hidden;
 	}
@@ -681,6 +676,7 @@
 			 font-weight: normal;
 			 margin-right: 10rpx;
 			 font-size: 24rpx;
+			 background-color: #fff;
 		 }
 		 .authoned{
 			 color: #5ab5ef;
@@ -691,6 +687,7 @@
 			 font-weight: normal;
 			 margin-right: 10rpx;
 			 font-size: 24rpx;
+			 background-color: #fff;
 		 }				 
 	 }
 	.header {
@@ -772,7 +769,7 @@
 		image {
 			width: 74rpx;
 			height: 74rpx;
-			border-radius: 6rpx;
+			border-radius: 50%;
 		}
 
 		.text {
@@ -781,7 +778,7 @@
 			margin-right: 20rpx;
 			margin-left: 20rpx;
 
-			navigator {
+			.navigator {
 				display: inline-flex;
 				align-items: center;
 				max-width: 100%;
@@ -804,6 +801,7 @@
 					color: #FFFFFF;
 				}
 			}
+
 
 			.score {
 				display: flex;
@@ -989,7 +987,14 @@
 					line-height: 1;
 					color: #222222;
 				}
+				.edit-wrapper{
+					display: flex;
+					justify-content: space-between;
+					font-size: 24rpx;
+					color: #737373;
+					margin-top: 10rpx;
 
+				}
 				.money-wrap {
 					display: flex;
 					align-items: center;
@@ -1021,11 +1026,18 @@
 				}
 
 				.score {
-					margin-top: 20rpx;
+					// margin-top: 20rpx;
 					font-weight: 500;
-					font-size: 20rpx;
-					line-height: 1;
+					font-size: 24rpx;
+					line-height: 40rpx;
 					color: #737373;
+					// padding-top: 10rpx;
+					
+				}
+				.edit-good{
+					border: 1px solid  #737373;
+					padding: 0 10rpx;
+					border-radius: 10rpx;
 				}
 			}
 
@@ -1107,6 +1119,8 @@
 						line-height: 28rpx;
 					}
 				}
+				
+				
 			}
 
 			.foot {
@@ -1211,7 +1225,8 @@
 				justify-content: center;
 				align-items: center;
 				width: 240rpx;
-				background: url(../static/images/coupon1.png) left top/100% 100% no-repeat;
+				background: url(../../store/static/images/coupon1.png) left top/100% 100% no-repeat;
+				// background: url(../static/images/coupon1.png) 
 				font-weight: 500;
 				font-size: 24rpx;
 				line-height: 1;
@@ -1306,7 +1321,8 @@
 
 		.disabled {
 			.left {
-				background-image: url(../static/images/coupon2.png);
+				// background-image: url(../static/images/coupon2.png);
+				background: url(../../store/static/images/coupon2.png);
 			}
 
 			.right {

@@ -110,6 +110,24 @@
             }
             
         }
+        ,{
+            "path" : "pages/publish/published/published",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我发布的",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/publish/publishedEdit/publishedEdit",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "编辑",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"subPackages": [{
 			"root": "pages/users",

@@ -4,8 +4,8 @@
 			<view class="user-card">
 				<view class="bg"></view>
 				<view class="user-info">
-					<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" @click="goEdit()"></image>
-					<image v-else class="avatar" src="/static/images/f.png" mode="" @click="goEdit()"></image>
+					<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" ></image>
+					<image v-else class="avatar" src="/static/images/f.png" mode="" ></image>
 					<view class="info">
 						<!-- #ifdef MP -->
 						<view class="name" v-if="!userInfo.uid" @tap="openAuto">
@@ -19,10 +19,10 @@
 									<view style="margin-left: 10rpx;" class="vip-txt">{{userInfo.vip_name}}</view>
 							</view>
 						</view>
-						<view class="num" v-if="userInfo.phone" @click="goEdit()">
+						<view class="num" v-if="userInfo.phone" @click="goEdit(userInfo.user_ca)">
 						<!-- <view class="num" v-if="true" @click="goEdit()"> -->
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
-							<view class="num-txt">{{userInfo.user_ca ? "身份认证成功" : "catInfo.msg"}}</view>
+							<view class="num-txt">{{userInfo.user_ca===1 ? "身份认证成功" : catInfo.msg||"catInfo.msg"}}</view>
 							<view class="icon">
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
@@ -49,7 +49,7 @@
 					</view>
 				</view>
 				<view class="right-btn">
-					<view class="iconfont icon-shezhi" @click="goEdit()" v-if="userInfo.phone"></view>
+					<view class="iconfont icon-shezhi" @click="goEdit()" style="display: none;"></view>
 					<navigator class="btn" url="/pages/chat/customer_list/index?type=0" hover-class="none">
 						<view class="iconfont icon-xiaoxi"></view>
 						<text class="iconnum" v-if="userInfo.total_unread">{{userInfo.total_unread}}</text>
@@ -372,10 +372,12 @@
 				});
 			},
 			// 编辑页面
-			goEdit() {
-				uni.navigateTo({
-					url: '/pages/users/user_info/index'
-				})
+			goEdit(user_ca) {
+				// if(user_ca === 2 || user_ca ===3 ){
+					uni.navigateTo({
+						url: '/pages/users/user_info/index?id='+user_ca
+					})
+				// }
 			},
 			// 签到
 			goSignIn() {

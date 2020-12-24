@@ -79,7 +79,7 @@
 							<view class="upload">
 								<view class='pictrue' v-for="(item,index) in pics" :key="index" :data-index="index" @click="getPhotoClickIdx">
 									<image :src='item'></image>
-									<text class='iconfont icon-guanbi1'  @click.stop='DelPic(index)'></text>
+									<text class='iconfont icon-guanbi1' v-if='showClose'  @click.stop='DelPic(index)'></text>
 								</view>
 								<view class='pictrue acea-row row-center-wrapper row-column' @click='uploadidpic' v-if="pics.length < 2">
 									<text class='iconfont icon-icon25201'></text>
@@ -137,11 +137,16 @@
 				switchUserInfo: [],
 				isAuto: false, //没有授权的不会自动授权
 				isShowAuth: false, //是否隐藏授权
-				pics:[]
+				pics:[],
+				showClose:true
 			};
 		},
 		computed: mapGetters(['isLogin']),
-		onLoad() {
+		onLoad(option) {
+			// console.log(option)
+			if(option&& option.id === '1'){ //审核成功之后不允许在修改身份证照片
+				this.showClose = false
+			}
 			if (this.isLogin) {
 				this.getUserInfo();
 				this.getUserCat();

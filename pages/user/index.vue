@@ -27,6 +27,9 @@
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
 						</view>
+						<view class="num" style="padding-top: 0;" v-if='userInfo.mer_ca ==1'>
+							已认证商家
+						</view>
 						<view class="phone" v-if="!userInfo.phone && isLogin && !userInfo.user_ca" @tap="bindPhone">身份认证</view>
 					</view>
 				</view>
@@ -117,7 +120,7 @@
 						<image src="/static/images/user-menu-002.png"></image>
 						<text>订单管理</text>
 					</navigator>
-					<navigator url="/pages/store/settled/index" class="item" hover-class="none" v-if="mer_intention_open == 1">
+					<navigator :url="`/pages/store/settled/index?id=${userInfo.mer_ca}`" class="item" hover-class="none" v-if="mer_intention_open == 1">
 						<image src="/static/images/user-menu-003.png"></image>
 						<text>商家入驻</text>
 					</navigator>
@@ -470,7 +473,7 @@
 							align-items: center;
 							font-size: 26rpx;
 							color: rgba(255, 255, 255, 0.6);
-
+							padding: 6rpx 0;
 							image {
 								width: 22rpx;
 								height: 23rpx;

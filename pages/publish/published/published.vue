@@ -1038,6 +1038,8 @@
 					border: 1px solid  #737373;
 					padding: 0 10rpx;
 					border-radius: 10rpx;
+					height: 40rpx;
+					line-height: 40rpx;
 				}
 			}
 

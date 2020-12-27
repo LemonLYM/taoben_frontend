@@ -20,14 +20,14 @@
 			</view>
 		</view>
 		<view class='collectionGoods' v-if="collectProductList.length">
-			<navigator :url='"/pages/goods_details/index?id="+item.type_id' hover-class='none' class='item acea-row row-between-wrapper' v-for="(item,index) in collectProductList" :key="index" v-if="item.product">
+			<navigator :url='"/pages/goods_details/index?id="+item.product_id' hover-class='none' class='item acea-row row-between-wrapper' v-for="(item,index) in collectProductList" :key="index" >
 				<view class='pictrue' >
-					<image :src="item.product.image"></image>
+					<image :src="item.image"></image>
 				</view>
 				<view class='text acea-row row-column-between'>
-					<view class='name line1'>{{item.product.store_name}}</view>
+					<view class='name line1'>{{item.store_name}}</view>
 					<view class='acea-row row-between-wrapper'>
-						<view class='money font-color'>￥{{item.product.price}}</view>
+						<view class='money font-color'>￥{{item.price}}</view>
 						<view class="deletewrapper">
 							<view class='delete' style="margin-right: 10rpx;" @click.stop='delCollection(item.type_id,index)'>删除</view>
 							<view class='delete' @click.stop='toEdit(item.type_id,index)'>编辑</view>
@@ -58,7 +58,8 @@
 		getStoreDetail,
 		getCollectUserList,
 		getProductHot,
-		collectDel
+		collectDel,
+		publishedItem
 	} from '@/api/store.js';
 	import {
 		mapGetters
@@ -181,10 +182,11 @@
 				if (this.loadend) return;
 				that.loading = true;
 				that.loadTitle = "";
-				getCollectUserList({
+				publishedItem({
 					page: that.page,
 					limit: that.limit
 				}).then(res => {
+					debugger
 					let collectProductList = res.data.list;
 					let loadend = collectProductList.length < that.limit;
 					that.collectProductList = that.$util.SplitArray(collectProductList, that.collectProductList);

@@ -15,6 +15,10 @@
 			multi:{
 				type:Boolean,
 				default:false
+			},
+			checkedids :{
+				type:Array,
+				default:[]
 			}
 		},
 		components:{
@@ -23,13 +27,23 @@
 		data() {
 			return {
 				items: this.list.map((item)=>{
-					console.log(Object.assign(item,{checked:false}))
+					// debugger
+					// console.log(checkedids)
+					// console.log(Object.assign(item,{checked:false}))
+					// console.log(this.$props.checkedids)
+					// console.log(this.$props.checkedids.includes(item.store_category_id))
+					if(this.$props.checkedids.includes(item.store_category_id)){
+					  return Object.assign(item,{checked:true})						
+					}else{
+					  return Object.assign(item,{checked:false})						
+					}
 					return Object.assign(item,{checked:false})
 				}),
 				resMulti: [],
 			};
 		},
 		created(){
+			// console.log(this.$props.checkedids)
 		},
 		computed:{
 		},

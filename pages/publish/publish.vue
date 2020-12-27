@@ -209,7 +209,7 @@
 
 				Object.keys(this.category).forEach(item=>{
 					if(this.category[item]){
-						categoryId.push(parseInt(item))
+						categoryId.push(parseInt(this.category[item]))
 					}
 				})
 				let that = this;
@@ -226,9 +226,9 @@
 						slider_image:this.pics.slice(1,this.pics.length),//轮播图
 						postage:parseInt(this.deliverPrice),//运费
 						// city: this.region[1],//城市名称
-						city:'13268'||this.valueRegion[1],
+						city:this.cityId,
 						// cityid:this.valueRegion[1], //城市id
-						province:'13267'||this.valueRegion[0],
+						province:this.province,
 						mer_cate_id: categoryId,//商品分类
 						keyword:"",
 						attr:[]
@@ -292,6 +292,7 @@
 				// this.$set(this.region,1,multiArray[1][value[1]]);
 				// this.$set(this.region,2,multiArray[2][value[2]]);
 				this.cityId = city.city_id
+				this.province = city.parent_id
 				this.valueRegion = [0, 0, 0]
 				this.initialize();
 			},

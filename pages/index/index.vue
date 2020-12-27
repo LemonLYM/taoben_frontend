@@ -421,7 +421,7 @@
 				loadTitle: '加载更多',
 				sortProduct: [],
 				where: {
-					pid: 0,
+
 					page: 1,
 					limit: 6
 				},
@@ -633,7 +633,7 @@
 					// }).then(res => {
 					// 	this.sortList = res.data.length > 9 ? res.data.splice(0, 9) : res.data;
 					// });
-					this.where.pid = e.pid;
+	
 					this.where.page = 1;
 					this.loadend = false;
 					this.loading = false;
@@ -645,7 +645,7 @@
 					this.hotPage = 1
 					this.get_host_product()
 				}else if(e.index ===2){
-					this.where.pid = e.pid;
+
 					this.where.page = 1;
 					this.loadend = false;
 					this.loading = false;

@@ -21,8 +21,10 @@ export function getLogo()
 {
   return request.get('wechat/get_logo', {}, { noAuth : true});
 }
-
-
+//编辑我发布的商品
+export function editMyProduct(data) {
+  return request.post("store/product/FromByUser/"+data.pro_id, data);
+}
 /**
  * 保存form_id
  * @param string formId 

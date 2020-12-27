@@ -90,10 +90,10 @@
 			</view>
 		</view>
 		<view v-if='productList.length!==0'>
-		<view class="kind" v-for="(item,idx) in productList" :key='idx'>
+		<view class="kind" v-for="(item,idx) in productList"  :key='idx'>
 			<text class="title">{{item.cate_name}}</text>
 			<view class="tag-wrapper" >
-				  <tag  :key='index'  :list='item.children' @change='tagClick'></tag>
+				  <tag  :key='index'  :list='item.children' @change='tagClick' :checkedids="checkedids"></tag>
 			</view>
 		</view>
 		</view>
@@ -103,7 +103,8 @@
 
 <script>
 	import {
-		getCity
+		getCity,
+		editMyProduct
 	} from '@/api/api.js';
 	import tag from '../../../components/axb-checkbox/axb-checkbox.vue';
 	import {
@@ -130,11 +131,13 @@
 				region: ['',''],
 				validate:false, //校验状态
 				productList:[], //商品分类标签
-				category:{}//选中的分类
+				category:{},//选中的分类
+				checkedids:[] //选中的商品分类
  			}
 		},
 		onLoad() {
 			console.log('onload')
+			this.geteditMyProduct()
 			this.getCityList();
 			this.getAllCategory(); //获取分类标签数据
 		},
@@ -148,6 +151,38 @@
 			console.log('onshow')
 		},
 		methods: {
+			geteditMyProduct:function(){
+				editMyProduct({pro_id:352}).then((res)=>{
+					const mapObj = {
+						0:0,
+						30:1,
+						50:2,
+						70:3,
+						90:4,
+						100:5
+					}
+					let images = res.data.slider_image
+					images.unshift(res.data.image)
+					this.new_percentage = mapObj[this.index]
+					if(res.status === 200){
+						this.bookName = res.data.store_name
+						this.prePrice = res.data.cost
+						this.curPrice = res.data.price
+						this.num = res.data.stock
+						this.index = mapObj[res.data.new_percentage]
+						this.textContext = res.data.content
+						this.pics = images
+						this.deliverPrice = res.data.postage
+						this.cityId = res.data.city
+						this.province = res.data.province
+						this.region[1] = res.data.city_name
+						this.checkedids = res.data.mer_cate_id
+						// this.multiArray[0] = resp.data.province_name
+						// this.multiArray[1] = resp.data.city_name
+					}
+					debugger
+				})
+			},
 			getAllCategory:function(){
 				let that = this;
 				getCategoryList().then(res => {
@@ -212,17 +247,23 @@
 				let that = this;
 				if (that.validateForm() && that.validate) {
 					create({
-						bookName: this.bookName, //剧本名称
-						curPrice: this.curPrice, //售价
-						prePrice: this.prePrice, //入手价
-						num: this.num, //商品数量
-						newDegree: this.index,//新旧程度
-						textContext: this.textContext,//商品描述
-						pics:this.pics, //商品图片
-						deliverPrice:this.deliverPrice,//运费
-						city: region[1],//城市名称
-						cityid:valueRegion[1], //城市id
-						category: categoryId//商品分类
+						store_name: this.bookName, //剧本名称
+						price: this.curPrice+'', //售价
+						cost: this.prePrice+'', //入手价
+						stock: parseInt(this.num), //商品数量
+						new_percentage:this.new_percentage,//新旧程度
+						store_info:'',//简述，前端没有给这个字段，供接口请求使用
+						content: this.textContext,//商品描述
+						image:this.pics[0],//封面图
+						slider_image:this.pics.slice(1,this.pics.length),//轮播图
+						postage:parseInt(this.deliverPrice),//运费
+						// city: this.region[1],//城市名称
+						city:this.cityId,
+						// cityid:this.valueRegion[1], //城市id
+						province:this.province,
+						mer_cate_id: categoryId,//商品分类
+						keyword:"",
+						attr:[]
 					}).then(data => {
 						if (data.status == 200) {
 							title: '发布成功',

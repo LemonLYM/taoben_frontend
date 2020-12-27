@@ -12,7 +12,7 @@
 			</view>
 			<input class='curPrice rightbox' name='curPrice' type='number' v-model="curPrice" placeholder="请输入售价"/>
 		</view>
-		<text class="tips" v-if='curPrice'>平台会收取5%的服务费，实际到手价格{{curPrice*0.95}}</text>
+		<text class="tips" v-if='curPrice'>平台会收取5%的服务费，实际到手价格{{(curPrice*0.95).toFixed(2) }}元</text>
 		<view class="publish-item">
 			<view class="name">
 				入手价
@@ -107,7 +107,8 @@
 	} from '@/api/api.js';
 	import tag from '../../components/axb-checkbox/axb-checkbox.vue';
 	import {
-		getCategoryList
+		getCategoryList,
+		createItem
 	} from '@/api/store.js';
 	export default {
 		components:{
@@ -121,6 +122,7 @@
 				num:'',//数量
 				index:0,
 				array:['请选择','三成新','五成新','七成新','九成新','全新'],
+				// array:[{0:'请选择'},{30:'三成新'},{50:'五成新'},{70:'七成新'},{90:'九成新'},{100:'全新'}],
 				textContext:'',//商品描述
 				pics:[],  //商品上传的图片
 				deliverPrice:'',//运费
@@ -130,7 +132,8 @@
 				region: ['',''],
 				validate:false, //校验状态
 				productList:[], //商品分类标签
-				category:{}//选中的分类
+				category:{},//选中的分类
+				new_percentage:0 //新旧程度给后端
  			}
 		},
 		onLoad() {
@@ -206,23 +209,29 @@
 
 				Object.keys(this.category).forEach(item=>{
 					if(this.category[item]){
-						categoryId.push(item)
+						categoryId.push(parseInt(item))
 					}
 				})
 				let that = this;
 				if (that.validateForm() && that.validate) {
-					create({
-						bookName: this.bookName, //剧本名称
-						curPrice: this.curPrice, //售价
-						prePrice: this.prePrice, //入手价
-						num: this.num, //商品数量
-						newDegree: this.index,//新旧程度
-						textContext: this.textContext,//商品描述
-						pics:this.pics, //商品图片
-						deliverPrice:this.deliverPrice,//运费
-						city: region[1],//城市名称
-						cityid:valueRegion[1], //城市id
-						category: categoryId//商品分类
+					createItem({
+						store_name: this.bookName, //剧本名称
+						price: this.curPrice+'', //售价
+						cost: this.prePrice+'', //入手价
+						stock: parseInt(this.num), //商品数量
+						new_percentage:this.new_percentage,//新旧程度
+						store_info:'',//简述，前端没有给这个字段，供接口请求使用
+						content: this.textContext,//商品描述
+						image:this.pics[0],//封面图
+						slider_image:this.pics.slice(1,this.pics.length),//轮播图
+						postage:parseInt(this.deliverPrice),//运费
+						// city: this.region[1],//城市名称
+						city:'13268'||this.valueRegion[1],
+						// cityid:this.valueRegion[1], //城市id
+						province:'13267'||this.valueRegion[0],
+						mer_cate_id: categoryId,//商品分类
+						keyword:"",
+						attr:[]
 					}).then(data => {
 						if (data.status == 200) {
 							title: '发布成功',
@@ -333,7 +342,17 @@
 				// this.setData({ multiArray: multiArray, multiIndex: multiIndex});
 			},
 			bindPickerChange:function(e){
-				this.index = e.detail.value
+				// debugger
+				this.index= e.detail.value
+				const mapObj = {
+					0:0,
+					1:30,
+					2:50,
+					3:70,
+					4:90,
+					5:100
+				}
+				this.new_percentage = mapObj[this.index]
 			},
 			//点击上传照片
 			uploadpic: function() {
@@ -441,6 +460,9 @@
 	}
 	.tips{
 		margin-left: 30rpx;
+		    color: #B2B2B2;
+		    font-size: 22rpx;
+
 	}
 }
 .publish-title{

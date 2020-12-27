@@ -8,7 +8,10 @@ import request from "@/utils/request.js";
 export function getProductDetail(id){
   return request.get('store/product/detail/' + id, {}, { noAuth : true });
 }
-
+//发布商品
+export function createItem(data) {
+  return request.post("store/product/createByUser", data);
+}
 /**
  * 产品分享二维码 推广员
  * @param int id

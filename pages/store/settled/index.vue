@@ -1,9 +1,9 @@
 <template>
-	<view class="settledSuccessMain" v-if='showTipsPage==1||showTipsPage ==2'>
+	<view class="settledSuccessMain" v-if='showTipsPage==1||showTipsPage ==0'>
 		<view class="settledSuccessful">
 			<img class="image" src="/static/images/settledSuccessful.svg" alt="">
 			<view class="title">您的资料已经提交成功！</view>
-			<view class="info" v-if='showTipsPage==2'>预计15个工作日内审核完毕，平台客服会及时与您联系！</view>
+			<view class="info" v-if='showTipsPage==0'>预计15个工作日内审核完毕，平台客服会及时与您联系！</view>
 			<view class="info" v-if='showTipsPage==1'>审核通过</view>
 			<view class="goHome" hover-class="none" @click="goHome1">
 				返回
@@ -213,7 +213,7 @@
 			if(options&&options.id){
 				this.showTipsPage = options.id
 				// this.showTipsPage =1
-				 if(options.id ==3){
+				 if(options.id ==2){ //审核失败
 					 this.$util.Tips({
 					 	title: '商家入驻申请审核失败，请重新提交申请'
 					 });

@@ -108,7 +108,8 @@
 	} from '@/api/api.js';
 	import tag from '../../../components/axb-checkbox/axb-checkbox.vue';
 	import {
-		getCategoryList
+		getCategoryList,
+		updateItem
 	} from '@/api/store.js';
 	export default {
 		components:{
@@ -241,12 +242,13 @@
 
 				Object.keys(this.category).forEach(item=>{
 					if(this.category[item]){
-						categoryId.push(item)
+						categoryId.push(parseInt(this.category[item]))
 					}
 				})
 				let that = this;
 				if (that.validateForm() && that.validate) {
-					create({
+					updateItem({
+						id:352,
 						store_name: this.bookName, //剧本名称
 						price: this.curPrice+'', //售价
 						cost: this.prePrice+'', //入手价
@@ -374,7 +376,16 @@
 				// this.setData({ multiArray: multiArray, multiIndex: multiIndex});
 			},
 			bindPickerChange:function(e){
-				this.index = e.detail.value
+				this.index= e.detail.value
+				const mapObj = {
+					0:0,
+					1:30,
+					2:50,
+					3:70,
+					4:90,
+					5:100
+				}
+				this.new_percentage = mapObj[this.index]
 			},
 			//点击上传照片
 			uploadpic: function() {

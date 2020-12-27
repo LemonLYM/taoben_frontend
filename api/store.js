@@ -12,6 +12,10 @@ export function getProductDetail(id){
 export function createItem(data) {
   return request.post("store/product/createByUser", data);
 }
+//发布商品
+export function updateItem(data) {
+  return request.post("store/product/updateByUser/"+data.id, data);
+}
 /**
  * 产品分享二维码 推广员
  * @param int id

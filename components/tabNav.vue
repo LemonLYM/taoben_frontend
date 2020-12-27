@@ -133,8 +133,17 @@
 				// this.$set(this.region,1,multiArray[1][value[1]]);
 				// this.$set(this.region,2,multiArray[2][value[2]]);
 				this.cityId = city.city_id
+				this.province =city.parent_id
 				this.valueRegion = [0, 0, 0]
 				this.initialize();
+				let obj = {
+					index:2,
+					pid:186,//自己的id
+					province:this.province||1,
+					city:this.cityId||2
+				}
+				
+				this.parentEmit(obj);
 			},
 			bindMultiPickerColumnChange: function(e) {
 				let that = this,
@@ -200,7 +209,9 @@
 				// }
 				let obj = {
 					index:index,
-					pid:id//自己的id
+					pid:id,//自己的id
+					province:this.province||1,
+					city:this.cityId||2
 				}
 				
 				this.parentEmit(obj);

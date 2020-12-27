@@ -27,7 +27,7 @@
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
 						</view>
-						<view class="num" style="padding-top: 0;" v-if='userInfo.mer_ca ==1'>
+						<view class="num"  v-if='userInfo.mer_ca ==1'>
 							已认证商家
 						</view>
 						<view class="phone" v-if="!userInfo.phone && isLogin && !userInfo.user_ca" @tap="bindPhone">身份认证</view>

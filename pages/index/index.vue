@@ -423,7 +423,7 @@
 				where: {
 					pid: 0,
 					page: 1,
-					limit: 6,
+					limit: 6
 				},
 				is_switch: true,
 				hostProduct: [],
@@ -625,8 +625,9 @@
 			},
 			// 导航分类切换
 			changeTab(e) {
+				debugger
 				this.navIndex = e.index;
-				if (e.index > 0) {
+				if (e.index === 1) {
 					// storeCategory({
 					// 	pid: e.pid
 					// }).then(res => {
@@ -637,6 +638,20 @@
 					this.loadend = false;
 					this.loading = false;
 					this.sortProduct = [];
+					this.where.province = ''
+					this.where.city = ''
+					this.get_product_list();
+				}else if(e.index === 0){ //获取我推荐的
+					this.hotPage = 1
+					this.get_host_product()
+				}else if(e.index ===2){
+					this.where.pid = e.pid;
+					this.where.page = 1;
+					this.loadend = false;
+					this.loading = false;
+					this.sortProduct = [];
+					this.where.province = e.province
+					this.where.city = e.city
 					this.get_product_list();
 				}
 			},

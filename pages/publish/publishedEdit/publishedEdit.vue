@@ -526,7 +526,7 @@
 	border: 1px solid #eee;
 	// margin-left: 30rpx;
 	.publish-textarea{
-		font-size: 24rpx;
+		font-size: 30rpx;
 		width: 100%;
 		height: 200rpx;
 

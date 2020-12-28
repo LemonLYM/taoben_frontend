@@ -41,7 +41,7 @@
 							<view class='delete' style="margin-right: 10rpx;" v-if='item.status===-1'>审核失败</view>
 							<view class='delete' style="margin-right: 10rpx;" v-if='item.is_show === 1&&item.status===1' @click.stop='delCollection(item.product_id,0)'>下架</view>
 							<view class='delete' style="margin-right: 10rpx;" v-if='item.is_show === 0&&item.status===1' @click.stop='delCollection(item.product_id,1)'>上架</view>
-							<view class='delete' @click.stop='toEdit(item.type_id,index)'  v-if='item.status===1||item.status===-1'>编辑</view>
+							<view class='delete' @click.stop='toEdit(item.product_id,index)'  v-if='item.status===1||item.status===-1'>编辑</view>
 						</view>
 					</view>
 				</view>
@@ -142,7 +142,6 @@
 			getUserInfo: function() {
 				let that = this;
 				getUserInfo().then(res => {
-					debugger
 					that.userInfo = res.data
 					// that.is_promoter = res.data.is_promoter
 				});
@@ -161,10 +160,11 @@
 				this.isShowAuth = e
 			},
 			
-			toEdit(e){
+			toEdit(id,index){
+				
 				console.log('编辑')
 				uni.redirectTo({
-						url: '/pages/publish/publishedEdit/publishedEdit'
+						url: '/pages/publish/publishedEdit/publishedEdit?id='+id
 					})
 			},
 			// 获取商品详情
@@ -215,7 +215,6 @@
 					page: that.page,
 					limit: that.limit
 				}).then(res => {
-					debugger
 					let collectProductList = res.data.list;
 					let loadend = collectProductList.length < that.limit;
 					that.collectProductList = that.$util.SplitArray(collectProductList, that.collectProductList);
@@ -237,7 +236,6 @@
 				collectUporDown({
 					status:index
 				},id).then(res => {
-					debugger
 					return that.$util.Tips({
 						title: '取消收藏成功',
 						icon: 'success'

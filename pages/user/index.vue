@@ -27,10 +27,15 @@
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
 						</view>
-						<view class="num"  v-if='userInfo.mer_ca ==1'>
-							已认证商家
+						<view class="num_phone_wrapper">
+							<view class="num"  v-if='userInfo.mer_ca ==1'>
+								<text style="color: #4fae70;">已认证商家</text>
+							</view>
+							<view class="phone" v-if="!userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
+								<text>身份未认证</text> 
+							</view>
 						</view>
-						<view class="phone" v-if="!userInfo.phone && isLogin && !userInfo.user_ca" @tap="bindPhone">身份认证</view>
+
 					</view>
 				</view>
 				<view class="num-wrapper">
@@ -473,11 +478,19 @@
 							align-items: center;
 							font-size: 26rpx;
 							color: rgba(255, 255, 255, 0.6);
-							padding: 6rpx 0;
+							// padding: 6rpx 0;
+							margin-right:10rpx;
 							image {
 								width: 22rpx;
 								height: 23rpx;
 								margin-left: 20rpx;
+							}
+							text{
+								color: #4fae70;
+								    /* padding: 4rpx; */
+								    border: 1px solid #4fae70;
+								    border-radius: 8rpx;
+										font-size: 24rpx;
 							}
 						}
 					}
@@ -657,10 +670,19 @@
 				font-size: 28rpx;
 			}
 		}
-
-		.phone {
-			color: #fff;
+    .num_phone_wrapper{
+			display: flex;
+			.phone {
+				color: #fff;
+				text{
+					    /* padding: 4rpx; */
+					    border: 1px solid #fff;
+					    border-radius: 8rpx;
+							font-size: 24rpx;
+				}
+			}
 		}
+
 
 		.order-status-num {
 

@@ -12,7 +12,7 @@
 			</view>
 			<input class='curPrice rightbox' name='curPrice' type='number' v-model="curPrice" placeholder="请输入售价"/>
 		</view>
-		<text class="tips" v-if='curPrice'>平台会收取5%的服务费，实际到手价格{{curPrice*0.95}}</text>
+		<text class="tips" v-if='curPrice'>平台会收取5%的服务费，实际到手价格{{(curPrice*0.95).toFixed(2) }}元</text>
 		<view class="publish-item">
 			<view class="name">
 				入手价
@@ -64,7 +64,7 @@
 				<input class="deliverPrice" type="number" name='deliverPrice' v-model="deliverPrice"/>
 				<checkbox-group @change="checkboxChange">
 				<label >
-					<checkbox value="0"  /><text>包邮</text>
+					<checkbox value="0"  checked="this.deliverPrice==0"/><text>包邮</text>
 				</label>
 				</checkbox-group>
 			</view>
@@ -133,12 +133,14 @@
 				validate:false, //校验状态
 				productList:[], //商品分类标签
 				category:{},//选中的分类
-				checkedids:[] //选中的商品分类
+				checkedids:[], //选中的商品分类
+				id:0
  			}
 		},
-		onLoad() {
+		onLoad(option) {
 			console.log('onload')
-			this.geteditMyProduct()
+			this.id = option.id
+			this.geteditMyProduct(option.id)
 			this.getCityList();
 			this.getAllCategory(); //获取分类标签数据
 		},
@@ -152,8 +154,8 @@
 			console.log('onshow')
 		},
 		methods: {
-			geteditMyProduct:function(){
-				editMyProduct({pro_id:352}).then((res)=>{
+			geteditMyProduct:function(id){
+				editMyProduct({pro_id:id}).then((res)=>{
 					const mapObj = {
 						0:0,
 						30:1,
@@ -173,7 +175,7 @@
 						this.index = mapObj[res.data.new_percentage]
 						this.textContext = res.data.content
 						this.pics = images
-						this.deliverPrice = res.data.postage
+						this.deliverPrice = res.data.postage+''
 						this.cityId = res.data.city
 						this.province = res.data.province
 						this.region[1] = res.data.city_name
@@ -248,7 +250,6 @@
 				let that = this;
 				if (that.validateForm() && that.validate) {
 					updateItem({
-						id:352,
 						store_name: this.bookName, //剧本名称
 						price: this.curPrice+'', //售价
 						cost: this.prePrice+'', //入手价
@@ -266,7 +267,7 @@
 						mer_cate_id: categoryId,//商品分类
 						keyword:"",
 						attr:[]
-					}).then(data => {
+					},this.id).then(data => {
 						if (data.status == 200) {
 							title: '发布成功',
 							that.loading = true;
@@ -492,7 +493,10 @@
 		flex:1;
 	}
 	.tips{
+
 		margin-left: 30rpx;
+		    color: #B2B2B2;
+		    font-size: 22rpx;
 	}
 }
 .publish-title{

@@ -18,9 +18,14 @@ export function createItem(data) {
   return request.post("store/product/createByUser", data);
 }
 //发布商品
-export function updateItem(data) {
-  return request.post("store/product/updateByUser/"+data.id, data);
+export function updateItem(data,id) {
+  return request.post("store/product/updateByUser/"+id, data);
 }
+//上架下架商品
+export function collectUporDown(data,id) {
+  return request.post('store/product/status/'+id, data);
+}
+
 /**
  * 产品分享二维码 推广员
  * @param int id

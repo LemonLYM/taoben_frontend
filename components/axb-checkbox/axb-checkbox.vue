@@ -33,6 +33,7 @@
 					// console.log(this.$props.checkedids)
 					// console.log(this.$props.checkedids.includes(item.store_category_id))
 					if(this.$props.checkedids.includes(item.store_category_id)){
+						this.$emit("change",{[item.pid]:item.store_category_id})
 					  return Object.assign(item,{checked:true})						
 					}else{
 					  return Object.assign(item,{checked:false})						

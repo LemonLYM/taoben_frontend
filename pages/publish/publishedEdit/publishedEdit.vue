@@ -269,11 +269,12 @@
 						attr:[]
 					},this.id).then(data => {
 						if (data.status == 200) {
-							title: '发布成功',
-							that.loading = true;
-							this.timer = setTimeout(() => {
-								that.successful = true;
-							}, 1000)
+							that.$util.Tips({
+								title: '编辑成功'
+							});
+							uni.redirectTo({
+								url: '/pages/publish/published/published'
+							});
 						}
 			
 					}).catch(res=>{

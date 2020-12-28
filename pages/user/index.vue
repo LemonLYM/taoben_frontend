@@ -19,15 +19,20 @@
 									<view style="margin-left: 10rpx;" class="vip-txt">{{userInfo.vip_name}}</view>
 							</view>
 						</view>
+						<view class="num_phone_wrapper">
 						<view class="num" v-if="userInfo.phone" @click="goEdit(userInfo.user_ca)">
 						<!-- <view class="num" v-if="true" @click="goEdit()"> -->
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
-							<view class="num-txt">{{userInfo.user_ca===1 ? "身份认证成功" : catInfo.msg||"catInfo.msg"}}</view>
-							<view class="icon">
+							<view class="num-txt">
+								<text v-if='userInfo.user_ca===1'>身份认证成功</text>
+								<text v-else-if='userInfo.user_ca===0' style="color: #fff; border-color: #fff;">身份审核中</text>
+								<text v-else-if='userInfo.user_ca===2' style="color: #fff; border-color: #fff;">身份审核失败</text>
+							</view>
+							<view class="icon" style="display: none;">
 								<image src="/static/images/edit.png" mode=""></image>
 							</view>
 						</view>
-						<view class="num_phone_wrapper">
+
 							<view class="num"  v-if='userInfo.mer_ca ==1'>
 								<text style="color: #4fae70;">已认证商家</text>
 							</view>
@@ -680,6 +685,9 @@
 					    border-radius: 8rpx;
 							font-size: 24rpx;
 				}
+			}
+			.num-txt{
+				
 			}
 		}
 

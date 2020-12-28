@@ -2,19 +2,27 @@
 	<view>
 		<!-- 店铺信息 -->
 		<view id="store" class="store">
-			<image :src="store.mer_avatar"></image>
+			<image :src="userInfo.avatar"></image>
 			<view class="text">
 				<view class="navigator">
-					<text v-if="store.is_trader" class="font-bg-red">自营</text>
-					<text class="name">{{ store.mer_name }}</text>
+					<text class="name">{{ userInfo.nickname}}</text>
 					<!-- <text class="iconfont icon-xiangyou"></text> -->
 				</view>
 				<view class="credibility-wrapper">
-					<view class="credibility">
-						信誉极好
+					<view class="credibility" v-if='userInfo.credit<=2'>信誉一般</view>
+					<view class="credibility" v-if='userInfo.credit>2&&userInfo.credit<=5'>信誉良好</view>
+					<view class="credibility" v-if='userInfo.credit>5'>信誉极好</view>
+					<view class="authoned" v-if="userInfo.user_ca === 1">
+						身份已认证
 					</view>
-					<view class="authoned">
-						已认证
+					<view class="authoned" v-if="userInfo.user_ca === 4">
+						身份未认证
+					</view>
+					<view class="authoned" v-if="userInfo.user_ca === 0">
+						身份审核中
+					</view>
+					<view class="authoned" v-if="userInfo.user_ca === 2">
+						身份审核失败
 					</view>
 				</view>
 			</view>
@@ -29,8 +37,11 @@
 					<view class='acea-row row-between-wrapper'>
 						<view class='money font-color'>￥{{item.price}}</view>
 						<view class="deletewrapper">
-							<view class='delete' style="margin-right: 10rpx;" @click.stop='delCollection(item.type_id,index)'>删除</view>
-							<view class='delete' @click.stop='toEdit(item.type_id,index)'>编辑</view>
+							<view class='delete' style="margin-right: 10rpx;" v-if='item.status===0'>审核中</view>
+							<view class='delete' style="margin-right: 10rpx;" v-if='item.status===-1'>审核失败</view>
+							<view class='delete' style="margin-right: 10rpx;" v-if='item.is_show === 1&&item.status===1' @click.stop='delCollection(item.product_id,0)'>下架</view>
+							<view class='delete' style="margin-right: 10rpx;" v-if='item.is_show === 0&&item.status===1' @click.stop='delCollection(item.product_id,1)'>上架</view>
+							<view class='delete' @click.stop='toEdit(item.type_id,index)'  v-if='item.status===1||item.status===-1'>编辑</view>
 						</view>
 					</view>
 				</view>
@@ -59,8 +70,12 @@
 		getCollectUserList,
 		getProductHot,
 		collectDel,
-		publishedItem
+		publishedItem,
+		collectUporDown
 	} from '@/api/store.js';
+	import {
+		getUserInfo
+	} from '@/api/user.js';
 	import {
 		mapGetters
 	} from "vuex";
@@ -93,13 +108,15 @@
 				isShowAuth: false ,//是否隐藏授权
 				hotScroll:false,
 				hotPage:1,
-				hotLimit:10
+				hotLimit:10,
+				userInfo: {}
 			}
 		},
 		computed: mapGetters(['isLogin']),
 		onLoad: function(options) {		
 			this.id = options.id;
 			if (this.isLogin) {
+				this.getUserInfo();
 				this.get_user_collect_product();
 				this.get_host_product();
 			} else {
@@ -120,12 +137,24 @@
 		},
 		methods: {
 			/**
+			 * 获取个人用户信息
+			 */
+			getUserInfo: function() {
+				let that = this;
+				getUserInfo().then(res => {
+					debugger
+					that.userInfo = res.data
+					// that.is_promoter = res.data.is_promoter
+				});
+			},
+			/**
 			 * 授权回调
 			 */
 			onLoadFun: function() {
 				this.isShowAuth = false;
 				this.get_user_collect_product();
 				this.get_host_product();
+				this.getUserInfo();
 			},
 			// 授权关闭
 			authColse: function(e) {
@@ -205,10 +234,10 @@
 			 */
 			delCollection: function(id, index) {
 				let that = this;
-				collectDel({
-					type:1,
-					type_id:id
-				}).then(res => {
+				collectUporDown({
+					status:index
+				},id).then(res => {
+					debugger
 					return that.$util.Tips({
 						title: '取消收藏成功',
 						icon: 'success'

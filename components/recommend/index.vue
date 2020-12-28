@@ -26,14 +26,15 @@
 						<view class="acea-row row-middle price-favor">
 							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
 							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
-							<text class="favor-num">9999人想要</text>
+							<text class="favor-num">{{item.merchant.care_count}}人想要</text>
 						</view>
 						<view class="user-info">
 							<view class="avatr-img-wrapper">
-								<image class="avatr-img" src='../../static/images/f.png'></image>
-								<text>嘻嘻嘻李</text>
+								<image class="avatr-img" :src='item.merchant.mer_avatar||"../../static/images/f.png"'></image>
+								<text>{{item.merchant.mer_name}}</text>
 							</view>
-							<text class="credibility">信誉极好</text>
+							<text class="credibility" v-if='item.merchant.credit>2&&item.merchant.credit<=5'>信誉良好</text>
+							<text class="credibility" v-if='item.merchant.credit>5'>信誉极好</text>
 						</view>
 					</view>
 				</view>
@@ -50,17 +51,21 @@
 					</view>
 					<view class="text">
 						<view class='name'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
+						<view class="tag">
+							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+						</view>
 						<view class="acea-row row-middle price-favor">
 							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
 							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
-							<text class="favor-num">9999人想要</text>
+							<text class="favor-num">{{item.merchant.care_count}}人想要</text>
 						</view>
 						<view class="user-info">
 							<view class="avatr-img-wrapper">
-								<image class="avatr-img" src='../../static/images/f.png'></image>
-								<text>嘻嘻嘻李</text>
+								<image class="avatr-img" :src='item.merchant.mer_avatar||"../../static/images/f.png"'></image>
+								<text>{{item.merchant.mer_name}}</text>
 							</view>
-							<text class=" credibility">信誉极好</text>
+							<text class="credibility" v-if='item.merchant.credit>2&&item.merchant.credit<=5'>信誉良好</text>
+							<text class="credibility" v-if='item.merchant.credit>5'>信誉极好</text>
 						</view>
 					</view>
 				</view>
@@ -194,6 +199,12 @@
 			.avatr-img-wrapper{
 				display: flex;
 				align-items: center;
+				text{
+					    white-space: nowrap;
+					    overflow: hidden;
+					    text-overflow: ellipsis;
+					    width: 130rpx;
+				}
 			}
 			margin-top: 10rpx;
 			font-size: 26rpx;

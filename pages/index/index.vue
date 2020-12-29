@@ -219,7 +219,7 @@
 		<!-- 分类页 -->
 
 		<view class="productList" v-if="navIndex>0" :style="'margin-top:'+prodeuctTop+'px;'">
-			<view class="sort acea-row">
+			<view class="sort acea-row" style="display: none;">
 				<navigator hover-class='none' :url="'/pages/columnGoods/goods_list/index?id='+item.store_category_id+'&title='+item.cate_name"
 				 class="item" v-for="(item,index) in sortList" :key="index">
 					<view class="pictrue">
@@ -235,24 +235,10 @@
 				</view>
 			</view>
 			<block v-if="sortProduct.length>0">
-				<view class='list acea-row row-between-wrapper'>
-					<navigator :url="`/pages/goods_details/index?id=${item.product_id}`" class='item' hover-class='none' v-for="(item,index) in sortProduct"
-					 :key="index">
-						<view class='pictrue'>
-							<image :src='item.image'></image>
-						</view>
-						<view class='text'>							
-							<view class='name line1'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
-							
-							<view class="acea-row row-middle">
-								<view class='money font-color-red'>￥<text class='num'>{{item.price}}</text></view>
-								<text class="coupon font-color-red" v-if="item.issetCoupon">领券</text>
-							</view>
-						</view>
-					</navigator>
-					<view class='loadingicon acea-row row-center-wrapper' v-if='sortProduct.length > 0 || sortProductLoading'>
-						<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
-					</view>
+			
+				<view class='list  row-between-wrapper'>
+					
+					<focuslist :hostProduct="sortProduct"></focuslist>
 				</view>
 			</block>
 			<block v-if="sortProduct.length == 0">
@@ -321,11 +307,13 @@
 		storeCategory,
 		storeMerchantList,
 		spikeListApi,
+		getCollectUserList,//获取我关注的商品列表
 	} from '@/api/store.js';
 	import {
 		setVisit
 	} from '@/api/user.js'
 	import recommend from '@/components/recommend';
+	import focuslist from '@/components/focusList.vue';
 	// #ifdef MP
 	import authorize from '@/components/Authorize';
 	// #endif
@@ -342,6 +330,7 @@
 			couponWindow,
 			countDown,
 			recommend,
+			focuslist,
 			// #ifdef MP
 			authorize
 			// #endif
@@ -428,6 +417,7 @@
 				is_switch: true,
 				hostProduct: [],
 				hotPage: 1,
+				hotPage1:1,
 				hotLimit: 8,
 				hotScroll: true,
 				hotLoading: false,
@@ -627,22 +617,18 @@
 			changeTab(e) {
 				debugger
 				this.navIndex = e.index;
-				if (e.index === 1) {
-					// storeCategory({
-					// 	pid: e.pid
-					// }).then(res => {
-					// 	this.sortList = res.data.length > 9 ? res.data.splice(0, 9) : res.data;
-					// });
-	
-					this.where.page = 1;
+				if (e.index === 1) { //获取我关注的
+				  this.hotPage1 = 1
+					this.sortProduct = [];
+					this.loadend = false;
+					this.loading = false;
+					this.get_product_list1();
+				}else if(e.index === 0){ //获取我推荐的
+					this.hotPage = 1
 					this.loadend = false;
 					this.loading = false;
 					this.sortProduct = [];
-					this.where.province = ''
-					this.where.city = ''
-					this.get_product_list();
-				}else if(e.index === 0){ //获取我推荐的
-					this.hotPage = 1
+					this.hostProduct = []
 					this.get_host_product()
 				}else if(e.index ===2){
 
@@ -672,6 +658,32 @@
 					that.loadTitle = loadend ? '已全部加载' : '加载更多';
 					that.$set(that, 'sortProduct', productList);
 					that.$set(that.where, 'page', that.where.page + 1);
+				}).catch(err => {
+					that.loading = false;
+					that.loadTitle = '加载更多';
+				});
+			},
+			//获取我关注的产品列表
+			get_product_list1: function() {
+				console.log(123);
+				let that = this;
+				// if (!that.loadend) return;
+				if (that.loading) return;
+				that.loading = true;
+				that.loadTitle = '';
+				getCollectUserList({
+					page: this.hotPage1,
+					limit: that.hotLimit
+				}).then(res => {
+					let list = res.data.list;
+					let productList = that.$util.SplitArray(list, that.sortProduct);
+					let loadend = list.length < that.hotLimit;
+					that.loadend = loadend;
+					that.loading = false;
+					that.loadTitle = loadend ? '已全部加载' : '加载更多';
+					that.$set(that, 'sortProduct', productList);
+					that.$set(that, 'hotPage1', that.hotPage1 + 1);
+					
 				}).catch(err => {
 					that.loading = false;
 					that.loadTitle = '加载更多';
@@ -853,13 +865,16 @@
 			if (this.navIndex == 0) {
 				// 首页加载更多
 				this.get_host_product();
-			} else {
+			} else if(this.navIndex==1) { //关注
 				// 分类栏目加载更多
-				if (this.sortProduct.length > 0) {
-					this.get_product_list();
-				} else {
-					this.get_host_product();
-				}
+				// if (this.sortProduct.length > 0) {
+				// 	this.get_product_list();
+				// } else {
+				// 	this.get_host_product();
+				// }
+				this.get_product_list1();
+			}else if(this.navIndex ==2){ //地点搜索
+				this.get_product_list();
 			}
 		},
 		// 滚动监听
@@ -2189,6 +2204,7 @@
 
 	.productList .list {
 		padding: 0 20rpx;
+		margin-top: 230rpx
 	}
 
 	.productList .list.on {

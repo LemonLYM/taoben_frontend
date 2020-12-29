@@ -275,7 +275,7 @@
 				this.getUserInfo();
 				this.orderNum();
 				this.getMyMenus();
-				this.getUserCat() //获取用户认证结果信息
+				// this.getUserCat() //获取用户认证结果信息
 				// this.setVisit();
 			} else {
 				// #ifdef H5 || APP-PLUS
@@ -308,7 +308,7 @@
 				this.getUserInfo();
 				this.getMyMenus();
 				this.orderNum();
-				this.getUserCat() //获取用户认证结果信息
+				// this.getUserCat() //获取用户认证结果信息
 				this.isShowAuth = false
 			},
 			Setting: function() {
@@ -330,9 +330,9 @@
 			},
 			getUserCat:function(){
 				let that = this
-				getUserCat().then(res=>{
-					that.catInfo = res.data
-				})
+				// getUserCat().then(res=>{
+				// 	that.catInfo = res.data
+				// })
 			},
 			/**
 			 * 获取个人用户信息

@@ -243,7 +243,7 @@
 			</block>
 			<block v-if="sortProduct1.length>0">
 			
-				<view class='list  row-between-wrapper' style="padding: 0;">
+				<view class='list dislist row-between-wrapper' style="padding: 0;">
 					
 					<recommend :hostProduct="sortProduct1" ></recommend>
 				</view>
@@ -2212,7 +2212,9 @@
 			}
 		}
 	}
-
+ .productList .dislist .common-hd{
+	 display: none;
+ }
 	.productList .list {
 		padding: 0 20rpx;
 		margin-top: 230rpx

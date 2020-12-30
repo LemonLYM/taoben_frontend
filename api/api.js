@@ -13,6 +13,7 @@ export function getIndexData()
   return request.get("common/home",{},{ noAuth : true});
 }
 
+
 /**
  * 获取登录授权login
  * 
@@ -48,7 +49,10 @@ export function setCouponReceive(couponId){
 export function getCoupons(data){
   return request.get('coupon/product',data)
 }
-
+//获取物流公司名称
+export function getDeliverList(data){
+  return request.get('order/delivery/getOptions',data)
+}
 /**
  * 商铺优惠券列表
  * @param object data
@@ -114,7 +118,10 @@ export function getArticleDetails(id){
 export function loginMobile(data){
   return request.post('login/mobile',data,{noAuth:true})
 }
-
+//发货
+export function deliveryGood(data){
+  return request.post('store/order/delivery',data)
+}
 /**
  * 获取短信KEY
  * @param object phone

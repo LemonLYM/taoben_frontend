@@ -8,6 +8,11 @@ import request from "@/utils/request.js";
 export function getProductDetail(id){
   return request.get('store/product/detail/' + id, {}, { noAuth : true });
 }
+//获取我卖出的商品
+
+export function getSaleList(data){
+  return request.get('store/order/my/lst', data);
+}
 //获取我发布的
 //发布商品
 export function publishedItem(data) {

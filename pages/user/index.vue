@@ -153,6 +153,12 @@
 							<text>我发布的</text>
 						</block>
 					</navigator>
+					<navigator class="item" hover-class="none" url="/pages/sale/sale">
+						<block>
+							<image src="/static/images/user-menu-001.png"></image>
+							<text>我卖出的</text>
+						</block>
+					</navigator>
 				</view>
 			</view>
 			

@@ -241,12 +241,19 @@
 					<focuslist :hostProduct="sortProduct"></focuslist>
 				</view>
 			</block>
-			<block v-if="sortProduct.length == 0">
-				<view class="noCommodity">
+			<block v-if="sortProduct1.length>0">
+			
+				<view class='list  row-between-wrapper' style="padding: 0;">
+					
+					<recommend :hostProduct="sortProduct1" ></recommend>
+				</view>
+			</block>
+			<block v-if="(sortProduct.length == 0&&navIndex==1 )||(sortProduct1.length == 0&&navIndex==2) ">
+				<view class="noCommodity" style="margin-top: 230rpx;">
 					<view class='pictrue'>
 						<image src='/static/images/noShopper.png'></image>
 					</view>
-					<recommend :hostProduct="hostProduct"></recommend>
+					<!-- <recommend :hostProduct="hostProduct"></recommend> -->
 				</view>
 
 			</block>
@@ -409,6 +416,7 @@
 				loading: false,
 				loadTitle: '加载更多',
 				sortProduct: [],
+				sortProduct1: [],
 				where: {
 
 					page: 1,
@@ -620,6 +628,7 @@
 				if (e.index === 1) { //获取我关注的
 				  this.hotPage1 = 1
 					this.sortProduct = [];
+					this.sortProduct1 = [];
 					this.loadend = false;
 					this.loading = false;
 					this.get_product_list1();
@@ -628,6 +637,7 @@
 					this.loadend = false;
 					this.loading = false;
 					this.sortProduct = [];
+					this.sortProduct1 = [];
 					this.hostProduct = []
 					this.get_host_product()
 				}else if(e.index ===2){
@@ -636,6 +646,7 @@
 					this.loadend = false;
 					this.loading = false;
 					this.sortProduct = [];
+					this.sortProduct1 = [];
 					this.where.province = e.province
 					this.where.city = e.city
 					this.get_product_list();
@@ -651,12 +662,12 @@
 				that.loadTitle = '';
 				getProductslist(that.where).then(res => {
 					let list = res.data.list;
-					let productList = that.$util.SplitArray(list, that.sortProduct);
+					let productList = that.$util.SplitArray(list, that.sortProduct1);
 					let loadend = list.length < that.where.limit;
 					that.loadend = loadend;
 					that.loading = false;
 					that.loadTitle = loadend ? '已全部加载' : '加载更多';
-					that.$set(that, 'sortProduct', productList);
+					that.$set(that, 'sortProduct1', productList);
 					that.$set(that.where, 'page', that.where.page + 1);
 				}).catch(err => {
 					that.loading = false;
@@ -2158,7 +2169,7 @@
 
 	.productList {
 		background-color: #F1F1F1;
-
+		flex: 1;
 		.sort {
 			width: 710rpx;
 			max-height: 380rpx;

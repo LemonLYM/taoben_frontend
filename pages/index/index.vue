@@ -623,7 +623,6 @@
 			},
 			// 导航分类切换
 			changeTab(e) {
-				debugger
 				this.navIndex = e.index;
 				if (e.index === 1) { //获取我关注的
 				  this.hotPage1 = 1

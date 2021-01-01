@@ -10,18 +10,18 @@
 			<view v-for="(item,index) in hostProduct" :key="index" hover-class='none' @tap="goDetail(item)">
 				<view class="item" v-if="index%2 ==0">
 					<view class='pictrue'>
-						<image :src='item.product.image'></image>
+						<image :src='item.image'></image>
 						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '1'">秒杀</text>
 						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '2'">砍价</text>
 						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '3'">拼团</text>
 					</view>
 					<view class="text">
-						<view class='name'><text v-if="item.merchant && item.merchant.is_trader" class="font-bg-red">自营</text>{{item.product.store_name}}</view>
+						<view class='name'><text v-if="item.merchant && item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 						<view class="tag">
-							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+							{{item.mer_cate_name.join(',')}}
 						</view>
 						<view class="acea-row row-middle price-favor">
-							<view class='money font-color'>￥<text class='num'>{{item.product.price}}</text></view>
+							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
 							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
 							<text class="favor-num">{{item.merchant.care_count}}人想要</text>
 						</view>
@@ -41,7 +41,7 @@
 			<view v-for="(item,index) in hostProduct" :key="index" hover-class='none' @tap="goDetail(item)">
 				<view class="item" v-if="index%2 ==1">
 					<view class='pictrue'>
-						<image :src='item.product.image'></image>
+						<image :src='item.image'></image>
 						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '1'">秒杀</text>
 						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '2'">砍价</text>
 						<text class="pictrue_log_big pictrue_log_class" v-if="item.activity && item.activity.type === '3'">拼团</text>
@@ -49,10 +49,10 @@
 					<view class="text">
 						<view class='name'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 						<view class="tag">
-							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+							{{item.mer_cate_name.join(',')}}
 						</view>
 						<view class="acea-row row-middle price-favor">
-							<view class='money font-color'>￥<text class='num'>{{item.product.price}}</text></view>
+							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
 							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
 							<text class="favor-num">{{item.merchant.care_count}}人想要</text>
 						</view>

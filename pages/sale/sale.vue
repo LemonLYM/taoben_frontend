@@ -206,8 +206,8 @@
 				if (this.loadend) return;
 				that.loading = true;
 				that.loadTitle = "";
-				getSaleList({
-					// publishedItem({
+				// getSaleList({
+					publishedItem({
 					page: that.page,
 					limit: that.limit
 					// keywords:"",

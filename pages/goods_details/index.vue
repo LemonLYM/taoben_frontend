@@ -27,7 +27,7 @@
 							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
 						</view>
 						<view class='label acea-row row-between-wrapper'>
-							<view>原价:￥{{storeInfo.ot_price ? storeInfo.ot_price : ''}}</view>
+							<view>原价:￥{{storeInfo.cost ? storeInfo.cost : ''}}</view>
 							<view>库存:{{storeInfo.stock}}{{storeInfo.unit_name}}</view>
 							<view>销量:{{storeInfo.sales}}{{storeInfo.unit_name}}</view>
 						</view>

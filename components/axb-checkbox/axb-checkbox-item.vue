@@ -89,7 +89,8 @@ const debounce = function (fun, delay, immediate) {
 		padding: 0 10rpx;
 		border-radius: 10rpx;
 		font-size: 26rpx;
-		margin-right: 10rpx;
+		margin-right: 20rpx;
+		margin-bottom: 15rpx;
 		box-sizing: border-box;
 		border: 1px solid #c3c3c3;
 		margin-bottom: 10rpx;

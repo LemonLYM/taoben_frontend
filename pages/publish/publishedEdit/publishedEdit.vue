@@ -426,6 +426,7 @@
 
 <style lang="scss">
 .publish-wrapper{
+	background-color: white;
 	padding: 0 30rpx;
 	// font-size: 32rpx;
 	.publish-btn{
@@ -467,6 +468,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		padding-left: 30rpx;
+		margin-bottom: 20rpx;
 		.title{
 			margin-right: 10rpx;
 		}

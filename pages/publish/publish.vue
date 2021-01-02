@@ -434,8 +434,10 @@
 		display: flex;
 		flex-wrap: wrap;
 		padding-left: 30rpx;
+		margin-bottom: 20rpx;
 		.title{
 			margin-right: 10rpx;
+			padding: 0 20rpx 0 0;
 		}
 		.tag-wrapper{
 			display: flex;

@@ -94,7 +94,7 @@
 		<view class="kind" v-for="(item,idx) in productList" :key='idx'>
 			<text class="title">{{item.cate_name}}</text>
 			<view class="tag-wrapper" >
-				  <tag  :key='index'  :list='item.children' @change='tagClick'></tag>
+				  <tag  :key='index'  :list='item.children[0].children' @change='tagClick'></tag>
 			</view>
 		</view>
 		</view>

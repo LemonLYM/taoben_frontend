@@ -98,6 +98,9 @@
 		</view>
 		</view>
 		<button type="primary" @click="formSubmit" class="publish-btn">发布</button>
+		<!-- #ifdef MP -->
+		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
+		<!-- #endif -->
 	</view>
 </template>
 
@@ -110,12 +113,17 @@
 		getCategoryList,
 		createItem
 	} from '@/api/store.js';
+	import {
+		getUserInfo
+	} from '@/api/user.js';
 	export default {
 		components:{
 			tag
 		},
 		data() {
 			return {
+				isAuto: false, //没有授权的不会自动授权
+				isShowAuth: false, //是否隐藏授权
 				bookName:'',//剧本名称
 				curPrice:'',//售价
 				prePrice:'',//原价
@@ -133,11 +141,13 @@
 				validate:false, //校验状态
 				productList:[], //商品分类标签
 				category:{},//选中的分类
-				new_percentage:0 //新旧程度给后端
+				new_percentage:0, //新旧程度给后端
+				userInfo:{}
  			}
 		},
 		onLoad() {
 			console.log('onload')
+			// this.getUserInfo();
 			this.getCityList();
 			this.getAllCategory(); //获取分类标签数据
 		},
@@ -149,8 +159,54 @@
 		//页面每次显示都会触发
 		onShow() {
 			console.log('onshow')
+			this.getUserInfo();
 		},
 		methods: {
+			/**
+			 * 获取个人用户信息
+			 */
+			getUserInfo: function() {
+				let that = this;
+				getUserInfo().then(res => {
+					that.userInfo = res.data
+					if(res.data.mer_ca===1){ //
+					  this.$util.Tips({
+						  title: '商户审核中，请耐心等待'
+					  });
+						setTimeout(()=>{
+							uni.switchTab({
+								url: '/pages/user/index'
+							});
+						},500)
+					}else if(res.data.mer_ca===4){
+						this.$util.Tips({
+							title: "请进行商户认证"
+						});
+						setTimeout(()=>{
+							uni.switchTab({
+								url: '/pages/user/index'
+							});
+						},500)
+					}else if(res.data.mer_ca===2){
+						this.$util.Tips({
+							title: "商家入驻申请审核失败，请重新提交申请"
+						});			
+						setTimeout(()=>{
+							uni.switchTab({
+								url: '/pages/user/index'
+							});
+						},500)	
+					}
+				});
+			},
+			// 授权回调
+			onLoadFun: function() {
+				this.isShowAuth = false;
+			},
+			// 授权关闭
+			authColse: function(e) {
+				this.isShowAuth = e
+			},
 			getAllCategory:function(){
 				let that = this;
 				getCategoryList().then(res => {

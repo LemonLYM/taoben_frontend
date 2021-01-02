@@ -25,8 +25,8 @@
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
 							<view class="num-txt">
 								<text v-if='userInfo.user_ca===1'>身份认证成功</text>
-								<text v-else-if='userInfo.user_ca===0' style="color: #fff; border-color: #fff;">身份审核中</text>
-								<text v-else-if='userInfo.user_ca===2' style="color: #fff; border-color: #fff;">身份审核失败</text>
+								<text v-else-if='userInfo.user_ca===0' style="color: #666; border-color: #fff;">身份审核中</text>
+								<text v-else-if='userInfo.user_ca===2' style="color: #666; border-color: #fff;">身份审核失败</text>
 							</view>
 							<view class="icon" style="display: none;">
 								<image src="/static/images/edit.png" mode=""></image>
@@ -36,7 +36,7 @@
 							<view class="num"  v-if='userInfo.mer_ca ==1'>
 								<text style="color: #4fae70;">已认证商家</text>
 							</view>
-							<view class="phone" v-if="!userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
+							<view class="phone" v-if="userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
 								<text>身份未认证</text> 
 							</view>
 						</view>

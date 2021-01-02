@@ -85,7 +85,7 @@ const debounce = function (fun, delay, immediate) {
 	.radio1 {
 		display: inline-block;
 		height: 50rpx;
-		line-height: 50rpx;
+		line-height: 45rpx;
 		padding: 0 10rpx;
 		border-radius: 10rpx;
 		font-size: 26rpx;

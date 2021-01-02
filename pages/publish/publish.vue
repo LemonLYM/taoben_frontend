@@ -31,7 +31,7 @@
 			</view>
 			<view class="rightbox">
 				  <picker @change="bindPickerChange" :value="index" :range="array">
-				    <view class="uni-input">{{array[index]}}</view>
+				    <view class="uni-input"  style="height: 1.4rem;">{{array[index]}}</view>
 				  </picker>
 			</view>
 		</view>

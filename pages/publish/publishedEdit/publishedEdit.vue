@@ -428,6 +428,7 @@
 .publish-wrapper{
 	background-color: white;
 	padding: 0 30rpx;
+	height: 100%;
 	// font-size: 32rpx;
 	.publish-btn{
 		font-size: 32rpx;

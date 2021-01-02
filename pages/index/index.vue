@@ -52,7 +52,7 @@
 			<!-- <view class="mp-bg"></view> -->
 			<!-- #endif -->
 			<!-- banner -->
-			<view class="swiper" v-if="imgUrls.length">
+			<view class="swiper home-swiper" v-if="imgUrls.length">
 				<swiper indicator-dots="true" :autoplay="true" :circular="circular" :interval="interval" :duration="duration"
 				 indicator-color="#E4E4E4" indicator-active-color="#E93323" previous-margin="40rpx" next-margin="40rpx" :current="swiperCur"
 				 @change="swiperChange">
@@ -913,6 +913,9 @@
 	}
 </style>
 <style lang="scss">
+	.home-swiper {
+		padding: 10rpx 0 0 0;
+	}
 	.mp-header .tabNav{
 		// background-color: blue;
 		// width: 300rpx !important;

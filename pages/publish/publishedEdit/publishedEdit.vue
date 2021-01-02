@@ -38,7 +38,8 @@
 		
 		<view class="publish-title">商品描述</view>
 		<view class="publish-content">
-			<textarea class="publish-textarea" v-model="textContext" placeholder="请输入您要发布的商品介绍" />
+			 <editor id="editor" class="publish-textarea"  @ready="onEditorReady" @blur='handleInput'></editor>
+			<!-- <textarea class="publish-textarea" v-model="textContext" placeholder="请输入您要发布的商品介绍" /> -->
 		</view>
 		<view class="publish-title-pic">商品图片</view>
 		<view class="publish-desc">(图片格式支持JPG、PNG、JPEG)</view>
@@ -153,7 +154,24 @@
 		onShow() {
 			console.log('onshow')
 		},
-		methods: {
+		methods: {		
+			onEditorReady:function(detail){
+                uni.createSelectorQuery().select('#editor').context((res) => {
+                  this.editorCtx = res.context
+									this.editorCtx.setContents({
+										html:this.textContext,
+										success:(res)=>{
+											
+										},
+										fail:(res)=>{
+											
+										}
+									})
+                }).exec()				
+			},
+			handleInput:function(detail){
+				this.textContext = detail.detail.html
+			},
 			geteditMyProduct:function(id){
 				editMyProduct({pro_id:id}).then((res)=>{
 					const mapObj = {
@@ -174,6 +192,8 @@
 						this.num = res.data.stock
 						this.index = mapObj[res.data.new_percentage]
 						this.textContext = res.data.content
+	
+						this.editorCtx.detail.html = res.data.content
 						this.pics = images
 						this.deliverPrice = res.data.postage+''
 						this.cityId = res.data.city

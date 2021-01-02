@@ -38,7 +38,8 @@
 		
 		<view class="publish-title">商品描述</view>
 		<view class="publish-content">
-			<textarea class="publish-textarea" v-model="textContext" placeholder="请输入您要发布的商品介绍" />
+			 <editor id="editor" class="publish-textarea"  @blur='handleInput'></editor>
+			<!-- <textarea class="publish-textarea" v-model="textContext" placeholder="" /> -->
 		</view>
 		<view class="publish-title-pic">商品图片</view>
 		<view class="publish-desc">(图片格式支持JPG、PNG、JPEG)</view>
@@ -171,6 +172,11 @@
 			this.getUserInfo();
 		},
 		methods: {
+			handleInput:function(detail){
+				debugger
+				console.log(detail)
+				this.textContext = detail.detail.html
+			},
 			/**
 			 * 获取个人用户信息
 			 */
@@ -558,6 +564,8 @@
 	margin-left: 30rpx;
 }	
 .publish-content{
+	overflow: scroll;
+	height: 200rpx;
 	padding: 20rpx;
 	box-sizing: border-box;
 	border: 1px solid #eee;

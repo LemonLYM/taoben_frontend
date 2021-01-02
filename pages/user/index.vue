@@ -688,8 +688,12 @@
 				text{
 					    /* padding: 4rpx; */
 					    border: 1px solid #fff;
-					    border-radius: 8rpx;
-							font-size: 24rpx;
+					    border-radius: 50rpx;
+						font-size: 20rpx;
+						background: white;
+						padding: 1rpx 6rpx;
+						color: #2d83cf;
+						box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 				}
 			}
 			.num-txt{

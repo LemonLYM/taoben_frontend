@@ -3,7 +3,7 @@
 		<!-- #ifdef H5 -->
 		<view class="header">
 			<view class="serch-wrapper flex acea-row row-between-wrapper">
-				<view class="logo">
+				<view class="logo home-logo">
 					<!-- <image v-if="!logoUrl" class="logo" src="/static/images/crmeb.png"></image> -->
 					<image :src="logoUrl" mode=""></image>
 				</view>
@@ -24,7 +24,7 @@
 			<view class="sys-head" view :style="{ height: statusBarHeight }"></view>
 			<view class="serch-box" view style="height: 43px;">
 				<view class="serch-wrapper flex">
-					<view class="logo">
+					<view class="logo home-logo">
 						<!-- <image class="logo" src="/static/images/crmeb.png"></image> -->
 						<image :src="logoUrl" mode=""></image>
 					</view>
@@ -917,6 +917,9 @@
 		// background-color: blue;
 		// width: 300rpx !important;
 	}
+	.home-logo {
+		margin-right: 26rpx;
+	}
 	.new-search{
 		.input {
 			display: flex;
@@ -1199,6 +1202,7 @@
 				align-items: center;
 				padding: 20rpx 30rpx 0 30rpx;
 
+				
 				.logo {
 					width: 127rpx;
 					height: 46rpx;

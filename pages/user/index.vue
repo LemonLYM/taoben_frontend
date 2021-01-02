@@ -25,8 +25,8 @@
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
 							<view class="num-txt">
 								<text v-if='userInfo.user_ca===1'>身份认证成功</text>
-								<text v-else-if='userInfo.user_ca===0' style="color: #fff; border-color: #fff;">身份审核中</text>
-								<text v-else-if='userInfo.user_ca===2' style="color: #fff; border-color: #fff;">身份审核失败</text>
+								<text v-else-if='userInfo.user_ca===0' style="border-color: #fff;">身份审核中</text>
+								<text v-else-if='userInfo.user_ca===2' style="border-color: #fff;">身份审核失败</text>
 							</view>
 							<view class="icon" style="display: none;">
 								<image src="/static/images/edit.png" mode=""></image>
@@ -499,9 +499,12 @@
 							text{
 								color: #4fae70;
 								    /* padding: 4rpx; */
+									padding: 2rpx 8rpx;
+									background-color: white;
 								    border: 1px solid #4fae70;
-								    border-radius: 8rpx;
-										font-size: 24rpx;
+								    border-radius: 20rpx;
+									font-size: 24rpx;
+									color: #282828;
 							}
 						}
 					}

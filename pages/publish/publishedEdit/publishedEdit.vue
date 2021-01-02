@@ -193,7 +193,7 @@
 						this.index = mapObj[res.data.new_percentage]
 						this.textContext = res.data.content
 	
-						this.editorCtx.detail.html = res.data.content
+						// this.editorCtx.detail.html = res.data.content
 						this.pics = images
 						this.deliverPrice = res.data.postage+''
 						this.cityId = res.data.city
@@ -203,7 +203,7 @@
 						// this.multiArray[0] = resp.data.province_name
 						// this.multiArray[1] = resp.data.city_name
 					}
-					debugger
+					// debugger
 				})
 			},
 			getAllCategory:function(){

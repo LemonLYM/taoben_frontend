@@ -235,11 +235,17 @@
 					status:index
 				},id).then(res => {
 					return that.$util.Tips({
-						title: '取消收藏成功',
+						title: index === 0 ?'下架成功' :'上架成功',
 						icon: 'success'
 					}, function() {
-						that.collectProductList.splice(index, 1);
-						that.$set(that, 'collectProductList', that.collectProductList);
+						that.loading = false;
+						that.loadend = false;
+						that.loadTitle = "";
+						that.page = 1;
+						that.collectProductList = []
+						that.get_user_collect_product()
+						// that.collectProductList.splice(index, 1);
+						// that.$set(that, 'collectProductList', that.collectProductList);
 					});
 				});
 			},

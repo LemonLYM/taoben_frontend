@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view style="display: flex;height: 100vh;flex-direction: column;">
 		<!-- 店铺信息 -->
 		<view id="store" class="store">
 			<image :src="userInfo.avatar"></image>
@@ -28,7 +28,7 @@
 			</view>
 		</view>
 		<view class='collectionGoods' v-if="collectProductList.length">
-			<navigator :url='"/pages/goods_details/index?id="+item.product_id' hover-class='none' class='item acea-row row-between-wrapper' v-for="(item,index) in collectProductList" :key="index" >
+			<navigator :url='item.status===1 ? "/pages/goods_details/index?id="+item.product_id : ""' hover-class='none' class='item acea-row row-between-wrapper' v-for="(item,index) in collectProductList" :key="index" >
 				<view class='pictrue' >
 					<image :src="item.image"></image>
 				</view>
@@ -52,9 +52,9 @@
 		</view>
 		<view class='noCommodity' v-else-if="!collectProductList.length && page > 1">
 			<view class='pictrue'>
-				<image src='/static/images/noCollection.png'></image>
+				<image src='/static/images/noCart.png'></image>
 			</view>
-			<recommend :hostProduct="hostProduct"></recommend>
+			<!-- <recommend :hostProduct="hostProduct"></recommend> -->
 		</view>
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
@@ -161,8 +161,6 @@
 			},
 			
 			toEdit(id,index){
-				
-				console.log('编辑')
 				uni.redirectTo({
 						url: '/pages/publish/publishedEdit/publishedEdit?id='+id
 					})
@@ -220,7 +218,7 @@
 					that.collectProductList = that.$util.SplitArray(collectProductList, that.collectProductList);
 					that.$set(that, 'collectProductList', that.collectProductList);
 					that.loadend = loadend;
-					that.loadTitle = loadend ? '我也是有底线的' : '加载更多';
+					that.loadTitle = loadend ? '已全部加载' : '加载更多';
 					that.page = that.page + 1;
 					that.loading = false;
 				}).catch(err => {
@@ -301,9 +299,8 @@
 		 display: flex;
 		 margin-top: 10rpx;
 		 .credibility{
-			 color: #5ab5ef;
-			 border: 1px solid #5ab5ef;
-			 border-radius: 50rpx;
+			 color: #2d83cf;
+			 border: 1px solid #fff;
 			 border-radius: 50rpx;
 			 padding: 0 10rpx;
 			 font-weight: normal;
@@ -312,9 +309,8 @@
 			 background-color: #fff;
 		 }
 		 .authoned{
-			 color: #5ab5ef;
-			 border: 1px solid #5ab5ef;
-			 border-radius: 50rpx;
+			 color: #2d83cf;
+			 border: 1px solid #fff;
 			 border-radius: 50rpx;
 			 padding: 0 10rpx;
 			 font-weight: normal;
@@ -1062,6 +1058,7 @@
 	}
 	
 	.noCommodity {
+		flex: 1;
 		background-color: #fff;
 		padding-top: 1rpx;
 		border-top: 0;

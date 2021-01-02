@@ -21,7 +21,7 @@
 					<view class="text">
 						<view class='name'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 						<view class="tag">
-							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+							{{item.mer_cate_name.join('，')}}
 						</view>
 						<view class="acea-row row-middle price-favor">
 							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
@@ -52,7 +52,7 @@
 					<view class="text">
 						<view class='name'><text v-if="item.merchant.is_trader" class="font-bg-red">自营</text>{{item.store_name}}</view>
 						<view class="tag">
-							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+							{{item.mer_cate_name.join('，')}}
 						</view>
 						<view class="acea-row row-middle price-favor">
 							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
@@ -252,7 +252,8 @@
 			justify-content: space-between;
 		}
 		.tag{
-			font-size:24rpx
+			font-size:24rpx;
+			margin: 10rpx 0;
 		}
 	}
 

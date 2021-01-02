@@ -25,8 +25,8 @@
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
 							<view class="num-txt">
 								<text v-if='userInfo.user_ca===1'>身份认证成功</text>
-								<text v-else-if='userInfo.user_ca===0' style="border-color: #fff;">身份审核中</text>
-								<text v-else-if='userInfo.user_ca===2' style="border-color: #fff;">身份审核失败</text>
+								<text v-else-if='userInfo.user_ca===0' style="color: #666; border-color: #fff;">身份审核中</text>
+								<text v-else-if='userInfo.user_ca===2' style="color: #666; border-color: #fff;">身份审核失败</text>
 							</view>
 							<view class="icon" style="display: none;">
 								<image src="/static/images/edit.png" mode=""></image>
@@ -36,7 +36,7 @@
 							<view class="num"  v-if='userInfo.mer_ca ==1'>
 								<text style="color: #4fae70;">已认证商家</text>
 							</view>
-							<view class="phone" v-if="!userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
+							<view class="phone" v-if="userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
 								<text>身份未认证</text> 
 							</view>
 						</view>
@@ -145,8 +145,8 @@
 						<text>联系客服</text>
 					</view>
 				</view>
-			  <view class="title marginTop60">我的交易</view>
-				<view class="menu-box" v-if="isLogin">
+			  <view class="title marginTop60" v-if='isLogin &&userInfo.mer_ca ==1'>我的交易</view>
+				<view class="menu-box" v-if="isLogin&&userInfo.mer_ca ==1">
 					<navigator class="item" hover-class="none" url="/pages/publish/published/published">
 						<block>
 							<image src="/static/images/user_menu10.png"></image>
@@ -485,10 +485,10 @@
 						}
 
 						.num {
-							display: flex;
-							align-items: center;
-							font-size: 26rpx;
-							color: rgba(255, 255, 255, 0.6);
+							// display: flex;
+							// align-items: center;
+							// font-size: 26rpx;
+							// color: rgba(255, 255, 255, 0.6);
 							// padding: 6rpx 0;
 							margin-right:10rpx;
 							image {
@@ -496,15 +496,14 @@
 								height: 23rpx;
 								margin-left: 20rpx;
 							}
-							text{
+							text{								
+								border: 1px solid #fff;
+								border-radius: 50rpx;
+								font-size: 20rpx;
+								background: white;
+								padding: 1rpx 6rpx;
 								color: #4fae70;
-								    /* padding: 4rpx; */
-									padding: 2rpx 8rpx;
-									background-color: white;
-								    border: 1px solid #4fae70;
-								    border-radius: 20rpx;
-									font-size: 24rpx;
-									color: #282828;
+								// box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 							}
 						}
 					}
@@ -696,7 +695,7 @@
 						background: white;
 						padding: 1rpx 6rpx;
 						color: #2d83cf;
-						box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
+						// box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 				}
 			}
 			.num-txt{

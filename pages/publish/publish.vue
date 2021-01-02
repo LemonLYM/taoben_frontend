@@ -169,7 +169,7 @@
 				let that = this;
 				getUserInfo().then(res => {
 					that.userInfo = res.data
-					if(res.data.mer_ca===1){ //
+					if(res.data.mer_ca===0){ //
 					  this.$util.Tips({
 						  title: '商户审核中，请耐心等待'
 					  });

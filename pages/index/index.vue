@@ -1359,7 +1359,7 @@
 			left: 0;
 			top: 0;
 			width: 100%;
-			height: 220rpx;
+			height: 240rpx;
 			/* #ifdef H5 */
 			padding-bottom: 20rpx;
 			/* #endif */

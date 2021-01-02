@@ -633,6 +633,7 @@
 					this.get_product_list1();
 				}else if(e.index === 0){ //获取我推荐的
 					this.hotPage = 1
+					this.hotScroll = true
 					this.loadend = false;
 					this.loading = false;
 					this.sortProduct = [];

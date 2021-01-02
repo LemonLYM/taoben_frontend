@@ -50,7 +50,7 @@
 			<view class='pictrue'>
 				<image src='/static/images/noCollection.png'></image>
 			</view>
-			<recommend :hostProduct="hostProduct"></recommend>
+			<!-- <recommend :hostProduct="hostProduct"></recommend> -->
 		</view>
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
@@ -206,8 +206,8 @@
 				if (this.loadend) return;
 				that.loading = true;
 				that.loadTitle = "";
-				// getSaleList({
-					publishedItem({
+				getSaleList({
+					// publishedItem({
 					page: that.page,
 					limit: that.limit
 					// keywords:"",
@@ -215,6 +215,7 @@
 					// date:'',
 					// username:''
 				}).then(res => {
+					debugger
 					let collectProductList = res.data.list;
 					let loadend = collectProductList.length < that.limit;
 					that.collectProductList = that.$util.SplitArray(collectProductList, that.collectProductList);

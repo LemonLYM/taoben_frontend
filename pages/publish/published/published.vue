@@ -218,7 +218,7 @@
 					that.collectProductList = that.$util.SplitArray(collectProductList, that.collectProductList);
 					that.$set(that, 'collectProductList', that.collectProductList);
 					that.loadend = loadend;
-					that.loadTitle = loadend ? '我也是有底线的' : '加载更多';
+					that.loadTitle = loadend ? '已全部加载' : '加载更多';
 					that.page = that.page + 1;
 					that.loading = false;
 				}).catch(err => {

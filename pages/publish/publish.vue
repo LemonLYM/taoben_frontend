@@ -223,7 +223,7 @@
 						store_info:'',//简述，前端没有给这个字段，供接口请求使用
 						content: this.textContext,//商品描述
 						image:this.pics[0],//封面图
-						slider_image:this.pics.slice(1,this.pics.length),//轮播图
+						slider_image:this.pics.length ===1 ? this.pics  : this.pics.slice(1,this.pics.length),//轮播图
 						postage:parseInt(this.deliverPrice),//运费
 						// city: this.region[1],//城市名称
 						city:this.cityId,
@@ -383,9 +383,9 @@
 			},
 			//删除照片
 			DelPic: function(index) {
-				pic = this.pics[index];
+				// pic = this.pics[index];
 				this.pics.splice(index, 1);
-				this.$set(that, 'pics', that.pics);
+				this.$set(this, 'pics', this.pics);
 			}
 		}
 	}

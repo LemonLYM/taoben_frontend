@@ -145,8 +145,8 @@
 						<text>联系客服</text>
 					</view>
 				</view>
-			  <view class="title marginTop60">我的交易</view>
-				<view class="menu-box" v-if="isLogin">
+			  <view class="title marginTop60" v-if='isLogin &&userInfo.mer_ca ==1'>我的交易</view>
+				<view class="menu-box" v-if="isLogin&&userInfo.mer_ca ==1">
 					<navigator class="item" hover-class="none" url="/pages/publish/published/published">
 						<block>
 							<image src="/static/images/user_menu10.png"></image>
@@ -485,10 +485,10 @@
 						}
 
 						.num {
-							display: flex;
-							align-items: center;
-							font-size: 26rpx;
-							color: rgba(255, 255, 255, 0.6);
+							// display: flex;
+							// align-items: center;
+							// font-size: 26rpx;
+							// color: rgba(255, 255, 255, 0.6);
 							// padding: 6rpx 0;
 							margin-right:10rpx;
 							image {
@@ -496,12 +496,14 @@
 								height: 23rpx;
 								margin-left: 20rpx;
 							}
-							text{
+							text{								
+								border: 1px solid #fff;
+								border-radius: 50rpx;
+								font-size: 20rpx;
+								background: white;
+								padding: 1rpx 6rpx;
 								color: #4fae70;
-								    /* padding: 4rpx; */
-								    border: 1px solid #4fae70;
-								    border-radius: 8rpx;
-										font-size: 24rpx;
+								// box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 							}
 						}
 					}
@@ -693,7 +695,7 @@
 						background: white;
 						padding: 1rpx 6rpx;
 						color: #2d83cf;
-						box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
+						// box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 				}
 			}
 			.num-txt{

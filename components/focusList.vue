@@ -99,7 +99,7 @@
 			goDetail(item){
 				goShopDetail(item,this.uid).then(res=>{
 					uni.navigateTo({
-						url:`/pages/goods_details/index?id=${item.product.product_id}`
+						url:`/pages/goods_details/index?id=${item.product_id}`
 					})
 				})
 			}

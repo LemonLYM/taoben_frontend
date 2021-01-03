@@ -1,1070 +1,742 @@
 <template>
 	<view>
-		<!-- 店铺信息 -->
-		<view id="store" class="store">
-			<image :src="userInfo.avatar"></image>
-			<view class="text">
-				<view class="navigator">
-					<text class="name">{{ userInfo.nickname}}</text>
-					<!-- <text class="iconfont icon-xiangyou"></text> -->
-				</view>
-				<view class="credibility-wrapper">
-					<view class="credibility" v-if='userInfo.credit<=2'>信誉一般</view>
-					<view class="credibility" v-if='userInfo.credit>2&&userInfo.credit<=5'>信誉良好</view>
-					<view class="credibility" v-if='userInfo.credit>5'>信誉极好</view>
-					<view class="authoned" v-if="userInfo.user_ca === 1">
-						身份已认证
+		<view class='my-order'>
+			<view class='header bg-color'>
+				<view class='picTxt acea-row row-between-wrapper'>
+					<view class='text'>
+						<view class='name'>订单信息</view>
+						<view>消费订单：{{orderData.orderCount || 0}} 总消费：￥{{orderData.orderPrice || 0}}</view>
 					</view>
-					<view class="authoned" v-if="userInfo.user_ca === 4">
-						身份未认证
-					</view>
-					<view class="authoned" v-if="userInfo.user_ca === 0">
-						身份审核中
-					</view>
-					<view class="authoned" v-if="userInfo.user_ca === 2">
-						身份审核失败
+					<view class='pictrue'>
+						<image src='/static/images/orderTime.png'></image>
 					</view>
 				</view>
 			</view>
-		</view>
-		<view class='collectionGoods' v-if="collectProductList.length">
-			<navigator :url='"/pages/goods_details/index?id="+item.product_id' hover-class='none' class='item acea-row row-between-wrapper' v-for="(item,index) in collectProductList" :key="index" >
-				<view class='pictrue' >
-					<image :src="item.image"></image>
+			<view class='nav acea-row row-around'>
+				<view class='item' :class='orderStatus==-1 ? "on": ""' @click="statusClick(-1)">
+					<view>全部</view>
+					<view class='num'>{{orderData.all || 0}}</view>
 				</view>
-				<view class='text acea-row row-column-between'>
-					<view class='name line1'>{{item.store_name}}</view>
-					<view class='acea-row row-between-wrapper'>
-						<view class='money font-color'>￥{{item.price}}</view>
-						<view class="deletewrapper">
-							<view class='delete' @click.stop='toEdit(item.product_id,index)'  v-if='item.status===1||item.status===-1'>去发货</view>
+				<view class='item' :class='orderStatus==0 ? "on": ""' @click="statusClick(0)">
+					<view>待付款</view>
+					<view class='num'>{{orderData.noPay || 0}}</view>
+				</view>
+				<view class='item' :class='orderStatus==1 ? "on": ""' @click="statusClick(1)">
+					<view>待发货</view>
+					<view class='num'>{{orderData.noPostage || 0}}</view>
+				</view>
+				<view class='item' :class='orderStatus==2 ? "on": ""' @click="statusClick(2)">
+					<view>待收货</view>
+					<view class='num '>{{orderData.noDeliver || 0}}</view>
+				</view>
+				<view class='item' :class='orderStatus==3 ? "on": ""' @click="statusClick(3)">
+					<view>待评价</view>
+					<view class='num'>{{orderData.noComment || 0}}</view>
+				</view>
+			</view>
+			<view class='list'>
+				<!-- 代付款 -->
+				<block v-if="orderStatus == 0">
+					<view class='item' v-for="(item,index) in orderList" :key="index">
+						<view @click='goOrderDetails(item.group_order_id)'>
+							<view class='title acea-row row-between-wrapper'>
+								<view class="acea-row row-middle left-wrapper">
+									{{item.group_order_sn}}
+								</view>
+								<view class='font-color'>待付款</view>
+							</view>
+							<view class='item-info acea-row row-between row-top' v-for="(order,j) in item.orderList" :key="order.order_id+j">
+								<block v-for="(goods,g) in order.orderProduct">
+									<view class='pictrue'>
+										<image :src='goods.cart_info.productAttr.image || goods.cart_info.product.image'></image>
+									</view>
+									<view class='text acea-row row-between'>
+										<view class='name line2'>{{goods.cart_info.product.store_name}}</view>
+										<view class='money'>
+											<view>￥{{goods.cart_info.productAttr.price}}</view>
+											<view>x{{goods.product_num}}</view>
+										</view>
+									</view>
+
+								</block>
+							</view>
+							<view class='bottom acea-row row-right row-middle'>
+							<!-- 	<view class='bnt cancelBnt' @click.stop='cancelOrder(index,item.group_order_id)'>取消订单</view> -->
+								<view class='bnt bg-color' @click.stop='goPay(item.pay_price,item.group_order_id)'>立即付款</view>
+							</view>
 						</view>
 					</view>
-				</view>
-			</navigator>
-			<view class='loadingicon acea-row row-center-wrapper'>
+				</block>
+
+
+				<!-- 待发货 待收货 待评价 已完成 -->
+				<block v-else>
+					<view class='item' v-for="(item,index) in orderList" :key="index">
+						<view @click='goOrderDetails(item.order_id)'>
+							<view class='title acea-row row-between-wrapper'>
+								<view class="acea-row row-middle left-wrapper">
+									<text class="iconfont icon-shangjiadingdan"></text>
+									<view class="store-name">{{item.merchant.mer_name}}</view>
+									<text class="iconfont icon-xiangyou"></text>
+								</view>
+								<view v-if="item.status == 0" class='font-color'>待发货</view>
+								<view v-if="item.status == 1" class='font-color'>待收货</view>
+								<view v-if="item.status == 2" class='font-color'>待评价</view>
+								<view v-if="item.status == 3" class='font-color'>已完成</view>
+								<view v-if="item.status == -1" class='font-color'>已退款</view>
+							</view>
+							<view class='item-info acea-row row-between row-top' v-for="(goods,index) in item.orderProduct" :key="index">
+								<view class='pictrue'>
+									<image :src='goods.cart_info.productAttr.image || goods.cart_info.product.image'></image>
+								</view>
+								<view class='text acea-row row-between'>
+									<view class='name '>
+										<view class="line2">{{goods.cart_info.product.store_name}}</view>
+										<view style="margin-top: 10rpx; color: red;">{{goods.is_refund==1?'退款中':goods.is_refund==2?'部分退款':goods.is_refund==3?'全部退款':''}}</view>
+									</view>
+									<view class='money'>
+										<view>￥{{goods.cart_info.productAttr.price}}</view>
+										<view>x{{goods.product_num}}</view>
+									</view>
+								</view>
+							</view>
+							<view class='totalPrice'>共{{item.orderNum || 0}}件商品，总金额
+								<text class='money font-color'>￥{{item.pay_price}}</text>
+							</view>
+						</view>
+						<view class='bottom acea-row row-right row-middle'>
+							<block v-if="item.status == 0">
+							<!-- 	<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>申请退款</view> -->
+								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>查看详情</view>
+							</block>
+							<block v-if="item.status == 1">
+								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>查看物流</view>
+								<view class='bnt bg-color' @tap='confirmOrder(item,index)'>确认收货</view>
+							</block>
+							<block v-if="item.status == 2">
+								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>再次购买</view>
+								<view class='bnt bg-color' @click='goOrderDetails_Evaluation(item.order_id)'>去评价</view>
+							</block>
+							<block v-if="item.status == 3">
+								<!-- <view class="bnt cancelBnt"  @click="delOrder(item.order_id,index)">删除记录</view> -->
+								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>再次购买</view>
+							</block>
+
+							<!-- <view class='bnt cancelBnt' v-if="item._status._type==0 || item._status._type == 9" @click='cancelOrder(index,item.order_id)'>取消订单</view>
+												<view class='bnt bg-color' v-if="item._status._type == 0" @click='goPay(item.pay_price,item.order_id)'>立即付款</view>
+												<view class='bnt cancelBnt' v-if="item._status._type == 1" @click='cancelOrder(index,item.order_id)'>申请退款</view>
+												<view class='bnt bg-color' v-if="item._status._type == 1 || item._status._type == 9" @click='goOrderDetails(item.order_id)'>查看详情</view>
+												<view class='bnt cancelBnt' v-if="item._status._type == 2" @click='goOrderDetails(item.order_id)'>查看物流</view>
+												<view class='bnt bg-color' v-if="item._status._type == 2" @click='goOrderDetails(item.order_id)'>确认收货</view>
+												<view class='bnt cancelBnt' v-if="item._status._type == 3" @click='goOrderDetails(item.order_id)'>再次购买</view>
+												<view class='bnt bg-color' v-if="item._status._type == 3" @click='goOrderDetails(item.order_id)'>去评价</view>
+					
+												<view class='bnt cancelBnt' v-if="item._status._type == 4" @click='delOrder(item.order_id,index)'>删除订单</view>
+												<view class='bnt bg-color' v-if="item._status._type == 4" @click='goOrderDetails(item.order_id)'>再次购买</view> -->
+						</view>
+					</view>
+				</block>
+			</view>
+			<view class='loadingicon acea-row row-center-wrapper' v-if="orderList.length>5">
 				<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
 			</view>
-		</view>
-		<view class='noCommodity' v-else-if="!collectProductList.length && page > 1">
-			<view class='pictrue'>
-				<image src='/static/images/noCollection.png'></image>
+			<view v-if="orderList.length == 0">
+				<emptyPage title="暂无订单~"></emptyPage>
 			</view>
-			<!-- <recommend :hostProduct="hostProduct"></recommend> -->
+		</view>
+		<view class='noCart' v-if="orderList.length == 0 && page > 1">
+			<view class='pictrue'>
+				<image src='/images/noOrder.png'></image>
+			</view>
 		</view>
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
 		<!-- #endif -->
+		<payment :payMode='payMode' :pay_close="pay_close" @onChangeFun='onChangeFun' :order_id="pay_order_id" :totalPrice='totalPrice'></payment>
 	</view>
-
 </template>
 
 <script>
-	import request from "@/utils/request.js";
+	let app = getApp();
 	import {
-		getStoreDetail,
-		getCollectUserList,
-		getProductHot,
-		collectDel,
-		publishedItem,
-		collectUporDown,
-		getSaleList
-	} from '@/api/store.js';
+		getOrderList,
+		orderData,
+		unOrderCancel,
+		orderDel,
+		orderPay,
+		groupOrderList,
+		orderTake
+	} from '@/api/order.js';
 	import {
 		getUserInfo
 	} from '@/api/user.js';
 	import {
-		mapGetters
-	} from "vuex";
+		getSaleList
+	} from '@/api/store.js';
+	import {
+		openOrderSubscribe
+	} from '@/utils/SubscribeMessage.js';
+	import payment from '@/components/payment';
 	import {
 		toLogin
 	} from '@/libs/login.js';
-	import recommend from '@/components/recommend';
+	import {
+		mapGetters
+	} from "vuex";
 	// #ifdef MP
 	import authorize from '@/components/Authorize';
 	// #endif
+	import emptyPage from '@/components/emptyPage.vue'
 	export default {
 		components: {
-			recommend,
+			payment,
+			emptyPage,
 			// #ifdef MP
 			authorize
 			// #endif
 		},
 		data() {
 			return {
-				id: 0, // 商铺id
-				store: {}, // 商铺详情
-				hostProduct: [],
-				loadTitle: '加载更多',
-				loading: false,
-				loadend: false,
-				collectProductList: [],
-				limit: 8,
+				loading: false, //是否加载中
+				loadend: false, //是否加载完毕
+				loadTitle: '加载更多', //提示语
+				orderList: [], //订单数组
+				orderData: {}, //订单详细统计
+				orderStatus: 0, //订单状态
 				page: 1,
+				limit: 20,
+				payMode: [{
+						name: "微信支付",
+						icon: "icon-weixinzhifu",
+						value: 'wechat',
+						title: '微信快捷支付',
+						payStatus: 1
+					},
+					{
+						name: "余额支付",
+						icon: "icon-yuezhifu",
+						value: 'balance',
+						title: '可用余额:',
+						number: 0,
+						payStatus: app.globalData.yue_pay_status
+					}
+				],
+				pay_close: false,
+				pay_order_id: '',
+				totalPrice: '0',
 				isAuto: false, //没有授权的不会自动授权
-				isShowAuth: false ,//是否隐藏授权
-				hotScroll:false,
-				hotPage:1,
-				hotLimit:10,
-				userInfo: {}
-			}
+				isShowAuth: false //是否隐藏授权
+			};
 		},
 		computed: mapGetters(['isLogin']),
-		onLoad: function(options) {		
-			this.id = options.id;
+		onShow() {
 			if (this.isLogin) {
+				this.$set(this, 'orderList', []);
+				this.page = 1;
+				this.loadend = false;
+				this.loading = false;
+				this.getOrderData();
+				this.getOrderList();
 				this.getUserInfo();
-				this.get_user_collect_product();
-				this.get_host_product();
 			} else {
 				// #ifdef H5 || APP-PLUS
 				toLogin();
 				// #endif 
 				// #ifdef MP
 				this.isAuto = true;
-				this.$set(this, 'isShowAuth', true)
+				this.$set(this, 'isShowAuth', true);
 				// #endif
 			}
 		},
-		onShow() {
-			this.getStore();
-		},
-		mounted: function() {
-
-		},
 		methods: {
-			/**
-			 * 获取个人用户信息
-			 */
-			getUserInfo: function() {
-				let that = this;
-				getUserInfo().then(res => {
-					that.userInfo = res.data
-					// that.is_promoter = res.data.is_promoter
-				});
-			},
-			/**
-			 * 授权回调
-			 */
-			onLoadFun: function() {
+			onLoadFun() {
 				this.isShowAuth = false;
-				this.get_user_collect_product();
-				this.get_host_product();
+				this.getOrderData();
+				this.getOrderList();
 				this.getUserInfo();
 			},
 			// 授权关闭
 			authColse: function(e) {
 				this.isShowAuth = e
 			},
-			
-			toEdit(id,index){
-				uni.redirectTo({
-						url: '/pages/sale/deliver/deliver?id='+id
-					})
+			/**
+			 * 事件回调
+			 * 
+			 */
+			onChangeFun: function(e) {
+				let opt = e;
+				let action = opt.action || null;
+				let value = opt.value != undefined ? opt.value : null;
+				(action && this[action]) && this[action](value);
 			},
-			// 获取商品详情
-			getStore: function() {
-				getStoreDetail(this.id || 65).then(res => {
-					this.store = res.data;
-					// #ifdef H5
-					this.ShareInfo();
-					// #endif
-				}).catch(err => {
-					this.loading = false;
-					uni.showToast({
-						title: err,
-						icon: 'none'
-					})
-					setTimeout(function(){
-						uni.navigateBack()
-					},1000);
-				})
-			},
-
-			// 去商品详情页
-			goGoodsDetail(id) {
-				uni.navigateTo({
-					url: `/pages/goods_details/index?id=${id}`
-				})
-			},
-
-			goback: function() {
-				uni.navigateBack();
-			},
-			// 首页
-			goHome() {
-				uni.switchTab({
-					url: '/pages/index/index'
+			/**
+			 * 获取用户信息
+			 * 
+			 */
+			getUserInfo: function() {
+				let that = this;
+				getUserInfo().then(res => {
+					that.payMode[1].number = res.data.now_money;
+					that.$set(that, 'payMode', that.payMode);
 				});
 			},
 			/**
-			 * 获取收藏产品
+			 * 关闭支付组件
+			 * 
 			 */
-			get_user_collect_product: function() {
-				let that = this;
-				if (this.loading) return;
-				if (this.loadend) return;
-				that.loading = true;
-				that.loadTitle = "";
-				getSaleList({
-					// publishedItem({
-					page: that.page,
-					limit: that.limit
-					// keywords:"",
-					// status:'',
-					// date:'',
-					// username:''
-				}).then(res => {
-					debugger
-					let collectProductList = res.data.list;
-					let loadend = collectProductList.length < that.limit;
-					that.collectProductList = that.$util.SplitArray(collectProductList, that.collectProductList);
-					that.$set(that, 'collectProductList', that.collectProductList);
-					that.loadend = loadend;
-					that.loadTitle = loadend ? '全部加载完成' : '加载更多';
-					that.page = that.page + 1;
-					that.loading = false;
-				}).catch(err => {
-					that.loading = false;
-					that.loadTitle = "加载更多";
-				});
+			payClose: function() {
+				this.pay_close = false;
 			},
 			/**
-			 * 取消收藏
+			 * 生命周期函数--监听页面加载
 			 */
-			delCollection: function(id, index) {
+			onLoad: function(options) {
+				if (options.status) this.orderStatus = options.status;
+			},
+			/**
+			 * 获取订单统计数据
+			 * 
+			 */
+			getOrderData: function() {
 				let that = this;
-				collectUporDown({
-					status:index
-				},id).then(res => {
+				orderData().then(res => {
+					that.$set(that, 'orderData', res.data);
+				})
+			},
+			/**
+			 * 取消订单
+			 * 
+			 */
+			cancelOrder: function(index, order_id) {
+				let that = this;
+				if (!order_id) return that.$util.Tips({
+					title: '缺少订单号无法取消订单'
+				});
+				unOrderCancel(order_id).then(res => {
 					return that.$util.Tips({
-						title: '取消收藏成功',
+						title: res.message,
 						icon: 'success'
 					}, function() {
-						that.collectProductList.splice(index, 1);
-						that.$set(that, 'collectProductList', that.collectProductList);
+						that.orderList.splice(index, 1);
+						that.$set(that, 'orderList', that.orderList);
+						that.$set(that.orderData, 'unpaid_count', that.orderData.unpaid_count - 1);
+						that.getOrderData();
+					});
+				}).catch(err => {
+					return that.$util.Tips({
+						title: err
 					});
 				});
 			},
 			/**
-			 * 获取我的推荐
+			 * 打开支付组件
+			 * 
 			 */
-			get_host_product: function() {
-				let that = this;
-				if(that.hotScroll) return
-				getProductHot(
-					that.hotPage,
-					that.hotLimit,
-				).then(res => {
-					that.hotPage++
-					that.hotScroll = res.data.list.length<that.hotLimit
-					that.hostProduct = that.hostProduct.concat(res.data.list)
+			goPay: function(pay_price, order_id) {
+				console.log(order_id)
+				this.$set(this, 'pay_close', true);
+				this.order_id = order_id;
+				this.pay_order_id = order_id.toString()
+				// this.$set(this, 'pay_order_id', );
+				this.$set(this, 'totalPrice', pay_price);
+			},
+			/**
+			 * 支付成功回调
+			 * 
+			 */
+			pay_complete: function() {
+				this.loadend = false;
+				this.page = 1;
+				this.$set(this, 'orderList', []);
+				this.pay_close = false;
+				this.pay_order_id = '';
+				this.getOrderData();
+				this.getOrderList();
+			},
+			/**
+			 * 支付失败回调
+			 * 
+			 */
+			pay_fail: function() {
+				this.pay_close = false;
+				this.pay_order_id = '';
+				
+			},
+			/**
+			 * 去订单详情
+			 */
+			goOrderDetails: function(order_id) {
+				let self = this
+				if (!order_id) return that.$util.Tips({
+					title: '缺少订单号无法查看订单详情'
 				});
-			}
+				// #ifdef MP
+				uni.showLoading({
+					title: '正在加载',
+				})
+				openOrderSubscribe().then(() => {
+					uni.hideLoading();
+					if (self.orderStatus == 0) {
+						uni.navigateTo({
+							url: '/pages/order_details/stay?order_id=' + order_id
+						})
+					} else {
+						uni.navigateTo({
+							url: '/pages/order_details/index?order_id=' + order_id
+						})
+					}
+				}).catch(() => {
+					uni.hideLoading();
+				})
+				// #endif  
+				// #ifndef MP
+				if (self.orderStatus == 0) {
+					uni.navigateTo({
+						url: '/pages/order_details/stay?order_id=' + order_id
+					})
+				} else {
+					uni.navigateTo({
+						url: '/pages/order_details/index?order_id=' + order_id
+					})
+				}
+				// #endif
+			},
+			/**
+			 * 点击去评价
+			 */
+			goOrderDetails_Evaluation: function(order_id) {
+				let self = this
+				if (!order_id) return that.$util.Tips({
+					title: '缺少订单号无法查看订单详情和评价'
+				});
+				// #ifdef MP			
+					if (self.orderStatus == 0) {
+						uni.navigateTo({
+							url: '/pages/order_details/stay?order_id=' + order_id
+						})
+					} else {
+						uni.navigateTo({
+							url: '/pages/order_details/index?order_id=' + order_id
+						})
+					}				
+				// #endif  
+				// #ifndef MP
+				if (self.orderStatus == 0) {
+					uni.navigateTo({
+						url: '/pages/order_details/stay?order_id=' + order_id
+					})
+				} else {
+					uni.navigateTo({
+						url: '/pages/order_details/index?order_id=' + order_id
+					})
+				}
+				// #endif
+			},
+			/**
+			 * 切换类型
+			 */
+			statusClick: function(status) {
+				if (status == this.orderStatus) return;
+				this.orderStatus = status;
+				this.loadend = false;
+				this.loading = false;
+				this.page = 1;
+				this.$set(this, 'orderList', []);
+				this.getOrderList();
+			},
+			/**
+			 * 获取订单列表
+			 */
+			getOrderList: function() {
+				let that = this;
+				if (that.loadend) return;
+				if (that.loading) return;
+				that.loading = true;
+				that.loadTitle = "加载更多";
+				if (that.orderStatus == 0) {
+					getSaleList({
+						page: that.page,
+						limit: that.limit,
+					}).then(res => {
+						let list = res.data.list || [];
+						let loadend = list.length < that.limit;
+						that.orderList = that.$util.SplitArray(list, that.orderList);
+						that.$set(that, 'orderList', that.orderList);
+						that.getProductCount();
+						that.loadend = loadend;
+						that.loading = false;
+						that.loadTitle = loadend ? "我也是有底线的" : '加载更多';
+						that.page = that.page + 1;
+					})
+				} else {
+					getSaleList({
+						status: that.orderStatus - 1,
+						page: that.page,
+						limit: that.limit,
+					}).then(res => {
+						let list = res.data.list || [];
+						let loadend = list.length < that.limit;
+						that.orderList = that.$util.SplitArray(list, that.orderList);
+						that.$set(that, 'orderList', that.orderList);
+						that.getProductCount();
+						that.loadend = loadend;
+						that.loading = false;
+						that.loadTitle = loadend ? "我也是有底线的" : '加载更多';
+						that.page = that.page + 1;
+					}).catch(err => {
+						that.loading = false;
+						that.loadTitle = "加载更多";
+					})
+				}
+				
+			},
+			/**
+			 * 获取单个订单商品数量
+			 */
+			getProductCount: function(){	
+				if(this.orderStatus !== 0){
+					this.orderList.forEach((item,i) => {
+						let orderNum = 0
+						 item.orderProduct.forEach((val) => {
+						      orderNum += val.product_num
+						  })
+						  this.orderList[i]['orderNum']=orderNum;
+					 })	
+				}
+							 
+			},				
+			/**
+			 * 删除订单
+			 */
+			delOrder: function(order_id, index) {
+				let that = this;
+				orderDel(order_id).then(res => {
+					that.orderList.splice(index, 1);
+					that.$set(that, 'orderList', that.orderList);
+					that.$set(that.orderData, 'unpaid_count', that.orderData.unpaid_count - 1);
+					that.getOrderData();
+					return that.$util.Tips({
+						title: '删除成功',
+						icon: 'success'
+					});
+				}).catch(err => {
+					return that.$util.Tips({
+						title: err
+					});
+				})
+			},
+			// 确认收货
+			confirmOrder: function(item, index) {
+				let that = this;
+				uni.showModal({
+					title: '确认收货',
+					content: '为保障权益，请收到货确认无误后，再确认收货',
+					success: function(res) {
+						if (res.confirm) {
+							orderTake(item.order_id).then(res => {
+								return that.$util.Tips({
+									title: '操作成功',
+									icon: 'success'
+								}, function() {
+									that.orderList.splice(index, 1);
+									that.getOrderData();
+								});
+							}).catch(err => {
+								return that.$util.Tips({
+									title: err
+								});
+							})
+						}
+					}
+				})
+			},
 		},
-		onReachBottom() {
-			this.get_user_collect_product();
+		onReachBottom: function() {
+			this.getOrderList();
 		}
 	}
-	
 </script>
 
-<style lang="scss">
-	/deep/ .care{
-		background-image: none!important;
-		border: 1px solid #fff;
-		background-color: transparent;
-	}
-	.store-home {
-		position: fixed;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		display: flex;
-		flex-direction: column;
-		// padding-bottom: 100rpx;
-		background: left top/750rpx 360rpx no-repeat fixed;
-		overflow: hidden;
+<style scoped lang="scss">
+	.my-order .header {
+		height: 260rpx;
+		padding: 0 30rpx;
 	}
 
-	.font-bg-red {
-		background: #E93424;
+	.my-order .header .picTxt {
+		height: 190rpx;
+	}
+
+	.my-order .header .picTxt .text {
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 26rpx;
+		font-family: 'Guildford Pro';
+	}
+
+	.my-order .header .picTxt .text .name {
+		font-size: 34rpx;
+		font-weight: bold;
 		color: #fff;
-		font-size: 20rpx;
-		width: 58rpx;
-		text-align: center;
-		line-height: 34rpx;
-		border-radius: 5rpx;
-		margin-right: 8rpx;
-	}
-   .credibility-wrapper{
-		 display: flex;
-		 margin-top: 10rpx;
-		 .credibility{
-			 color: #5ab5ef;
-			 border: 1px solid #5ab5ef;
-			 border-radius: 50rpx;
-			 border-radius: 50rpx;
-			 padding: 0 10rpx;
-			 font-weight: normal;
-			 margin-right: 10rpx;
-			 font-size: 24rpx;
-			 background-color: #fff;
-		 }
-		 .authoned{
-			 color: #5ab5ef;
-			 border: 1px solid #5ab5ef;
-			 border-radius: 50rpx;
-			 border-radius: 50rpx;
-			 padding: 0 10rpx;
-			 font-weight: normal;
-			 margin-right: 10rpx;
-			 font-size: 24rpx;
-			 background-color: #fff;
-		 }				 
-	 }
-	.header {
-		position: relative;
-		z-index: 6;
-		display: flex;
-		align-items: center;
-		padding-right: 34rpx;
-		height: 86rpx;
-		padding-left: 33rpx;
-
-		.head-menu {
-			display: -webkit-box;
-			display: -webkit-flex;
-			display: flex;
-			-webkit-box-align: center;
-			-webkit-align-items: center;
-			align-items: center;
-			height: 27px;
-			width: 70px;
-			background: rgba(0, 0, 0, 0.25);
-			border-radius: 13px;
-
-			.icon-xiangzuo {
-				font-size: 32rpx;
-				color: #FFFFFF;
-			}
-
-			.iconfont {
-				-webkit-box-flex: 1;
-				-webkit-flex: 1;
-				flex: 1;
-				text-align: center;
-				color: #fff;
-				box-sizing: border-box;
-
-				&.icon-xiangzuo {
-					border-right: 1px solid #fff;
-				}
-			}
-		}
-
-
-		.search {
-			flex: 1;
-			display: flex;
-			align-items: center;
-			min-width: 0;
-			height: 58rpx;
-			border-radius: 29rpx;
-			margin-left: 32rpx;
-			background-color: #FFFFFF;
-			font-weight: 500;
-			font-size: 26rpx;
-			color: #999999;
-
-			.iconfont {
-				margin-right: 13rpx;
-				margin-left: 30rpx;
-				font-size: 24rpx;
-			}
-		}
+		margin-bottom: 20rpx;
 	}
 
-	.main {
-		flex: 1;
-		min-height: 0rpx;
+	.my-order .header .picTxt .pictrue {
+		width: 122rpx;
+		height: 109rpx;
 	}
 
-	.store {
-		position: relative;
-		z-index: 6;
-		display: flex;
-		align-items: center;
-		// padding-right: 20rpx;
-		// padding-left: 20rpx;
-		// padding-top: 20rpx;
-		// padding-bottom: 22rpx;
-		padding: 40rpx;
-		background:linear-gradient(90deg, #EB3C3C 0%, #FF5D43 100%);
-		image {
-			width: 74rpx;
-			height: 74rpx;
-			border-radius: 50%;
-		}
-
-		.text {
-			flex: 1;
-			min-width: 0;
-			margin-right: 20rpx;
-			margin-left: 20rpx;
-
-			.navigator {
-				display: inline-flex;
-				align-items: center;
-				max-width: 100%;
-
-				.name {
-					flex: 1;
-					min-width: 0;
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					font-weight: bold;
-					font-size: 30rpx;
-					line-height: 1;
-					color: #FFFFFF;
-				}
-
-				.iconfont {
-					margin-left: 10rpx;
-					font-size: 17rpx;
-					color: #FFFFFF;
-				}
-			}
-
-
-			.score {
-				display: flex;
-				align-items: center;
-				margin-top: 17rpx;
-				font-weight: 500;
-				font-size: 24rpx;
-				line-height: 1;
-				color: #FFFFFF;
-
-				.star {
-					position: relative;
-					width: 111rpx;
-					height: 19rpx;
-					margin-right: 10rpx;
-					// background: url(../../columnGoods/images/star.png) left top/100% 100% no-repeat;
-					overflow: hidden;
-
-					view {
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 100%;
-						height: 100%;
-						// background: url(../../columnGoods/images/star_active.png) left top/111rpx 19rpx no-repeat;
-					}
-				}
-			}
-		}
-
-		button {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 113rpx;
-			height: 48rpx;
-			border-radius: 24rpx;
-			background-image: linear-gradient(-90deg, rgba(246, 122, 56, 1) 0%, rgba(241, 27, 9, 1) 100%);
-			font-weight: 500;
-			font-size: 22rpx;
-			color: #FFFFFF;
-
-			.iconfont {
-				margin-right: 6rpx;
-				font-size: 22rpx;
-			}
-
-			&.gary {
-				background-color: #999;
-			}
-		}
-	}
-
-	.nav.fixed {
-		position: fixed;
-		left: 0;
+	.my-order .header .picTxt .pictrue image {
 		width: 100%;
-
-		.nav-cont {
-			position: absolute;
-			width: 100%;
-		}
+		height: 100%;
 	}
 
-	.nav {
-		position: relative;
-
-		.nav-cont {
-			display: flex;
-			align-items: center;
-			height: 84rpx;
-
-			.item {
-				flex: 1;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				min-width: 0;
-
-				.cont {
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					width: 116rpx;
-					height: 44rpx;
-					border-radius: 22rpx;
-					font-weight: 500;
-					font-size: 24rpx;
-					color: #FFFFFF;
-
-					.arrow-icon {
-						margin-left: 10rpx;
-						font-size: 18rpx;
-					}
-
-					.layout-icon {
-						font-size: 32rpx;
-					}
-
-					.icon-pailie {
-						font-size: 32rpx;
-					}
-
-					image {
-						width: 15rpx;
-						height: 21rpx;
-						margin-left: 7rpx;
-					}
-				}
-			}
-
-			.active {
-				.cont {
-					background-color: #FFFFFF;
-					font-weight: bold;
-					color: $theme-color;
-				}
-			}
-		}
-
-		.select {
-			position: absolute;
-			top: 100%;
-			left: 0;
-			z-index: 2;
-			width: 100%;
-			padding-right: 40rpx;
-			padding-bottom: 28rpx;
-			padding-left: 74rpx;
-			border-bottom-right-radius: 24rpx;
-			border-bottom-left-radius: 24rpx;
-			background-color: #FFFFFF;
-
-			.item {
-				margin-top: 28rpx;
-				font-size: 24rpx;
-				color: #454545;
-			}
-
-			.active {
-				// background: url(../../../static/images/active.png) right center/20rpx no-repeat;
-				color: #E93323;
-			}
-		}
-	}
-
-	.goods {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		padding-top: 20rpx;
-		padding-right: 20rpx;
-		padding-left: 20rpx;
-		background-color: #F5F5F5;
-		width: 750rpx;
-		.item {
-			width: 345rpx;
-			border-radius: 16rpx;
-			margin-bottom: 20rpx;
-			background-color: #FFFFFF;
-			overflow: hidden;
-
-			.image {
-				width: 345rpx;
-				height: 345rpx;
-
-				image {
-					display: block;
-					width: 100%;
-					height: 100%;
-				}
-			}
-
-			.text {
-				padding: 20rpx 20rpx 25rpx;
-
-				.name {
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					font-weight: 500;
-					font-size: 30rpx;
-					line-height: 1;
-					color: #222222;
-				}
-				.edit-wrapper{
-					display: flex;
-					justify-content: space-between;
-					font-size: 24rpx;
-					color: #737373;
-					margin-top: 10rpx;
-
-				}
-				.money-wrap {
-					display: flex;
-					align-items: center;
-					margin-top: 43rpx;
-
-					.money {
-						font-weight: bold;
-						font-size: 26rpx;
-						color: $theme-color;
-
-						text {
-							font-size: 34rpx;
-							line-height: 1;
-						}
-					}
-
-					.ticket {
-						height: 26rpx;
-						padding-right: 9rpx;
-						padding-left: 9rpx;
-						border: 1rpx solid $theme-color;
-						border-radius: 4rpx;
-						margin-left: 10rpx;
-						font-weight: 500;
-						font-size: 20rpx;
-						line-height: 24rpx;
-						color: $theme-color;
-					}
-				}
-
-				.score {
-					// margin-top: 20rpx;
-					font-weight: 500;
-					font-size: 24rpx;
-					line-height: 40rpx;
-					color: #737373;
-					// padding-top: 10rpx;
-					
-				}
-				.edit-good{
-					border: 1px solid  #737373;
-					padding: 0 10rpx;
-					border-radius: 10rpx;
-					height: 40rpx;
-					line-height: 40rpx;
-				}
-			}
-
-			.foot {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 52rpx;
-				background: linear-gradient(to right, #F11B09, #F67A38);
-				font-weight: 500;
-				font-size: 24rpx;
-				color: #FFFFFF;
-
-				.iconfont {
-					margin-right: 10rpx;
-					font-size: 22rpx;
-					line-height: 1;
-				}
-			}
-		}
-	}
-
-	.column {
-		padding: 0;
-		background-color: #FFFFFF;
-
-		.item {
-			position: relative;
-			display: flex;
-			align-items: center;
-			width: 100%;
-			padding: 30rpx 20rpx;
-			border-radius: 0;
-			margin-bottom: 0;
-
-			&::before {
-				content: " ";
-				position: absolute;
-				top: 0;
-				right: 20rpx;
-				left: 250rpx;
-				border-top: 1rpx solid #F5F5F5;
-			}
-
-			.image {
-				width: 200rpx;
-				height: 200rpx;
-				border-radius: 16rpx;
-				overflow: hidden;
-			}
-
-			.text {
-				position: relative;
-				flex: 1;
-				min-width: 0;
-				padding-top: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-
-				.name {
-					color: #282828;
-				}
-
-				.money-wrap {
-					display: flex;
-					flex-direction: column;
-					align-items: flex-start;
-					margin-top: 52rpx;
-
-					.ticket {
-						height: 28rpx;
-						padding-right: 12rpx;
-						padding-left: 12rpx;
-						border: none;
-						border-radius: 0;
-						margin-top: 17rpx;
-						margin-left: 0;
-						// background: url(../../../static/images/yh.png) top left/100% 100% no-repeat;
-						line-height: 28rpx;
-					}
-				}
-				
-				
-			}
-
-			.foot {
-				position: absolute;
-				right: 20rpx;
-				bottom: 30rpx;
-				height: 44rpx;
-				padding-right: 17rpx;
-				padding-left: 17rpx;
-				border-radius: 22rpx;
-				font-size: 22rpx;
-				color: #F5F5F5;
-			}
-		}
-	}
-
-	.category {
-		padding-top: 34rpx;
-		padding-right: 20rpx;
-		padding-left: 20rpx;
-
-		.section {
-			border-radius: 10rpx;
-			margin-bottom: 20rpx;
-			background-color: #FFFFFF;
-
-			.head {
-				position: relative;
-				display: flex;
-				align-items: center;
-				height: 90rpx;
-				padding-right: 20rpx;
-				padding-left: 36rpx;
-				font-weight: bold;
-				color: #282828;
-
-				&::before {
-					content: " ";
-					position: absolute;
-					top: 50%;
-					left: 20rpx;
-					width: 6rpx;
-					height: 24rpx;
-					background-color: $theme-color;
-					transform: translateY(-50%);
-				}
-
-				.title {
-					flex: 1;
-					min-width: 0;
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					font-size: 30rpx;
-				}
-
-				.iconfont {
-					font-size: 22rpx;
-					line-height: 1;
-				}
-			}
-
-			.body {
-				display: flex;
-				flex-wrap: wrap;
-				justify-content: space-between;
-				align-items: center;
-				padding: 9rpx 36rpx 14rpx;
-
-				.item {
-					width: 314rpx;
-					height: 84rpx;
-					padding-right: 30rpx;
-					padding-left: 30rpx;
-					border-radius: 10rpx;
-					background-color: #F5F5F5;
-					margin-bottom: 10rpx;
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					font-weight: 500;
-					font-size: 26rpx;
-					line-height: 84rpx;
-					color: #282828;
-				}
-			}
-		}
-	}
-
-	.coupon {
-		padding: 30rpx;
-		margin-top: 34rpx;
-		background-color: #F5F5F5;
-
-		.item {
-			display: flex;
-			margin-bottom: 16rpx;
-
-			.left {
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				width: 240rpx;
-				// background: url(../../store/static/images/coupon1.png) left top/100% 100% no-repeat;
-				// background: url(../static/images/coupon1.png) 
-				font-weight: 500;
-				font-size: 24rpx;
-				line-height: 1;
-				color: #FFFFFF;
-
-				&.gary {
-					background-image: url('data:image/png;base64,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');
-				}
-
-				.money {
-					margin-bottom: 25rpx;
-					font-weight: 800;
-					font-size: 36rpx;
-
-					text {
-						margin-left: 10rpx;
-						font-size: 60rpx;
-					}
-				}
-			}
-
-			.right {
-				flex: 1;
-				min-width: 0;
-				padding-right: 18rpx;
-				padding-left: 27rpx;
-				background-color: #FFFFFF;
-
-				.name {
-					padding-top: 32rpx;
-					padding-bottom: 32rpx;
-					border-bottom: 1rpx solid #F0F0F0;
-					font-weight: 500;
-					font-size: 30;
-					line-height: 1;
-					color: #282828;
-
-					text {
-						display: inline-block;
-						width: 84rpx;
-						height: 28rpx;
-						border: 1rpx solid $theme-color;
-						border-radius: 14rpx;
-						margin-right: 15rpx;
-						background-color: #FFF4F3;
-						font-weight: 500;
-						font-size: 20rpx;
-						line-height: 26rpx;
-						text-align: center;
-						color: $theme-color;
-
-						&.gary {
-							border-color: #BBB;
-							color: #bbb;
-							background-color: #F5F5F5;
-						}
-					}
-				}
-
-				.time-wrap {
-					display: flex;
-					align-items: center;
-					padding-top: 16rpx;
-					padding-bottom: 16rpx;
-					font-weight: 500;
-					font-size: 20rpx;
-					color: #999999;
-
-					.time {
-						flex: 1;
-						min-width: 0;
-					}
-
-					.button {
-						width: 136rpx;
-						height: 44rpx;
-						border-radius: 22rpx;
-						background-color: $theme-color;
-						font-weight: 500;
-						font-size: 22rpx;
-						line-height: 44rpx;
-						text-align: center;
-						color: #FFFFFF;
-
-						&.gary {
-							background-color: #999;
-						}
-					}
-				}
-			}
-		}
-
-		.disabled {
-			.left {
-				// background-image: url(../static/images/coupon2.png);
-				// background: url(../../store/static/images/coupon2.png);
-			}
-
-			.right {
-				.name {
-					text {
-						border-color: #C1C1C1;
-						color: #C1C1C1;
-					}
-				}
-
-				.time-wrap {
-					.button {
-						background-color: #CCCCCC;
-						color: #FFFFFF;
-					}
-				}
-			}
-		}
-	}
-
-	.footer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		z-index: 5;
-		display: flex;
-		width: 100%;
-		height: 100rpx;
-		background-color: #FFFFFF;
-		opacity: 0.96;
-
-		.item {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			font-weight: 500;
-			font-size: 20rpx;
-			color: #282828;
-
-			.iconfont {
-				font-size: 43rpx;
-			}
-		}
-
-		.active {
-			color: $theme-color;
-		}
-	}
-	.collectionGoods {
+	.my-order .nav {
 		background-color: #fff;
-		border-top: 1rpx solid #eee;
+		width: 690rpx;
+		height: 140rpx;
+		border-radius: 6rpx;
+		margin: -73rpx auto 0 auto;
 	}
-	
-	.collectionGoods .item {
-		margin-left: 30rpx;
-		padding-right: 30rpx;
+
+	.my-order .nav .item {
+		text-align: center;
+		font-size: 26rpx;
+		color: #282828;
+		padding: 29rpx 0;
+	}
+
+	.my-order .nav .item.on {
+		font-weight: bold;
+		border-bottom: 5rpx solid #e93323;
+	}
+
+	.my-order .nav .item .num {
+		margin-top: 18rpx;
+	}
+
+	.my-order .list {
+		width: 690rpx;
+		margin: 14rpx auto 0 auto;
+	}
+
+	.my-order .list .item {
+		background-color: #fff;
+		border-radius: 6rpx;
+		margin-bottom: 14rpx;
+	}
+
+	.my-order .list .item .title {
+		height: 84rpx;
+		padding: 0 30rpx;
 		border-bottom: 1rpx solid #eee;
-		height: 180rpx;
+		font-size: 28rpx;
+		color: #282828;
+
+		.left-wrapper {
+			.iconfont {
+				margin-top: 5rpx;
+			}
+
+			.store-name {
+				margin: 0 10rpx;
+			}
+
+			.icon-xiangyou {
+				font-size: 20rpx;
+			}
+		}
 	}
-	
-	.collectionGoods .item .pictrue {
-		width: 130rpx;
-		height: 130rpx;
+
+	.my-order .list .item .title .sign {
+		font-size: 24rpx;
+		padding: 0 7rpx;
+		height: 36rpx;
+		margin-right: 15rpx;
 	}
-	
-	.collectionGoods .item .pictrue image {
+
+	.my-order .list .item .item-info {
+		padding: 0 30rpx;
+		margin-top: 22rpx;
+	}
+
+	.my-order .list .item .item-info .pictrue {
+		width: 120rpx;
+		height: 120rpx;
+	}
+
+	.my-order .list .item .item-info .pictrue image {
 		width: 100%;
 		height: 100%;
 		border-radius: 6rpx;
 	}
-	
-	.collectionGoods .item .text {
-		width: 535rpx;
-		height: 130rpx;
+
+	.my-order .list .item .item-info .text {
+		width: 486rpx;
 		font-size: 28rpx;
+		color: #999;
+		margin-top: 6rpx;
+	}
+
+	.my-order .list .item .item-info .text .name {
+		width: 306rpx;
 		color: #282828;
 	}
-	
-	.collectionGoods .item .text .name {
-		width: 100%;
+
+	.my-order .list .item .item-info .text .money {
+		text-align: right;
 	}
-	
-	.collectionGoods .item .text .money {
-		font-size: 26rpx;
-	}
-	.collectionGoods .item .text .deletewrapper{
-		display: flex;
-	}
-	.collectionGoods .item .text .delete {
+
+	.my-order .list .item .totalPrice {
 		font-size: 26rpx;
 		color: #282828;
-		width: 144rpx;
-		height: 46rpx;
-		border: 1px solid #bbb;
-		border-radius: 4rpx;
+		text-align: right;
+		margin: 27rpx 0 0 30rpx;
+		padding: 0 30rpx 30rpx 0;
+	}
+
+	.my-order .list .item .totalPrice .money {
+		font-size: 28rpx;
+		font-weight: bold;
+	}
+
+	.my-order .list .item .bottom {
+		height: 107rpx;
+		padding: 0 30rpx;
+		border-top: 1px solid #f0f0f0;
+	}
+
+	.my-order .list .item .bottom .bnt {
+		width: 176rpx;
+		height: 60rpx;
 		text-align: center;
-		line-height: 46rpx;
+		line-height: 60rpx;
+		color: #fff;
+		border-radius: 50rpx;
+		font-size: 27rpx;
 	}
-	
-	.noCommodity {
-		background-color: #fff;
-		padding-top: 1rpx;
-		border-top: 0;
+
+	.my-order .list .item .bottom .bnt.cancelBnt {
+		border: 1rpx solid #ddd;
+		color: #aaa;
+	}
+
+	.my-order .list .item .bottom .bnt~.bnt {
+		margin-left: 17rpx;
+	}
+
+	.noCart {
+		margin-top: 171rpx;
+		padding-top: 0.1rpx;
+	}
+
+	.noCart .pictrue {
+		width: 414rpx;
+		height: 336rpx;
+		margin: 78rpx auto 56rpx auto;
+	}
+
+	.noCart .pictrue image {
+		width: 100%;
+		height: 100%;
 	}
 </style>

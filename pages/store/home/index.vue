@@ -3,66 +3,32 @@
 	 class="store-home">
 		<!-- 搜索 -->
 		<!-- #ifdef MP -->
-		<view :style="{ height: `${systemInfo.statusBarHeight}px` }"></view>
-		<view :style="{ height: `${(menuButtonInfo.top - systemInfo.statusBarHeight) * 2 + menuButtonInfo.height}px`, 'padding-right': `${(systemInfo.windowWidth - menuButtonInfo.left) * 2 + 34}rpx`}"
-		 class="header">
-			<view class="iconfont icon-xiangzuo" @click="goback"></view>
-			<navigator :url="'/pages/store/list/index?mer_id='+id" hover-class="none" class="search"><text class="iconfont icon-xiazai5"></text>搜索商品</navigator>
+		<view 
+			:style="{ height: `${(menuButtonInfo.top - systemInfo.statusBarHeight) * 2 + menuButtonInfo.height}px`, 
+			'padding-right': `${(systemInfo.windowWidth - menuButtonInfo.left) * 2 + 34}rpx`}"
+			 class="header"
+		>
+			<view class="iconfont icon-xiangzuo" @click="goback" style="color:white;bottom: -5px;position:absolute;"></view>
 		</view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
-		<view class="header">
+		<!-- <view class="header">
 			<view class="head-menu">
 				<view class="iconfont icon-xiangzuo" @click="goback"></view>
 				<view class="iconfont icon-shouye4" @click="goHome"></view>
 			</view>
 			<navigator :url="'/pages/store/list/index?mer_id='+id" hover-class="none" class="search"><text class="iconfont icon-xiazai5"></text>搜索商品</navigator>
-		</view>
+		</view> -->
 		<!-- #endif -->
-		<view v-show="navShow && tabActive === 0" class="nav">
-			<view class="nav-cont">
-				<view :class="{ active: navActive === 0 }" class="item" @click="navActive = 0;select.show = !select.show">
-					<view class="cont">
-						{{ select.selected ? '评分' : '默认' }}
-						<text :class="['arrow-icon', 'iconfont', select.show ? 'icon-xiangshang' : 'icon-xiangxia']"></text>
-					</view>
-				</view>
-				<view :class="{ active: navActive === 1 }" class="item" @click="set_where(2)">
-					<view class="cont">
-						销量
-					</view>
-				</view>
-				<view :class="{ active: navActive === 2 }" class="item" @click="set_where(3)">
-					<view class="cont">
-						价格
-						<image :src="sortPrice ? '/static/images/up.png' : '/static/images/down.png'"></image>
-					</view>
-				</view>
-				<view :class="{ active: navActive === 3 }" class="item" @click="set_where(4)">
-					<view class="cont">
-						新品
-					</view>
-				</view>
-				<view :class="{ active: navActive === 4 }" class="item" @click="select.show = false;navActive = 4;isColumn = !isColumn">
-					<view class="cont">
-						<text :class="['layout-icon', 'iconfont', isColumn ? 'icon-pailie' : 'icon-tupianpailie']"></text>
-					</view>
-				</view>
-			</view>
-			<view v-show="select.show && navShow" class="select">
-				<view v-for="item in select.options" :key="item.id" :class="{ active: item.id === select.selected }" class="item"
-				 @click="set_where(item.id)">{{ item.name }}</view>
-			</view>
-		</view>
+		
 		<scroll-view class="main" scroll-y="true" @scroll="scrollHome">
 			<!-- 店铺信息 -->
 			<view id="store" class="store">
 				<image :src="store.mer_avatar"></image>
 				<view class="text">
-					<navigator :url="`/pages/store/detail/index?id=${id}`" hover-class="none">
+					<navigator hover-class="none">
 						<text v-if="store.is_trader" class="font-bg-red">自营</text>
 						<text class="name">{{ store.mer_name }}</text>
-						<text class="iconfont icon-xiangyou"></text>
 					</navigator>
 					<view class="score" style="display: none;">
 						<view class="star">
@@ -122,64 +88,7 @@
 						</view>
 					</view>
 				</view>
-				<!-- 分类 -->
-				<view v-show="tabActive === 1">
-					<view class="category">
-						<view class="section">
-							<view class="head" @click="goCategoryGoods('')">
-								<view class="title">全部</view>
-								<view class="iconfont icon-xiangyou"></view>
-							</view>
-						</view>
-						<view v-for="item in category" :key="item.store_category_id" class="section">
-							<view class="head" @click="goCategoryGoods(item.store_category_id)">
-								<view class="title">{{ item.cate_name }}</view>
-								<view class="iconfont icon-xiangyou"></view>
-							</view>
-							<view v-if="item.children" class="body">
-								<view v-for="value in item.children" :key="value.store_category_id" class="item" @click="goCategoryGoods(value.store_category_id)">{{ value.cate_name }}</view>
-							</view>
-						</view>
-					</view>
-					<view :hidden="!categoryLoading" class="acea-row row-center-wrapper loadingicon">
-						<text class="iconfont icon-jiazai loading"></text>{{loadTitle}}
-					</view>
-				</view>
-				<!-- 优惠券 -->
-				<view v-show="tabActive === 2">
-					<view v-if="coupon.length" class="coupon">
-						<view v-for="item in coupon" :key="item.coupon_id" class="item">
-							<view class="left" :class="{gary:item.issue}">
-								<view class="money">
-									¥
-									<text>{{ item.coupon_price }}</text>
-								</view>
-								<view>满{{ item.use_min_price }}元可用</view>
-							</view>
-							<view class="right">
-								<view class="name">
-									<text :class="{gary:item.issue}">{{item.type===0?'店铺券':'商品券'}}</text>
-									<!--购物满{{ item.use_min_price }}元可用-->
-									{{ item.title }}
-								</view>
-								<view class="time-wrap" style="justify-content: space-between;">
-									<block v-if="item.coupon_type == 1">
-										<view class="time">{{ item.use_start_time | dateFormat }}-{{ item.use_end_time | dateFormat }}</view>
-									</block>
-									<block v-if="item.coupon_type == 0">
-										<view>领取后{{ item.coupon_time}}天内可用</view>
-									</block>
-									<block v-if="item.issue">
-										<view class="button gary">已领取</view>
-									</block>
-									<block v-else>
-										<view class="button" @click="receiveCoupon(item)">立即领取</view>
-									</block>
-								</view>
-							</view>
-						</view>
-					</view>
-				</view>
+				
 			</view>
 		</scroll-view>
 		<!-- #ifdef MP -->
@@ -725,7 +634,7 @@
 		padding-right: 20rpx;
 		padding-left: 20rpx;
 		padding-top: 20rpx;
-		padding-bottom: 22rpx;
+		padding-bottom: 34rpx;
 		image {
 			width: 74rpx;
 			height: 74rpx;

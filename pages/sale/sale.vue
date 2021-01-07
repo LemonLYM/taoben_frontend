@@ -13,64 +13,28 @@
 				</view>
 			</view>
 			<view class='nav acea-row row-around'>
-				<view class='item' :class='orderStatus==-1 ? "on": ""' @click="statusClick(-1)">
+				<view class='item' :class='orderStatus==0 ? "on": ""' @click="statusClick(0)">
 					<view>全部</view>
 					<view class='num'>{{orderData.all || 0}}</view>
 				</view>
-				<view class='item' :class='orderStatus==0 ? "on": ""' @click="statusClick(0)">
+				<view class='item' :class='orderStatus==1 ? "on": ""' @click="statusClick(1)">
 					<view>待付款</view>
 					<view class='num'>{{orderData.noPay || 0}}</view>
 				</view>
-				<view class='item' :class='orderStatus==1 ? "on": ""' @click="statusClick(1)">
+				<view class='item' :class='orderStatus==2 ? "on": ""' @click="statusClick(2)">
 					<view>待发货</view>
 					<view class='num'>{{orderData.noPostage || 0}}</view>
 				</view>
-				<view class='item' :class='orderStatus==2 ? "on": ""' @click="statusClick(2)">
+				<view class='item' :class='orderStatus==3 ? "on": ""' @click="statusClick(3)">
 					<view>待收货</view>
 					<view class='num '>{{orderData.noDeliver || 0}}</view>
 				</view>
-				<view class='item' :class='orderStatus==3 ? "on": ""' @click="statusClick(3)">
+				<view class='item' :class='orderStatus==4 ? "on": ""' @click="statusClick(4)">
 					<view>待评价</view>
 					<view class='num'>{{orderData.noComment || 0}}</view>
 				</view>
 			</view>
 			<view class='list'>
-				<!-- 代付款 -->
-				<block v-if="orderStatus == 0">
-					<view class='item' v-for="(item,index) in orderList" :key="index">
-						<view @click='goOrderDetails(item.group_order_id)'>
-							<view class='title acea-row row-between-wrapper'>
-								<view class="acea-row row-middle left-wrapper">
-									{{item.group_order_sn}}
-								</view>
-								<view class='font-color'>待付款</view>
-							</view>
-							<view class='item-info acea-row row-between row-top' v-for="(order,j) in item.orderList" :key="order.order_id+j">
-								<block v-for="(goods,g) in order.orderProduct">
-									<view class='pictrue'>
-										<image :src='goods.cart_info.productAttr.image || goods.cart_info.product.image'></image>
-									</view>
-									<view class='text acea-row row-between'>
-										<view class='name line2'>{{goods.cart_info.product.store_name}}</view>
-										<view class='money'>
-											<view>￥{{goods.cart_info.productAttr.price}}</view>
-											<view>x{{goods.product_num}}</view>
-										</view>
-									</view>
-
-								</block>
-							</view>
-							<view class='bottom acea-row row-right row-middle'>
-							<!-- 	<view class='bnt cancelBnt' @click.stop='cancelOrder(index,item.group_order_id)'>取消订单</view> -->
-								<view class='bnt bg-color' @click.stop='goPay(item.pay_price,item.group_order_id)'>立即付款</view>
-							</view>
-						</view>
-					</view>
-				</block>
-
-
-				<!-- 待发货 待收货 待评价 已完成 -->
-				<block v-else>
 					<view class='item' v-for="(item,index) in orderList" :key="index">
 						<view @click='goOrderDetails(item.order_id)'>
 							<view class='title acea-row row-between-wrapper'>
@@ -135,7 +99,6 @@
 												<view class='bnt bg-color' v-if="item._status._type == 4" @click='goOrderDetails(item.order_id)'>再次购买</view> -->
 						</view>
 					</view>
-				</block>
 			</view>
 			<view class='loadingicon acea-row row-center-wrapper' v-if="orderList.length>5">
 				<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
@@ -291,7 +254,7 @@
 			 * 生命周期函数--监听页面加载
 			 */
 			onLoad: function(options) {
-				if (options.status) this.orderStatus = options.status;
+				this.orderStatus = options.status;
 			},
 			/**
 			 * 获取订单统计数据
@@ -376,29 +339,19 @@
 				})
 				openOrderSubscribe().then(() => {
 					uni.hideLoading();
-					if (self.orderStatus == 0) {
-						uni.navigateTo({
-							url: '/pages/order_details/stay?order_id=' + order_id
-						})
-					} else {
+					
 						uni.navigateTo({
 							url: '/pages/order_details/index?order_id=' + order_id
 						})
-					}
 				}).catch(() => {
 					uni.hideLoading();
 				})
 				// #endif  
 				// #ifndef MP
-				if (self.orderStatus == 0) {
-					uni.navigateTo({
-						url: '/pages/order_details/stay?order_id=' + order_id
-					})
-				} else {
+			
 					uni.navigateTo({
 						url: '/pages/order_details/index?order_id=' + order_id
 					})
-				}
 				// #endif
 			},
 			/**
@@ -410,26 +363,16 @@
 					title: '缺少订单号无法查看订单详情和评价'
 				});
 				// #ifdef MP			
-					if (self.orderStatus == 0) {
-						uni.navigateTo({
-							url: '/pages/order_details/stay?order_id=' + order_id
-						})
-					} else {
+					
 						uni.navigateTo({
 							url: '/pages/order_details/index?order_id=' + order_id
 						})
-					}				
 				// #endif  
 				// #ifndef MP
-				if (self.orderStatus == 0) {
-					uni.navigateTo({
-						url: '/pages/order_details/stay?order_id=' + order_id
-					})
-				} else {
+		
 					uni.navigateTo({
 						url: '/pages/order_details/index?order_id=' + order_id
 					})
-				}
 				// #endif
 			},
 			/**
@@ -438,6 +381,7 @@
 			statusClick: function(status) {
 				if (status == this.orderStatus) return;
 				this.orderStatus = status;
+				debugger
 				this.loadend = false;
 				this.loading = false;
 				this.page = 1;
@@ -453,24 +397,9 @@
 				if (that.loading) return;
 				that.loading = true;
 				that.loadTitle = "加载更多";
-				if (that.orderStatus == 0) {
+				
 					getSaleList({
-						page: that.page,
-						limit: that.limit,
-					}).then(res => {
-						let list = res.data.list || [];
-						let loadend = list.length < that.limit;
-						that.orderList = that.$util.SplitArray(list, that.orderList);
-						that.$set(that, 'orderList', that.orderList);
-						that.getProductCount();
-						that.loadend = loadend;
-						that.loading = false;
-						that.loadTitle = loadend ? "我也是有底线的" : '加载更多';
-						that.page = that.page + 1;
-					})
-				} else {
-					getSaleList({
-						status: that.orderStatus - 1,
+						status: that.orderStatus,
 						page: that.page,
 						limit: that.limit,
 					}).then(res => {
@@ -487,14 +416,11 @@
 						that.loading = false;
 						that.loadTitle = "加载更多";
 					})
-				}
-				
 			},
 			/**
 			 * 获取单个订单商品数量
 			 */
 			getProductCount: function(){	
-				if(this.orderStatus !== 0){
 					this.orderList.forEach((item,i) => {
 						let orderNum = 0
 						 item.orderProduct.forEach((val) => {
@@ -502,8 +428,6 @@
 						  })
 						  this.orderList[i]['orderNum']=orderNum;
 					 })	
-				}
-							 
 			},				
 			/**
 			 * 删除订单

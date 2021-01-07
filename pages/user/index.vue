@@ -56,10 +56,10 @@
 						<text class="num">{{userInfo.total_visit_product || 0}}</text>
 						<view class="txt">浏览记录</view>
 					</view>
-					<view class="num-item" @click="goMenuPage('/pages/users/user_coupon/index')">
+					<!-- <view class="num-item" @click="goMenuPage('/pages/users/user_coupon/index')">
 						<text class="num">{{userInfo.total_coupon || 0}}</text>
 						<view class="txt">优惠券</view>
-					</view>
+					</view> -->
 				</view>
 				<view class="right-btn">
 					<view class="iconfont icon-shezhi" @click="goEdit()" style="display: none;"></view>

@@ -24,12 +24,12 @@
 						</view>
 						<view class='introduce'><text v-if="storeInfo.merchant.is_trader" class="font-bg-red">自营</text>{{storeInfo.store_name}}</view>
 						<view class="tag">
-							6人，现代，恐怖，硬核，进阶，盒装，开放，欢乐，机制
+							{{merCateName}}
 						</view>
 						<view class='label acea-row row-between-wrapper'>
 							<view>原价:￥{{storeInfo.cost ? storeInfo.cost : ''}}</view>
-							<view>库存:{{storeInfo.stock}}{{storeInfo.unit_name}}</view>
-							<view>销量:{{storeInfo.sales}}{{storeInfo.unit_name}}</view>
+							<view>库存:{{storeInfo.stock || 0}}{{storeInfo.unit_name || ''}}</view>
+							<view>销量:{{storeInfo.sales || 0}}{{storeInfo.unit_name || ''}}</view>
 						</view>
 						<!-- <view class='coupon acea-row row-between-wrapper' v-if="storeInfo.give_integral > 0">
 							<view class='hide line1 acea-row'>
@@ -37,13 +37,13 @@
 								<view class='activity'>赠送 {{storeInfo.give_integral}} 积分</view>
 							</view>
 						</view> -->
-						<view class='coupon acea-row row-between-wrapper' @click='couponTap' style="margin-top: 20rpx;">
+						<!-- <view class='coupon acea-row row-between-wrapper' @click='couponTap' style="margin-top: 20rpx;">
 							<view class='hide line1 acea-row'>
 								优惠券：
 								<view class='activity' v-for="(item,index) in coupon.list" :key="index">满{{item.use_min_price}}减{{item.coupon_price}}</view>
 							</view>
 							<view class='iconfont icon-jiantou'></view>
-						</view>
+						</view> -->
 						<view class="coupon acea-row row-between-wrapper" v-if="activity.length">
 							<view class="line1 acea-row">
 								<text>活&nbsp;&nbsp;&nbsp;动：</text>
@@ -92,15 +92,15 @@
 							</view>
 							<view class="info">
 								<view class="name">
-								{{storeInfo.merchant.mer_name}}
+								{{storeInfo.merchant.mer_name || ''}}
 								<text class="credibility">信誉极好</text>
 								<text v-if="storeInfo.merchant.is_trader" class="font-bg-red ml8">自营</text>
 								</view>
-								<view class="txt">{{storeInfo.merchant.care_count}}人关注</view>
+								<view class="txt">{{storeInfo.merchant.care_count || 0}}人关注</view>
 							</view>
-							<navigator :url="'/pages/store/home/index?id='+storeInfo.merchant.mer_id" class="link" hover-class="none">进店</navigator>
+							<navigator :url="'/pages/store/home/index?id='+storeInfo.merchant.mer_id" class="link" hover-class="none">查看</navigator>
 						</view>
-						<view class="score-wrapper">
+						<!--<view class="score-wrapper">
 							<view class="item">
 								商品描述<text>{{storeInfo.merchant.product_score}}</text>
 							</view>
@@ -110,9 +110,9 @@
 							<view class="item">
 								物流服务<text>{{storeInfo.merchant.postage_score}}</text>
 							</view>
-						</view>
+						</view>-->
 					</view>
-					<view class="con-box">
+					<!--<view class="con-box">
 						<view class="title">店铺推荐</view>
 						<view class="img-box">
 							<view class="img-item" v-for="(item,index) in storeInfo.merchant.recommend" :key="index" @click="goProDetail(item)">
@@ -125,7 +125,7 @@
 								</view>
 							</view>
 						</view>
-					</view>
+					</view>-->
 				</view>
 				<view class='product-intro' id="past3">
 					<view class='title'>产品介绍</view>
@@ -278,6 +278,7 @@
 		data() {
 			let that = this;
 			return {
+				merCateName: '',
 				statusBarHeight: statusBarHeight, //系统导航条高度
 				//属性是否打开
 				coupon: {
@@ -648,6 +649,7 @@
 				getProductDetail(that.id).then(res => {
 					uni.hideLoading();
 					let storeInfo = res.data;
+					that.merCateName = res.data.mer_cate_name;
 					that.$set(that, 'storeInfo', storeInfo);					
 					that.$set(that, 'description', storeInfo.content);					
 					that.$set(that, 'reply', res.data.topReply ? [res.data.topReply] : []);
@@ -1350,10 +1352,13 @@
 </script>
 
 <style scoped lang="scss">
-	#past0  .wrapper .tag{
+	#past0 .wrapper {
+		padding-bottom: 10rpx;
+		.tag{
 			font-size:24rpx;
 			margin: 10rpx 30rpx 0 30rpx;
 		}
+	}
 	.font-bg-red{
 		display: inline-block;
 		background: #E93424;
@@ -1831,6 +1836,7 @@
 								padding: 0 10rpx;
 								margin-left:10rpx;
 								font-weight: normal;
+								font-size: 24rpx;
 							}
 					}
 					

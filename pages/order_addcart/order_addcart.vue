@@ -1,11 +1,11 @@
 <template>
 	<view>
 		<view class='shoppingCart'>
-			<view class='labelNav acea-row row-around row-middle'>
+			<!--<view class='labelNav acea-row row-around row-middle'>
 				<view class='item'><text class='iconfont icon-xuanzhong'></text>100%正品保证</view>
 				<view class='item'><text class='iconfont icon-xuanzhong'></text>所有商品精挑细选</view>
 				<view class='item'><text class='iconfont icon-xuanzhong'></text>售后无忧</view>
-			</view>
+			</view>-->
 			<view class='nav acea-row row-between-wrapper'>
 				<view>购物数量 <text class='num font-color'>{{cartTotalCount}}</text></view>
 				<view v-if="cartList.valid.length > 0 || cartList.invalid.length > 0" class='administrate acea-row row-center-wrapper'
@@ -594,7 +594,7 @@
 		position: fixed;
 		left: 0;
 		z-index: 5;
-		top: 76rpx;
+		top: 0;
 	}
 
 	.shoppingCart .nav .administrate {
@@ -607,7 +607,7 @@
 	}
 
 	.shoppingCart .noCart {
-		margin-top: 171rpx;
+		margin-top: 78rpx;
 		background-color: #fff;
 		padding-top: 0.1rpx;
 	}
@@ -624,7 +624,7 @@
 	}
 
 	.shoppingCart .list {
-		margin-top: 171rpx;
+		margin-top: 78rpx;
 	}
 
 	.shoppingCart .list .item {

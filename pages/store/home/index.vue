@@ -89,43 +89,7 @@
 				</button>
 			</view>
 
-			<view v-show="!navShow && tabActive === 0" class="nav">
-
-				<view class="nav-cont">
-					<view :class="{ active: navActive === 0 }" class="item" @click="navActive = 0;select.show = !select.show">
-						<view class="cont">
-							{{ select.selected ? '评分' : '默认' }}
-							<text :class="['arrow-icon', 'iconfont', select.show ? 'icon-xiangshang' : 'icon-xiangxia']"></text>
-						</view>
-					</view>
-					<view :class="{ active: navActive === 1 }" class="item" @click="set_where(2)">
-						<view class="cont">
-							销量
-						</view>
-					</view>
-					<view :class="{ active: navActive === 2 }" class="item" @click="set_where(3)">
-						<view class="cont">
-							价格
-							<image v-if="navActive === 2 && where.order == 'price_asc'" src="/static/images/up.png"></image>
-							<image v-if="navActive === 2 && where.order == 'price_desc'" src="/static/images/down.png"></image>
-						</view>
-					</view>
-					<view :class="{ active: navActive === 3 }" class="item" @click="set_where(4)">
-						<view class="cont">
-							新品
-						</view>
-					</view>
-					<view :class="{ active: navActive === 4 }" class="item" @click="select.show = false;navActive = 4;isColumn = !isColumn">
-						<view class="cont">
-							<text :class="['layout-icon', 'iconfont', isColumn ? 'icon-pailie' : 'icon-tupianpailie']"></text>
-						</view>
-					</view>
-				</view>
-				<view v-show="select.show && !navShow" class="select">
-					<view v-for="item in select.options" :key="item.id" :class="{ active: item.id === select.selected }" class="item"
-					 @click="set_where(item.id)">{{ item.name }}</view>
-				</view>
-			</view>
+			
 			<view class="tab-cont">
 				<!-- 首页 -->
 				<view v-show="tabActive === 0">
@@ -218,12 +182,6 @@
 				</view>
 			</view>
 		</scroll-view>
-		<view class="footer">
-			<view v-for="(item, index) in tabs" :key="index" :class="{ active: tabActive === index }" class="item" @click="tab(index)">
-				<view :class="['iconfont', item.icon]"></view>
-				<view>{{ item.name }}</view>
-			</view>
-		</view>
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
 		<!-- #endif -->
@@ -654,7 +612,6 @@
 		left: 0;
 		display: flex;
 		flex-direction: column;
-		padding-bottom: 100rpx;
 		background: left top/750rpx 360rpx no-repeat fixed;
 		overflow: hidden;
 	}

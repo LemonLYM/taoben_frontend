@@ -305,23 +305,23 @@
 		 display: flex;
 		 margin-top: 10rpx;
 		 .credibility{
-			 color: #2d83cf;
+			 color: green;
 			 border: 1px solid #fff;
 			 border-radius: 50rpx;
 			 padding: 0 10rpx;
 			 font-weight: normal;
 			 margin-right: 10rpx;
-			 font-size: 24rpx;
+			 font-size: 20rpx;
 			 background-color: #fff;
 		 }
 		 .authoned{
-			 color: #2d83cf;
+			 color: green;
 			 border: 1px solid #fff;
 			 border-radius: 50rpx;
 			 padding: 0 10rpx;
 			 font-weight: normal;
 			 margin-right: 10rpx;
-			 font-size: 24rpx;
+			 font-size: 20rpx;
 			 background-color: #fff;
 		 }				 
 	 }
@@ -1058,9 +1058,9 @@
 		width: 144rpx;
 		height: 46rpx;
 		border: 1px solid #bbb;
-		border-radius: 4rpx;
+		border-radius: 23rpx;
 		text-align: center;
-		line-height: 46rpx;
+		line-height: 44rpx;
 	}
 	
 	.noCommodity {

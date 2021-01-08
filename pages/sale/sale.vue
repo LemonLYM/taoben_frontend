@@ -4,7 +4,7 @@
 			<view class='header bg-color'>
 				<view class='picTxt acea-row row-between-wrapper'>
 					<view class='text'>
-						<view class='name'>订单信息</view>
+						<view class='name'>我卖出的</view>
 						<view>消费订单：{{orderData.orderCount || 0}} 总消费：￥{{orderData.orderPrice || 0}}</view>
 					</view>
 					<view class='pictrue'>

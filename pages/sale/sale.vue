@@ -71,19 +71,18 @@
 						<view class='bottom acea-row row-right row-middle'>
 							<block v-if="item.status == 0">
 							<!-- 	<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>申请退款</view> -->
-								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>查看详情</view>
+								<view class='bnt bg-color' @click='sengProject(item.order_id)'>发货</view>
 							</block>
 							<block v-if="item.status == 1">
 								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>查看物流</view>
-								<view class='bnt bg-color' @tap='confirmOrder(item,index)'>确认收货</view>
+								<!-- <view class='bnt bg-color' @tap='confirmOrder(item,index)'>确认收货</view> -->
 							</block>
 							<block v-if="item.status == 2">
-								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>再次购买</view>
-								<view class='bnt bg-color' @click='goOrderDetails_Evaluation(item.order_id)'>去评价</view>
+								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>查看订单</view>
 							</block>
 							<block v-if="item.status == 3">
 								<!-- <view class="bnt cancelBnt"  @click="delOrder(item.order_id,index)">删除记录</view> -->
-								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>再次购买</view>
+								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>查看订单</view>
 							</block>
 
 							<!-- <view class='bnt cancelBnt' v-if="item._status._type==0 || item._status._type == 9" @click='cancelOrder(index,item.order_id)'>取消订单</view>
@@ -341,7 +340,7 @@
 					uni.hideLoading();
 					
 						uni.navigateTo({
-							url: '/pages/order_details/index?order_id=' + order_id
+							url: '/pages/sale/sale_order/sale_order?order_id=' + order_id
 						})
 				}).catch(() => {
 					uni.hideLoading();
@@ -357,6 +356,12 @@
 			/**
 			 * 点击去评价
 			 */
+			sengProject: function(order_id) {
+				uni.navigateTo({
+					url: '/pages/sale/deliver/deliver?id=' + order_id
+				})
+			},
+
 			goOrderDetails_Evaluation: function(order_id) {
 				let self = this
 				if (!order_id) return that.$util.Tips({
@@ -381,7 +386,6 @@
 			statusClick: function(status) {
 				if (status == this.orderStatus) return;
 				this.orderStatus = status;
-				debugger
 				this.loadend = false;
 				this.loading = false;
 				this.page = 1;

@@ -119,8 +119,8 @@ export function loginMobile(data){
   return request.post('login/mobile',data,{noAuth:true})
 }
 //发货
-export function deliveryGood(data){
-  return request.post('store/order/delivery',data)
+export function deliveryGood(id,data){
+  return request.post(`store/order/delivery/${id}`,data)
 }
 /**
  * 获取短信KEY

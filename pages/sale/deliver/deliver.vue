@@ -52,15 +52,17 @@
 				array:[{label:'请选择物流公司',value:0}],
 				index:0,
 				id:0,
-				validate:false
+				validate:false,
+				orderId: 0
 			};
 		},
 		computed: mapGetters(['isLogin']),
-		onLoad() {
+		onLoad(opts) {
 			if (this.isLogin) {
 				// verifyCode().then(res=>{
 				// 	this.$set(this, 'key', res.data.key)
 				// });
+				this.orderId = opts.id
 				this.deliverList()
 			} else {
 				// #ifdef H5 || APP-PLUS
@@ -103,7 +105,7 @@
 			
 			deliverygood:function(e){
 				if (this.validateForm() && this.validate) {
-					deliveryGood({
+					deliveryGood(this.orderId, {
 						delivery_type:1,
 						delivery_name	:this.id,
 						delivery_id	:this.code

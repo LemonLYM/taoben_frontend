@@ -5,7 +5,7 @@
 			<view class="title">您的资料已经提交成功！</view>
 			<view class="info" v-if='showTipsPage==0'>预计15个工作日内审核完毕，平台客服会及时与您联系！</view>
 			<view class="info" v-if='showTipsPage==1'>审核通过</view>
-			<view class="goHome" hover-class="none" @click="goHome1">
+			<view class="goHome" hover-class="none" @click="goHome1" style="position:absolute;left:calc(50% - 119px);wxcs_style_left:calc(50% - 280rpx);">
 				返回
 			</view>
 		</view>

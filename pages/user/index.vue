@@ -113,14 +113,6 @@
 						<image src="/static/images/user-menu-001.png"></image>
 						<text>我的余额</text>
 					</navigator>
-					<navigator url="/pages/users/user_spread_user/index" class="item" hover-class="none" v-if="is_promoter == 1">
-						<image src="/static/images/user_menu11.png"></image>
-						<text>分销推广</text>
-					</navigator>
-					<navigator url="/pages/users/distributor/index" class="item" hover-class="none" v-else>
-						<image src="/static/images/user_menu11.png"></image>
-						<text>分销推广</text>
-					</navigator>
 					<navigator class="item" :url="item.url" hover-class="none" v-if="item.url!='#' && item.url!='/pages/service/index'"
 					 v-for="(item,index) in MyMenus" :key="index">
 						<image :src="item.pic"></image>

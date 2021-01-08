@@ -7,7 +7,7 @@
 				<view class='item'><text class='iconfont icon-xuanzhong'></text>售后无忧</view>
 			</view>-->
 			<view class='nav acea-row row-between-wrapper'>
-				<view>购物数量 <text class='num font-color'>{{cartTotalCount}}</text></view>
+				<view>购物数量<text class='num font-color' style="margin-left: 10rpx;">{{cartTotalCount}}</text></view>
 				<view v-if="cartList.valid.length > 0 || cartList.invalid.length > 0" class='administrate acea-row row-center-wrapper'
 				 @click='manage'>{{ footerswitch ? '管理' : '取消'}}</view>
 			</view>
@@ -594,7 +594,7 @@
 		position: fixed;
 		left: 0;
 		z-index: 5;
-		top: 0;
+		top: 20rpx;
 	}
 
 	.shoppingCart .nav .administrate {
@@ -607,7 +607,7 @@
 	}
 
 	.shoppingCart .noCart {
-		margin-top: 78rpx;
+		margin-top: 118rpx;
 		background-color: #fff;
 		padding-top: 0.1rpx;
 	}
@@ -624,7 +624,7 @@
 	}
 
 	.shoppingCart .list {
-		margin-top: 78rpx;
+		margin-top: 118rpx;
 	}
 
 	.shoppingCart .list .item {

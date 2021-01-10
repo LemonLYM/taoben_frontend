@@ -83,6 +83,7 @@
 						this.$emit('onLoadFun',this.userInfo);
 					}).catch(res=>{
 						uni.hideLoading();
+						this.$emit('authColse',false);
 						uni.showToast({
 							title:res.msg,
 							icon:'none',

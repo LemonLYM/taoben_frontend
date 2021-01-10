@@ -29,11 +29,11 @@
 							<text class="favor-num">{{item.care_count || 0}}人想要</text>
 						</view>
 						<view class="user-info">
-							<view class="avatr-img-wrapper">
+							<view :class="item.merchant.credit<2 ? 'avatr-img-wrapper ':'avatr-img-wrapper avatar-has'">
 								<image class="avatr-img" :src='item.merchant.mer_avatar||"../../static/images/f.png"'></image>
 								<text>{{item.merchant.mer_name}}</text>
 							</view>
-							<text class="credibility" v-if='item.merchant.credit>2&&item.merchant.credit<=5'>信誉良好</text>
+							<text class="credibility" v-if='item.merchant.credit>=2&&item.merchant.credit<=5'>信誉良好</text>
 							<text class="credibility" v-if='item.merchant.credit>5'>信誉极好</text>
 						</view>
 					</view>
@@ -191,15 +191,19 @@
 		.user-info{
 			overflow: hidden;
 			.credibility{
+				font-size: 22rpx;
+				white-space:nowrap;
+				word-break:break-all;
+				display: inline-block;
 				color: #5ab5ef;
 				border: 1px solid #5ab5ef;
 				border-radius: 50rpx;
 				padding: 0 10rpx;
-				width: 184rpx;
+				width: 144rpx;
 			}
 			.avatar-has {
 				text{
-					width: 130rpx !important;
+					width: 140rpx !important;
 				}
 			}
 			.avatr-img-wrapper{

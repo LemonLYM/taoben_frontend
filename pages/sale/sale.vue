@@ -5,7 +5,6 @@
 				<view class='picTxt acea-row row-between-wrapper'>
 					<view class='text'>
 						<view class='name'>我卖出的</view>
-						<view>卖出订单：{{orderData.orderCount || 0}} 总价格：￥{{orderData.orderPrice || 0}}</view>
 					</view>
 					<view class='pictrue'>
 						<image src='/static/images/orderTime.png'></image>

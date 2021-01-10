@@ -1352,6 +1352,10 @@
 </script>
 
 <style scoped lang="scss">
+	.conter {
+		padding: 20rpx;
+		font-size: 32rpx;
+	}
 	#past0 .wrapper {
 		padding-bottom: 10rpx;
 		.tag{

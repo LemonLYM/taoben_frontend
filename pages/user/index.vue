@@ -3,7 +3,7 @@
 		<view class="head">
 			<view class="user-card">
 				<view class="bg"></view>
-				<view class="user-info">
+				<view class="user-info" @click="goEdit()">
 					<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" ></image>
 					<image v-else class="avatar" src="/static/images/f.png" mode="" ></image>
 					<view class="info">
@@ -20,7 +20,7 @@
 							</view>
 						</view>
 						<view class="num_phone_wrapper">
-						<view class="num" v-if="userInfo.phone" @click="goEdit(userInfo.user_ca)">
+						<view class="num" v-if="userInfo.phone">
 						<!-- <view class="num" v-if="true" @click="goEdit()"> -->
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
 							<view class="num-txt">
@@ -383,7 +383,10 @@
 				});
 			},
 			// 编辑页面
-			goEdit(user_ca) {
+			goEdit() {
+				this.userInfo
+				if (!this.userInfo.user_ca) return;
+				let user_ca = this.userInfo.user_ca
 				// if(user_ca === 2 || user_ca ===3 ){
 					uni.navigateTo({
 						url: '/pages/users/user_info/index?id='+user_ca

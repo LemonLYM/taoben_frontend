@@ -184,7 +184,7 @@
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
 		<!-- #endif -->
 		<payment :payMode='payMode' :pay_close="pay_close" @onChangeFun='onChangeFun' :order_id="pay_order_id" :totalPrice='totalPrice'></payment>
-		<PopExpress />
+		<!-- <PopExpress /> -->
 	</view>
 </template>
 <style scoped lang="scss">
@@ -865,6 +865,7 @@
 				uni.showLoading({
 					title: "正在加载中"
 				});
+				debugger
 				getOrderDetail(this.order_id).then(res => {
 					// let _type = res.data._status._type;
 					uni.hideLoading();
@@ -891,7 +892,7 @@
 					uni.hideLoading();
 					that.$util.Tips({
 						title: err
-					}, '/pages/users/order_list/index');
+					});
 				});
 			},
 			/**

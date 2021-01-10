@@ -3,7 +3,7 @@ let VUE_APP_WS_URL = `ws://${location.hostname}?type=user`
 // #endif
 
 // 网络接口修改此字符 小程序域名要求https
-let httpApi = 'http://apis.taoben888.cn'
+let httpApi = 'https://apis.taoben888.cn'
 // let httpApi = 'http://192.168.31.50:8324'
 
 

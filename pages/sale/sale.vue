@@ -5,6 +5,7 @@
 				<view class='picTxt acea-row row-between-wrapper'>
 					<view class='text'>
 						<view class='name'>我卖出的</view>
+						<view>卖出订单：{{orderData.all || 0}}</view>
 					</view>
 					<view class='pictrue'>
 						<image src='/static/images/orderTime.png'></image>
@@ -14,23 +15,23 @@
 			<view class='nav acea-row row-around'>
 				<view class='item' :class='orderStatus==0 ? "on": ""' @click="statusClick(0)">
 					<view>全部</view>
-					<view class='num'>{{orderData.all || 0}}</view>
+					<view class='num'>{{orderData.statusAll || 0}}</view>
 				</view>
 				<view class='item' :class='orderStatus==1 ? "on": ""' @click="statusClick(1)">
 					<view>待付款</view>
-					<view class='num'>{{orderData.noPay || 0}}</view>
+					<view class='num'>{{orderData.unpaid || 0}}</view>
 				</view>
 				<view class='item' :class='orderStatus==2 ? "on": ""' @click="statusClick(2)">
 					<view>待发货</view>
-					<view class='num'>{{orderData.noPostage || 0}}</view>
+					<view class='num'>{{orderData.unshipped || 0}}</view>
 				</view>
 				<view class='item' :class='orderStatus==3 ? "on": ""' @click="statusClick(3)">
 					<view>待收货</view>
-					<view class='num '>{{orderData.noDeliver || 0}}</view>
+					<view class='num '>{{orderData.untake || 0}}</view>
 				</view>
 				<view class='item' :class='orderStatus==4 ? "on": ""' @click="statusClick(4)">
 					<view>待评价</view>
-					<view class='num'>{{orderData.noComment || 0}}</view>
+					<view class='num'>{{orderData.unevaluate || 0}}</view>
 				</view>
 			</view>
 			<view class='list'>
@@ -70,18 +71,12 @@
 						<view class='bottom acea-row row-right row-middle'>
 							<block v-if="item.status == 0">
 							<!-- 	<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>申请退款</view> -->
-								<view class='bnt bg-color' @click='sengProject(item.order_id)'>发货</view>
+								<view class='bnt bg-color' v-if="item.paid == 1" @click='sengProject(item.order_id)'>发货</view>
+								<view class='bnt cancelBnt' v-if="item.paid == 0">待付款</view>
 							</block>
-							<block v-if="item.status == 1">
-								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>查看物流</view>
-								<!-- <view class='bnt bg-color' @tap='confirmOrder(item,index)'>确认收货</view> -->
-							</block>
-							<block v-if="item.status == 2">
+							<block v-else>
 								<view class='bnt cancelBnt' @click='goOrderDetails(item.order_id)'>查看订单</view>
-							</block>
-							<block v-if="item.status == 3">
-								<!-- <view class="bnt cancelBnt"  @click="delOrder(item.order_id,index)">删除记录</view> -->
-								<view class='bnt bg-color' @click='goOrderDetails(item.order_id)'>查看订单</view>
+								<!-- <view class='bnt bg-color' @tap='confirmOrder(item,index)'>确认收货</view> -->
 							</block>
 
 							<!-- <view class='bnt cancelBnt' v-if="item._status._type==0 || item._status._type == 9" @click='cancelOrder(index,item.order_id)'>取消订单</view>

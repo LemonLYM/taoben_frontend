@@ -15,7 +15,7 @@
 						<block v-if="orderInfo.status == 3">已完成</block>
 						<block v-if="orderInfo.status == -1">已为您退款,感谢您的支持</block>
 					</view>
-					<view>{{orderInfo.pay_time}}</view>
+					<view>{{orderInfo.pay_time || ''}}</view>
 				</view>
 			</view>
 			<view>
@@ -47,8 +47,8 @@
 				</block>
 				<!-- 配送地址 -->
 				<view class='address' v-if="orderInfo.order_type == 0">
-					<view class='name'>{{orderInfo.real_name}}<text class='phone'>{{orderInfo.user_phone}}</text></view>
-					<view>{{orderInfo.user_address}}</view>
+					<view class='name'>{{orderInfo.real_name || ''}}<text class='phone'>{{orderInfo.user_phone || ''}}</text></view>
+					<view>{{orderInfo.user_address || ''}}</view>
 				</view>
 				<!-- 核销订单 -->
 				<view class="writeOff" v-if="orderInfo.order_type == 1 && isGoodsReturn==false && orderInfo.take">
@@ -64,7 +64,7 @@
 					<view class="gear">
 						<image src="/static/images/writeOff.jpg"></image>
 					</view>
-					<view class="num">{{orderInfo.verify_code}}</view>
+					<view class="num">{{orderInfo.verify_code || ''}}</view>
 					<view class="rules">
 						<view class="item">
 							<view class="rulesTitle acea-row row-middle">
@@ -865,7 +865,6 @@
 				uni.showLoading({
 					title: "正在加载中"
 				});
-				debugger
 				getOrderDetail(this.order_id).then(res => {
 					// let _type = res.data._status._type;
 					uni.hideLoading();

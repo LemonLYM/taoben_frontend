@@ -115,6 +115,11 @@
 								url: `/pages/sale/sale`
 							})
 						}
+					}).catch(err => {
+						uni.showToast({
+							title: '订单信息或状态错误',
+							icon:'none'
+						});
 					})
 				}
 			}

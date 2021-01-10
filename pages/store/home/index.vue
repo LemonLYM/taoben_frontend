@@ -4,8 +4,6 @@
 		<!-- 搜索 -->
 		<!-- #ifdef MP -->
 		<view 
-			:style="{ height: `${(menuButtonInfo.top - systemInfo.statusBarHeight) * 2 + menuButtonInfo.height}px`, 
-			'padding-right': `${(systemInfo.windowWidth - menuButtonInfo.left) * 2 + 34}rpx`}"
 			 class="header"
 		>
 			<view class="iconfont icon-xiangzuo" @click="goback" style="color:white;bottom: -5px;position:absolute;"></view>
@@ -632,9 +630,10 @@
 		display: flex;
 		align-items: center;
 		padding-right: 20rpx;
-		padding-left: 20rpx;
+		padding-left: 45rpx;
 		padding-top: 20rpx;
 		padding-bottom: 34rpx;
+		margin-top: 20rpx;
 		image {
 			width: 74rpx;
 			height: 74rpx;

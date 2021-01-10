@@ -109,9 +109,9 @@
 				<block v-if="cartInfo.length>0">
 					<orderGoods :evaluate='orderInfo.status' :orderId="order_id" :cartInfo="cartInfo" :jump="true"></orderGoods>
 				</block>
-				<div class="goodCall" @click="goGoodCall">
+				<!-- <div class="goodCall" @click="goGoodCall">
 					<span class="iconfont icon-kefu"></span><span style="font-size: 28rpx;">联系客服</span>
-				</div>
+				</div> -->
 				<!-- 送货 -->
 				<view class="wrapper" v-if="orderInfo.delivery_type == 2">
 					<view class='item acea-row row-between'>
@@ -897,14 +897,12 @@
 						// verifyCode
 						this.getOrderCode()
 					}
-					
-					
 					// that.getOrderStatus();
 				}).catch(err => {
 					uni.hideLoading();
 					that.$util.Tips({
 						title: err
-					}, '/pages/users/order_list/index');
+					});
 				});
 			},
 			/**

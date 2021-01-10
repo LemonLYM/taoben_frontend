@@ -43,7 +43,8 @@
 									<view class="store-name">{{item.merchant.mer_name}}</view>
 									<text class="iconfont icon-xiangyou"></text>
 								</view>
-								<view v-if="item.status == 0" class='font-color'>待发货</view>
+								<view v-if="item.status == 0 && item.paid == 1" class='font-color'>待发货</view>
+								<view v-if="item.status == 0 && item.paid == 0" class='font-color'>待付款</view>
 								<view v-if="item.status == 1" class='font-color'>待收货</view>
 								<view v-if="item.status == 2" class='font-color'>待评价</view>
 								<view v-if="item.status == 3" class='font-color'>已完成</view>

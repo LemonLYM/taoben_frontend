@@ -5,7 +5,7 @@
 				<view class='picTxt acea-row row-between-wrapper'>
 					<view class='text'>
 						<view class='name'>我卖出的</view>
-						<view>消费订单：{{orderData.orderCount || 0}} 总消费：￥{{orderData.orderPrice || 0}}</view>
+						<view>卖出订单：{{orderData.orderCount || 0}} 总价格：￥{{orderData.orderPrice || 0}}</view>
 					</view>
 					<view class='pictrue'>
 						<image src='/static/images/orderTime.png'></image>
@@ -114,7 +114,6 @@
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
 		<!-- #endif -->
-		<payment :payMode='payMode' :pay_close="pay_close" @onChangeFun='onChangeFun' :order_id="pay_order_id" :totalPrice='totalPrice'></payment>
 	</view>
 </template>
 
@@ -122,7 +121,7 @@
 	let app = getApp();
 	import {
 		getOrderList,
-		orderData,
+		orderSaleData,
 		unOrderCancel,
 		orderDel,
 		orderPay,
@@ -242,13 +241,7 @@
 					that.$set(that, 'payMode', that.payMode);
 				});
 			},
-			/**
-			 * 关闭支付组件
-			 * 
-			 */
-			payClose: function() {
-				this.pay_close = false;
-			},
+		
 			/**
 			 * 生命周期函数--监听页面加载
 			 */
@@ -261,69 +254,11 @@
 			 */
 			getOrderData: function() {
 				let that = this;
-				orderData().then(res => {
+				orderSaleData().then(res => {
 					that.$set(that, 'orderData', res.data);
 				})
 			},
-			/**
-			 * 取消订单
-			 * 
-			 */
-			cancelOrder: function(index, order_id) {
-				let that = this;
-				if (!order_id) return that.$util.Tips({
-					title: '缺少订单号无法取消订单'
-				});
-				unOrderCancel(order_id).then(res => {
-					return that.$util.Tips({
-						title: res.message,
-						icon: 'success'
-					}, function() {
-						that.orderList.splice(index, 1);
-						that.$set(that, 'orderList', that.orderList);
-						that.$set(that.orderData, 'unpaid_count', that.orderData.unpaid_count - 1);
-						that.getOrderData();
-					});
-				}).catch(err => {
-					return that.$util.Tips({
-						title: err
-					});
-				});
-			},
-			/**
-			 * 打开支付组件
-			 * 
-			 */
-			goPay: function(pay_price, order_id) {
-				console.log(order_id)
-				this.$set(this, 'pay_close', true);
-				this.order_id = order_id;
-				this.pay_order_id = order_id.toString()
-				// this.$set(this, 'pay_order_id', );
-				this.$set(this, 'totalPrice', pay_price);
-			},
-			/**
-			 * 支付成功回调
-			 * 
-			 */
-			pay_complete: function() {
-				this.loadend = false;
-				this.page = 1;
-				this.$set(this, 'orderList', []);
-				this.pay_close = false;
-				this.pay_order_id = '';
-				this.getOrderData();
-				this.getOrderList();
-			},
-			/**
-			 * 支付失败回调
-			 * 
-			 */
-			pay_fail: function() {
-				this.pay_close = false;
-				this.pay_order_id = '';
-				
-			},
+			
 			/**
 			 * 去订单详情
 			 */
@@ -354,7 +289,7 @@
 				// #endif
 			},
 			/**
-			 * 点击去评价
+			 * 发货
 			 */
 			sengProject: function(order_id) {
 				uni.navigateTo({

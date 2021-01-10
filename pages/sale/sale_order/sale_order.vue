@@ -184,6 +184,7 @@
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
 		<!-- #endif -->
 		<payment :payMode='payMode' :pay_close="pay_close" @onChangeFun='onChangeFun' :order_id="pay_order_id" :totalPrice='totalPrice'></payment>
+		<PopExpress />
 	</view>
 </template>
 <style scoped lang="scss">
@@ -563,6 +564,7 @@
 <script>
 	let app = getApp();
 	import { HTTP_REQUEST_URL } from '@/config/app';
+	import PopExpress from '@/components/popExpress';
 	import {
 		getOrderDetail,
 		orderAgain,
@@ -594,8 +596,9 @@
 			payment,
 			orderGoods,
 			// #ifdef MP
-			authorize
+			authorize,
 			// #endif
+			PopExpress
 		},
 		data() {
 			return {
@@ -673,6 +676,13 @@
 			// #endif
 		},
 		methods: {
+			expressInfo(){
+				uni.$emit('showPopExpress',{"expressInfo":{
+					'code': '11',
+					'number': '78168054095930',
+					'com': 'zhongtong'
+				}})
+			},
 			// 数字转汉字
 			toChinese(num){
 			
@@ -890,14 +900,16 @@
 			 */
 			// #ifndef H5
 			copy: function() {
-				let that = this;
-				console.log(that.orderInfo.order_sn)
-				uni.setClipboardData({
-					data: that.orderInfo.order_sn,
-					success: function(res){
-					}
+				this.expressInfo()
+				// debugger
+				// let that = this;
+				// console.log(that.orderInfo.order_sn)
+				// uni.setClipboardData({
+				// 	data: that.orderInfo.order_sn,
+				// 	success: function(res){
+				// 	}
 					
-				});
+				// });
 			},
 			// #endif
 			/**

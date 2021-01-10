@@ -34,6 +34,15 @@
 						</view>
 					</view>
 				</view>
+				
+				<view class="wrapper" v-if="switchUserInfo.length>0">
+					<view class="title">我的余额</view>
+					<view class="wrapList" style="position: relative; padding-bottom: 32rpx;">
+						<view class="iconfont animated yueee icon-icon-test" style="margin-top: 10rpx;"></view>
+						<view class="yueee-text">{{userInfo.now_money}}</view>
+						<view class="yueee-tixian" @click="onTixian">提现</view>
+					</view>
+				</view>
 				<view class='list'>
 					<view class='item acea-row row-between-wrapper'>
 						<view>昵称</view>
@@ -103,6 +112,7 @@
 
 <script>
 	import {
+		extractUserCash,
 		getUserInfo,
 		userEdit,
 		getLogout,
@@ -161,6 +171,26 @@
 			}
 		},
 		methods: {
+			onTixian: function() {
+				let value = {};
+				let that = this;
+				value.extract_price = this.userInfo.now_money;
+				extractUserCash(value).then(res => {
+					that.getUserInfo();
+					uni.showToast({
+						title: '已提交申请',
+						icon: 'none'
+					});
+					return that.$util.Tips({
+						title: res.message,
+						icon: 'success'
+					});
+				}).catch(err => {
+					return that.$util.Tips({
+						title: err
+					});
+				});
+			},
 			//点击上传照片
 			uploadidpic: function() {
 				let that = this;
@@ -366,6 +396,30 @@
 </script>
 
 <style scoped lang="scss">
+	.yueee-tixian {
+		display: inline-block;
+		   position: absolute;
+		   border: solid 1px #ccc;
+		    border-radius: 20rpx;
+		    padding: 10rpx 14rpx;
+		    right: 0;
+	}
+	.yueee-text {
+		display: inline-block;
+	}
+	.yueee {
+		
+		display: inline-block;
+		width: 44rpx;
+		    height: 44rpx;
+		    border-radius: 50%;
+		    text-align: center;
+		    line-height: 44rpx;
+		    background-color: #fe960f;
+		    color: #fff;
+		    font-size: 30rpx;
+		    margin-right: 15rpx;
+	}
 	.id-card-edit{
 		padding: 30rpx;
 		.item-title{
@@ -379,6 +433,7 @@
 			line-height: 36rpx;
 			width: 100%;
 		}
+		
 		.upload {
 			display: -webkit-box;
 			display: -moz-box;

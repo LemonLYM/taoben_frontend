@@ -64,7 +64,7 @@
 							<view class='discount' v-if='item.order.postage_price > 0'>+￥{{item.order.postage_price}}</view>
 							<view class='discount' v-else>免运费</view>
 						</view>
-						<view class='item acea-row row-between-wrapper' v-if="!pinkId && !BargainId && !combinationId && !seckillId">
+					<!-- 	<view class='item acea-row row-between-wrapper' v-if="!pinkId && !BargainId && !combinationId && !seckillId">
 							<view>优惠券</view>
 							<block v-if="item.coupon.length>0">
 								<view class='discount' @tap='couponTap(item,index)'>
@@ -76,7 +76,7 @@
 							<block v-else>
 								<view class='discount'>暂无优惠券</view>
 							</block>
-						</view>
+						</view> -->
 						<view class='item acea-row row-between-wrapper' v-if="textareaStatus">
 							<view>备注信息</view>
 							<input v-if="coupon.status===false" placeholder-class='placeholder' @input='bindHideKeyboard' value="" name="mark"
@@ -95,7 +95,11 @@
 					<view>支付方式</view>
 					<view class='list'>
 						<!-- #ifdef H5 -->
-						<view class='payItem acea-row row-middle' :class='active==index ?"on":""' @tap='payItem(index)' v-for="(item,index) in cartArr" :key='index' v-if="item.payStatus==1">
+						<view class='payItem acea-row row-middle' 
+						:class='active==index ?"on":""'
+						 @tap='payItem(index)'
+						  v-for="(item,index) in cartArr"
+						   :key='index' v-if="item.payStatus==1">
 							<view class='name acea-row row-center-wrapper'>
 								<view class='iconfont animated' :class='(item.icon) + " " + (animated==true&&active==index ?"bounceIn":"")'></view>{{item.name}}
 							</view>
@@ -129,14 +133,14 @@
 					<view>商品总价：</view>
 					<view class='money'>￥{{proPrice}}</view>
 				</view>
-				<view class='item acea-row row-between-wrapper' v-if="coupon_price > 0">
+			<!-- 	<view class='item acea-row row-between-wrapper' v-if="coupon_price > 0">
 					<view>优惠券抵扣：</view>
 					<view class='money'>-￥{{coupon_price}}</view>
 				</view>
 				<view class='item acea-row row-between-wrapper' v-if="integral_price > 0">
 					<view>积分抵扣：</view>
 					<view class='money'>-￥{{integral_price}}</view>
-				</view>
+				</view> -->
 				<view class='item acea-row row-between-wrapper' v-if="priceGroup.storePostage > 0">
 					<view>运费：</view>
 					<view class='money'>+￥{{priceGroup.storePostage}}</view>
@@ -232,13 +236,13 @@
 						title: '可用余额:',
 						payStatus: app.globalData.yue_pay_status,
 					},
-					{
-						"name": "线下支付",
-						"icon": "icon-yinhangqia",
-						value: 'offline',
-						title: '线下支付',
-						payStatus: 2,
-					},
+					// {
+					// 	"name": "线下支付",
+					// 	"icon": "icon-yinhangqia",
+					// 	value: 'offline',
+					// 	title: '线下支付',
+					// 	payStatus: 2,
+					// },
 				],
 				payType: 'weixin', //支付方式
 				openType: 1, //优惠券打开方式 1=使用

@@ -215,6 +215,10 @@ export function extractCash(data){
   return request.post('user/extract/create',data)
 }
 
+export function extractUserCash(data){
+  return request.post('user/extract/userCreate',data)
+}
+
 /**
  * 提现银行/提现最低金额
  * 

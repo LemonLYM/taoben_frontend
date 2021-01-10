@@ -69,7 +69,9 @@ export function orderPay(id,data){
 export function orderData(){
   return request.get('order/number')
 }
-
+export function orderSaleData(){
+  return request.get('store/product/my/chart')
+}
 /**
  * 订单取消
  * @param string id

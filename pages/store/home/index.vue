@@ -35,7 +35,10 @@
 						<view>{{ score.number.toFixed(1) }}</view>
 					</view>
 					<view class="credibility-wrapper">
-						<view class="credibility">
+						<view class="credibility" v-if='goods[0].merchant.credit>=2&&goods[0].merchant.credit<=5'>
+							信誉良好
+						</view>
+						<view class="credibility" v-if='goods[0].merchant.credit>5'>
 							信誉极好
 						</view>
 						<view class="authoned">

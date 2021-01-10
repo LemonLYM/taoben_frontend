@@ -93,7 +93,8 @@
 							<view class="info">
 								<view class="name">
 								{{storeInfo.merchant.mer_name || ''}}
-								<text class="credibility">信誉极好</text>
+								<text class="credibility" v-if='storeInfo.merchant.credit>=2&&storeInfo.merchant.credit<=5'>信誉良好</text>
+								<text class="credibility" v-if='storeInfo.merchant.credit>5'>信誉极好</text>
 								<text v-if="storeInfo.merchant.is_trader" class="font-bg-red ml8">自营</text>
 								</view>
 								<view class="txt">{{storeInfo.merchant.care_count || 0}}人关注</view>

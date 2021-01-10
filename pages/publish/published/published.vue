@@ -9,7 +9,7 @@
 					<!-- <text class="iconfont icon-xiangyou"></text> -->
 				</view>
 				<view class="credibility-wrapper">
-					<view class="credibility" v-if='userInfo.credit<=2'>信誉一般</view>
+					<!-- <view class="credibility" v-if='userInfo.credit<=2'>信誉一般</view> -->
 					<view class="credibility" v-if='userInfo.credit>2&&userInfo.credit<=5'>信誉良好</view>
 					<view class="credibility" v-if='userInfo.credit>5'>信誉极好</view>
 					<view class="authoned" v-if="userInfo.user_ca === 1">

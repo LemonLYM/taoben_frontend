@@ -189,6 +189,7 @@
 		.user-info{
 			overflow: hidden;
 			.credibility{
+				text-align: center;
 				font-size: 22rpx;
 				white-space:nowrap;
 				word-break:break-all;

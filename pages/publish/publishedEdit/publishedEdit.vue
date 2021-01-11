@@ -436,7 +436,7 @@
 			},
 			//删除照片
 			DelPic: function(index) {
-				pic = this.pics[index];
+				// pic = this.pics[index];
 				this.pics.splice(index, 1);
 				this.$set(that, 'pics', that.pics);
 			}

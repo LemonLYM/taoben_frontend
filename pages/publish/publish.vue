@@ -510,6 +510,7 @@
 		.title{
 			margin-right: 10rpx;
 			padding: 6rpx 20rpx 0 0;
+			min-width: 110rpx;
 		}
 		.tag-wrapper{
 			display: flex;

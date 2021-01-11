@@ -337,7 +337,7 @@
 					areaChildren.forEach(function(item) {
 						area.push(item.name);
 					});
-					this.multiArray = [province, city, area]
+					this.multiArray = [province, city]
 				}
 			},
 			bindRegionChange: function(e) {
@@ -351,7 +351,7 @@
 					multiArray = this.multiArray,
 					value = e.detail.value;
 			
-				this.region = [multiArray[0][value[0]], multiArray[1][value[1]], multiArray[2][value[2]]]
+				this.region = [multiArray[0][value[0]], multiArray[1][value[1]]]
 				// this.$set(this.region,0,multiArray[0][value[0]]);
 				// this.$set(this.region,1,multiArray[1][value[1]]);
 				// this.$set(this.region,2,multiArray[2][value[2]]);
@@ -377,15 +377,15 @@
 						multiArray[1] = currentCity.children.map((item) => {
 							return item.name;
 						});
-						multiArray[2] = areaList.children.map((item) => {
-							return item.name;
-						});
+						// multiArray[2] = areaList.children.map((item) => {
+						// 	return item.name;
+						// });
 						break;
 					case 1:
 						let cityList = that.district[multiIndex[0]].children[multiIndex[1]].children || [];
-						multiArray[2] = cityList.map((item) => {
-							return item.name;
-						});
+						// multiArray[2] = cityList.map((item) => {
+						// 	return item.name;
+						// });
 						break;
 					case 2:
 			
@@ -394,7 +394,7 @@
 				// #ifdef MP
 				this.$set(this.multiArray, 0, multiArray[0]);
 				this.$set(this.multiArray, 1, multiArray[1]);
-				this.$set(this.multiArray, 2, multiArray[2]);
+				// this.$set(this.multiArray, 2, multiArray[2]);
 				// #endif
 				// #ifdef H5
 				this.multiArray = multiArray;

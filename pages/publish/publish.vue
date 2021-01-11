@@ -29,9 +29,9 @@
 			<view class="name">
 				新旧程度
 			</view>
-			<view class="rightbox">
+			<view class="rightbox boxstyle">
 				  <picker @change="bindPickerChange" :value="index" :range="array">
-				    <view class="uni-input"  style="height: 1.4rem;">{{array[index]}}</view>
+				    <view class="uni-input"  style="height: 1.4rem;line-height: 1.4rem;">{{array[index]}}</view>
 				  </picker>
 			</view>
 		</view>
@@ -509,7 +509,7 @@
 		margin-bottom: 20rpx;
 		.title{
 			margin-right: 10rpx;
-			padding: 0 20rpx 0 0;
+			padding: 6rpx 20rpx 0 0;
 		}
 		.tag-wrapper{
 			display: flex;

@@ -173,7 +173,6 @@
 		},
 		methods: {
 			handleInput:function(detail){
-				debugger
 				console.log(detail)
 				this.textContext = detail.detail.html
 			},

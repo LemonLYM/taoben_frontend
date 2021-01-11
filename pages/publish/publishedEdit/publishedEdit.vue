@@ -438,7 +438,7 @@
 			DelPic: function(index) {
 				// pic = this.pics[index];
 				this.pics.splice(index, 1);
-				this.$set(that, 'pics', that.pics);
+				this.$set(this, 'pics', that.pics);
 			}
 		}
 	}

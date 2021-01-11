@@ -192,7 +192,15 @@
 						this.num = res.data.stock
 						this.index = mapObj[res.data.new_percentage]
 						this.textContext = res.data.content
-	
+	          this.editorCtx&&this.editorCtx.setContents({
+	          	html:this.textContext,
+	          	success:(res)=>{
+	          		
+	          	},
+	          	fail:(res)=>{
+	          		
+	          	}
+	          })
 						// this.editorCtx.detail.html = res.data.content
 						this.pics = images
 						this.deliverPrice = res.data.postage+''

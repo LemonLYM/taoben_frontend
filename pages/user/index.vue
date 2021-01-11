@@ -3,7 +3,7 @@
 		<view class="head">
 			<view class="user-card">
 				<view class="bg"></view>
-				<view class="user-info" @click="goEdit()">
+				<view class="user-info">
 					<image class="avatar" :src='userInfo.avatar' v-if="userInfo.avatar" ></image>
 					<image v-else class="avatar" src="/static/images/f.png" mode="" ></image>
 					<view class="info">
@@ -36,7 +36,7 @@
 							<view class="num"  v-if='userInfo.mer_ca ==1'>
 								<text style="color: #4fae70;">已认证商家</text>
 							</view>
-							<view class="phone" v-if="userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
+							<view class="phone" v-if="!userInfo.phone && isLogin && userInfo.user_ca===4" @tap="bindPhone">
 								<text>身份未认证</text> 
 							</view>
 						</view>
@@ -498,6 +498,7 @@
 								background: white;
 								padding: 1rpx 6rpx;
 								color: #4fae70;
+								vertical-align: middle;
 								// box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 							}
 						}
@@ -690,6 +691,7 @@
 						background: white;
 						padding: 1rpx 6rpx;
 						color: #2d83cf;
+						vertical-align: middle;
 						// box-shadow: rgb(233, 238, 243) 0px 0px 8px 0px;
 				}
 			}

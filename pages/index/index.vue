@@ -239,6 +239,9 @@
 				<view class='list  row-between-wrapper'>
 					
 					<focuslist :hostProduct="sortProduct"></focuslist>
+					<view class='loadingicon acea-row row-center-wrapper' v-if='sortProduct.length > 0 '>
+						<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
+					</view>
 				</view>
 			</block>
 			<block v-if="sortProduct1.length>0">
@@ -246,6 +249,9 @@
 				<view class='list dislist row-between-wrapper' style="padding: 0;">
 					
 					<recommend :hostProduct="sortProduct1" ></recommend>
+					<view class='loadingicon acea-row row-center-wrapper' v-if='sortProduct1.length > 0 '>
+						<text class='loading iconfont icon-jiazai' :hidden='loading==false'></text>{{loadTitle}}
+					</view>
 				</view>
 			</block>
 			<block v-if="(sortProduct.length == 0&&navIndex==1 )||(sortProduct1.length == 0&&navIndex==2) ">

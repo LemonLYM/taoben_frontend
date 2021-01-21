@@ -52,7 +52,8 @@
 		</view>
 		<view class='noCommodity' v-else-if="!collectProductList.length && page > 1">
 			<view class='pictrue'>
-				<image src='/static/images/noCart.png'></image>
+				<image src='/static/images/empty-box.png'></image>
+				<view style="text-align: center; font-size: 26rpx;color: #999;">暂无发布的商品，快去发布吧</view>
 			</view>
 			<!-- <recommend :hostProduct="hostProduct"></recommend> -->
 		</view>
@@ -130,7 +131,7 @@
 			}
 		},
 		onShow() {
-			this.getStore();
+			// this.getStore();
 		},
 		mounted: function() {
 

@@ -20,8 +20,8 @@
 							</view>
 						</view>
 						<view class="num_phone_wrapper">
-						<view class="num" v-if="userInfo.phone">
-						<!-- <view class="num" v-if="true" @click="goEdit()"> -->
+						<view class="num" v-if="userInfo.phone" @click="goEdit()">
+						<!-- <view class="num" v-if="true" > -->
 							<!-- <view class="num-txt">ID：{{userInfo.uid}}</view> -->
 							<view class="num-txt">
 								<text v-if='userInfo.user_ca===1'>身份认证成功</text>

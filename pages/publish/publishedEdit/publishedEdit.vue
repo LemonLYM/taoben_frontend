@@ -38,7 +38,7 @@
 		
 		<view class="publish-title">商品描述</view>
 		<view class="publish-content">
-			 <editor id="editor" class="publish-textarea"  @ready="onEditorReady" @blur='handleInput'></editor>
+			 <editor id="editor" class="publish-textarea"  @ready="onEditorReady" @blur='handleInput' ></editor>
 			<!-- <textarea class="publish-textarea" v-model="textContext" placeholder="请输入您要发布的商品介绍" /> -->
 		</view>
 		<view class="publish-title-pic">商品图片</view>
@@ -139,7 +139,7 @@
  			}
 		},
 		onLoad(option) {
-			console.log('onload')
+			// console.log('onload')
 			this.id = option.id
 			this.geteditMyProduct(option.id)
 			this.getCityList();
@@ -148,15 +148,17 @@
 		
 		//tabbar点击就会触发
 		onTabItemTap(e){
-			console.log(e)
+			// console.log(e)
 		},
 		//页面每次显示都会触发
 		onShow() {
-			console.log('onshow')
+			// console.log('onshow')
 		},
 		methods: {		
 			onEditorReady:function(detail){
                 uni.createSelectorQuery().select('#editor').context((res) => {
+									// debugger
+									// console.log(this.textContext,'1')
                   this.editorCtx = res.context
 									this.editorCtx.setContents({
 										html:this.textContext,
@@ -170,7 +172,13 @@
                 }).exec()				
 			},
 			handleInput:function(detail){
-				this.textContext = detail.detail.html
+				// console.log(detail.detail.html,detail)
+				if(detail.detail.html === '<p><br></p>'){
+					
+				}else{
+					this.textContext =  detail.detail.html
+				}
+
 			},
 			geteditMyProduct:function(id){
 				editMyProduct({pro_id:id}).then((res)=>{
@@ -184,14 +192,17 @@
 					}
 					let images = res.data.slider_image
 					images.unshift(res.data.image)
-					this.new_percentage = mapObj[this.index]
+					// 
 					if(res.status === 200){
+						// debugger
 						this.bookName = res.data.store_name
 						this.prePrice = res.data.cost
 						this.curPrice = res.data.price
 						this.num = res.data.stock
 						this.index = mapObj[res.data.new_percentage]
+						this.new_percentage =res.data.new_percentage
 						this.textContext = res.data.content
+						// console.log(this.textContext,2)
 	          this.editorCtx&&this.editorCtx.setContents({
 	          	html:this.textContext,
 	          	success:(res)=>{
@@ -277,6 +288,7 @@
 				})
 				let that = this;
 				if (that.validateForm() && that.validate) {
+					// console.log(this.textContext)
 					updateItem({
 						store_name: this.bookName, //剧本名称
 						price: this.curPrice+'', //售价
@@ -421,7 +433,7 @@
 			uploadpic: function() {
 				let that = this;
 				that.$util.uploadImageOne({url:'upload/image',count:6}, function(res) {
-					console.log(res);
+					// console.log(res);
 					that.pics.push(res.data.path);
 					that.$set(that, 'pics', that.pics);
 				});

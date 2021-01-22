@@ -459,7 +459,8 @@
 				endBg: 'linear-gradient(#666666, #999999)',
 				notBg: 'rgb(26, 163, 246)',
 				playBg: 'linear-gradient(#FF0000, #FF5400)',
-				hide_mer_status: ''
+				hide_mer_status: '',
+				maketag:0
 			}
 		},
 		onLoad() {
@@ -500,7 +501,34 @@
 			this.setViewport(`width=device-width, initial-scale=1.0`);
 		},
 		onShow() {
+			// console.log('首页  onshows')
 			this.getConfig()
+			if(this.maketag && this.maketag === 1){
+				this.hotPage1 = 1
+				this.sortProduct = [];
+				this.sortProduct1 = [];
+				this.loadend = false;
+				this.loading = false;
+				this.get_product_list1();
+			}else if(this.maketag === 0){
+				this.hotPage = 1
+				this.hotScroll = true
+				this.loadend = false;
+				this.loading = false;
+				this.sortProduct = [];
+				this.sortProduct1 = [];
+				this.hostProduct = []
+				this.get_host_product()
+			}else if(this.maketag && this.maketag === 2){
+				this.where.page = 1;
+				this.loadend = false;
+				this.loading = false;
+				this.sortProduct = [];
+				this.sortProduct1 = [];
+				this.where.province = e.province
+				this.where.city = e.city
+				this.get_product_list();
+			}
 		},
 
 		methods: {
@@ -631,6 +659,7 @@
 			changeTab(e) {
 				this.navIndex = e.index;
 				if (e.index === 1) { //获取我关注的
+				  this.maketag = 1
 				  this.hotPage1 = 1
 					this.sortProduct = [];
 					this.sortProduct1 = [];
@@ -638,6 +667,7 @@
 					this.loading = false;
 					this.get_product_list1();
 				}else if(e.index === 0){ //获取我推荐的
+				  this.marktag = 0
 					this.hotPage = 1
 					this.hotScroll = true
 					this.loadend = false;
@@ -647,7 +677,7 @@
 					this.hostProduct = []
 					this.get_host_product()
 				}else if(e.index ===2){
-
+					this.maketag = 2
 					this.where.page = 1;
 					this.loadend = false;
 					this.loading = false;

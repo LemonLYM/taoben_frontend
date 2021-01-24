@@ -95,7 +95,6 @@
  			}
 		},
 		onLoad() {
-			console.log('onload')
 			// this.getUserInfo();
 			this.getCityList();
 			this.getAllCategory(); //获取分类标签数据
@@ -121,9 +120,7 @@
 		},
 		methods: {
 			handleInput:function(detail){
-				debugger
-				console.log(detail)
-				this.textContext = detail.detail.html
+				this.textContext = detail.detail.text
 			},
 			/**
 			 * 获取个人用户信息
@@ -222,12 +219,12 @@
 						store_name: this.bookName, //剧本名称
 						price: this.curPrice+'', //售价
 						new_percentage:this.new_percentage,//新旧程度
-						store_info:'',//简述，前端没有给这个字段，供接口请求使用
-						content: this.textContext,//商品描述
+						store_info: this.textContext,//简述，前端没有给这个字段，供接口请求使用
 						image:this.pics[0],//封面图
 						slider_image:this.pics.length ===1 ? this.pics  : this.pics.slice(1,this.pics.length),//轮播图
 						keyword:"",
-						attr:[]
+						attr:[],
+						is_trade: 1
 					}).then(data => {
 						if (data.status == 200) {
 							that.$util.Tips({

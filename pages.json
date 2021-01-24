@@ -489,7 +489,13 @@
 						"backgroundColor": "#FFFFFF"
 					}
 				}
-			]
+			    ,{
+                    "path" : "o-publish/o-publish",
+					"style": {
+						"navigationBarTitleText": "已旧换新商品提交"
+					}
+                }
+            ]
 		},
 		{
 			"root": "pages/store",

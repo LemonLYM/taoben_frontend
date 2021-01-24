@@ -104,8 +104,13 @@ export function orderDel(id){
  * @param string uni 
 */
 export function getOrderDetail(uni){
+  return request.get('order/detail/'+uni);
+}
+
+export function getSaleOrderDetail(uni){
   return request.get('store/order/detail/'+uni);
 }
+
 
 /**
  * 订单详情

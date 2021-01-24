@@ -587,7 +587,7 @@
 	let app = getApp();
 	import { HTTP_REQUEST_URL } from '@/config/app';
 	import {
-		getOrderDetail,
+		getOrderDetail1,
 		orderAgain,
 		orderTake,
 		orderDel,
@@ -878,7 +878,7 @@
 				uni.showLoading({
 					title: "正在加载中"
 				});
-				getOrderDetail(this.order_id).then(res => {
+				getOrderDetail1(this.order_id).then(res => {
 					// let _type = res.data._status._type;
 					uni.hideLoading();
 					that.$set(that, 'orderInfo', res.data);

@@ -12,26 +12,13 @@
 			</view>
 			<input class='curPrice rightbox' name='curPrice' type='number' v-model="curPrice" placeholder="请输入售价"/>
 		</view>
-		<text class="tips" v-if='curPrice'>平台会收取5%的服务费，实际到手价格{{(curPrice*0.95).toFixed(2) }}元</text>
-		<view class="publish-item">
-			<view class="name">
-				入手价
-			</view>
-			<input class='prePrice rightbox' name='prePrice' type="number" v-model="prePrice" placeholder="请输入入手价"/>
-		</view>
-		<view class="publish-item">
-			<view class="name">
-				数量
-			</view>
-			<input class='num rightbox' name='num' type="number" v-model="num" placeholder="请输入数量"/>
-		</view>
 		<view class="publish-item">
 			<view class="name">
 				新旧程度
 			</view>
-			<view class="rightbox boxstyle">
+			<view class="rightbox">
 				  <picker @change="bindPickerChange" :value="index" :range="array">
-				    <view class="uni-input"  style="height: 1.4rem;line-height: 1.4rem;">{{array[index]}}</view>
+				    <view class="uni-input"  style="height: 1.4rem;">{{array[index]}}</view>
 				  </picker>
 			</view>
 		</view>
@@ -57,47 +44,8 @@
 					</view>
 				</view>		
 		</view>
-		<view class="publish-item">
-			<view class="name">
-				运费
-			</view>
-			<view class="deliverPriceWrapper">
-				<input class="deliverPrice" type="number" name='deliverPrice' v-model="deliverPrice"/>
-				<checkbox-group @change="checkboxChange">
-				<label >
-					<checkbox value="0"  /><text>包邮</text>
-				</label>
-				</checkbox-group>
-			</view>
-		</view>
-		<view class="publish-item">
-			<view class="name">
-				所在城市
-			</view>
-			<view class="address">
-				{{region[1]}}
-				<picker mode="multiSelector" @change="bindRegionChange" @columnchange="bindMultiPickerColumnChange" :value="valueRegion"
-				 :range="multiArray">
-					<view class='acea-row'>
-						<view class="picker"></view>
-						<view class='iconfont icon-dizhi font-color'></view>
-					</view>
-				</picker>
-			</view>
-		</view>
-		<view class="publish-item">
-			<view class="name">
-				剧本分类
-			</view>
-		</view>
-		<view v-if='productList.length!==0'>
-		<view class="kind" v-for="(item,idx) in productList" :key='idx'>
-			<text class="title">{{item.cate_name}}</text>
-			<view class="tag-wrapper" >
-				  <tag  :key='index'  :list='item.children[0].children' @change='tagClick'></tag>
-			</view>
-		</view>
-		</view>
+		
+	
 		<button type="primary" @click="formSubmit" class="publish-btn">发布</button>
 		<!-- #ifdef MP -->
 		<authorize @onLoadFun="onLoadFun" :isAuto="isAuto" :isShowAuth="isShowAuth" @authColse="authColse"></authorize>
@@ -109,7 +57,7 @@
 	import {
 		getCity
 	} from '@/api/api.js';
-	import tag from '../../components/axb-checkbox/axb-checkbox.vue';
+	import tag from '../../../components/axb-checkbox/axb-checkbox.vue';
 	import {
 		getCategoryList,
 		createItem
@@ -173,6 +121,7 @@
 		},
 		methods: {
 			handleInput:function(detail){
+				debugger
 				console.log(detail)
 				this.textContext = detail.detail.html
 			},
@@ -247,12 +196,6 @@
 				if (!this.curPrice) return that.$util.Tips({
 					title: '请输入售价'
 				});
-				if (!this.prePrice) return that.$util.Tips({
-					title: '请输入入手价'
-				});
-				if (!this.num) return that.$util.Tips({
-					title: '请输入数量'
-				});
 				if (!this.index) return that.$util.Tips({
 					title: '请选择新旧程度'
 				});
@@ -261,15 +204,6 @@
 				});
 				if (this.pics.length === 0) return that.$util.Tips({
 					title: '请上传商品图片'
-				});
-				if (this.deliverPrice === '') return that.$util.Tips({
-					title: '请输入运费'
-				});
-				if(!this.region[1])return that.$util.Tips({
-					title: '请选择所在城市'
-				});
-				if(Object.keys(this.category).length === 0)return that.$util.Tips({
-					title: '请选择商品分类'
 				});
 				that.validate = true;
 				return true;
@@ -287,19 +221,11 @@
 					createItem({
 						store_name: this.bookName, //剧本名称
 						price: this.curPrice+'', //售价
-						cost: this.prePrice+'', //入手价
-						stock: parseInt(this.num), //商品数量
 						new_percentage:this.new_percentage,//新旧程度
 						store_info:'',//简述，前端没有给这个字段，供接口请求使用
 						content: this.textContext,//商品描述
 						image:this.pics[0],//封面图
 						slider_image:this.pics.length ===1 ? this.pics  : this.pics.slice(1,this.pics.length),//轮播图
-						postage:parseInt(this.deliverPrice),//运费
-						// city: this.region[1],//城市名称
-						city:this.cityId,
-						// cityid:this.valueRegion[1], //城市id
-						province:this.province,
-						mer_cate_id: categoryId,//商品分类
 						keyword:"",
 						attr:[]
 					}).then(data => {
@@ -344,7 +270,7 @@
 					areaChildren.forEach(function(item) {
 						area.push(item.name);
 					});
-					this.multiArray = [province, city]
+					this.multiArray = [province, city, area]
 				}
 			},
 			bindRegionChange: function(e) {
@@ -358,7 +284,7 @@
 					multiArray = this.multiArray,
 					value = e.detail.value;
 			
-				this.region = [multiArray[0][value[0]], multiArray[1][value[1]]]
+				this.region = [multiArray[0][value[0]], multiArray[1][value[1]], multiArray[2][value[2]]]
 				// this.$set(this.region,0,multiArray[0][value[0]]);
 				// this.$set(this.region,1,multiArray[1][value[1]]);
 				// this.$set(this.region,2,multiArray[2][value[2]]);
@@ -385,15 +311,15 @@
 						multiArray[1] = currentCity.children.map((item) => {
 							return item.name;
 						});
-						// multiArray[2] = areaList.children.map((item) => {
-						// 	return item.name;
-						// });
+						multiArray[2] = areaList.children.map((item) => {
+							return item.name;
+						});
 						break;
 					case 1:
 						let cityList = that.district[multiIndex[0]].children[multiIndex[1]].children || [];
-						// multiArray[2] = cityList.map((item) => {
-						// 	return item.name;
-						// });
+						multiArray[2] = cityList.map((item) => {
+							return item.name;
+						});
 						break;
 					case 2:
 			
@@ -402,7 +328,7 @@
 				// #ifdef MP
 				this.$set(this.multiArray, 0, multiArray[0]);
 				this.$set(this.multiArray, 1, multiArray[1]);
-				// this.$set(this.multiArray, 2, multiArray[2]);
+				this.$set(this.multiArray, 2, multiArray[2]);
 				// #endif
 				// #ifdef H5
 				this.multiArray = multiArray;
@@ -509,8 +435,7 @@
 		margin-bottom: 20rpx;
 		.title{
 			margin-right: 10rpx;
-			padding: 6rpx 20rpx 0 0;
-			min-width: 110rpx;
+			padding: 0 20rpx 0 0;
 		}
 		.tag-wrapper{
 			display: flex;
@@ -570,7 +495,6 @@
 	margin: 0 28rpx;
 	box-sizing: border-box;
 	border: 1px solid #eee;
-	// margin-left: 30rpx;
 	.publish-textarea{
 		font-size: 30rpx;
 		width: 100%;

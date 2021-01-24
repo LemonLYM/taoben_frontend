@@ -566,7 +566,7 @@
 	import { HTTP_REQUEST_URL } from '@/config/app';
 	import PopExpress from '@/components/popExpress';
 	import {
-		getOrderDetail,
+		getSaleOrderDetail,
 		orderAgain,
 		orderTake,
 		orderDel,
@@ -865,7 +865,7 @@
 				uni.showLoading({
 					title: "正在加载中"
 				});
-				getOrderDetail(this.order_id).then(res => {
+				getSaleOrderDetail(this.order_id).then(res => {
 					// let _type = res.data._status._type;
 					uni.hideLoading();
 					that.$set(that, 'orderInfo', res.data);

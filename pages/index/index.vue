@@ -78,7 +78,10 @@
 
 				</block>
 			</view>
-			<navigator class="ad" :url="ad.home_ad_url" hover-class="none">
+			<n<!-- avigator class="ad" :url="ad.home_ad_url" hover-class="none">
+				<image mode="" :src="ad.home_ad_pic"></image>
+			</navigator> -->
+			<navigator class="ad" url="/pages/users/o-publish/o-publish" hover-class="none">
 				<image mode="" :src="ad.home_ad_pic"></image>
 			</navigator>
 			<!--秒杀-->
@@ -195,7 +198,8 @@
 								</view>
 							</view>
 							<view class="pro-box">
-								<navigator :url="`/pages/goods_details/index?id=${itemn.product_id}`" hover-class="none" class="pro-item" v-for="(itemn,indexn) in item.recommend"
+								<navigator :url="`/pages/goods_details/index?id=${itemn.product_id}`" 
+								hover-class="none" class="pro-item" v-for="(itemn,indexn) in item.recommend"
 								 :key='indexn' v-if="item.recommend.length<=3">
 									<image :src="itemn.image" mode=""></image>
 									<view class="price">

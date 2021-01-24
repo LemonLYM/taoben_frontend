@@ -1354,8 +1354,12 @@
 
 <style scoped lang="scss">
 	.conter {
+		jyf-parser{
+			text-indent: 56rpx;
+		}
 		padding: 20rpx;
-		font-size: 32rpx;
+		font-size: 28rpx;
+		background-color: #fff;
 	}
 	#past0 .wrapper {
 		padding-bottom: 10rpx;

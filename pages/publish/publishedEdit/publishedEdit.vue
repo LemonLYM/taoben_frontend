@@ -31,14 +31,14 @@
 			</view>
 			<view class="rightbox">
 				  <picker @change="bindPickerChange" :value="index" :range="array">
-				    <view class="uni-input"  style="height: 1.4rem;">{{array[index]}}</view>
+				    <view class="uni-input"  style="height: 1.4rem;line-height: 1.4rem;">{{array[index]}}</view>
 				  </picker>
 			</view>
 		</view>
 		
 		<view class="publish-title">商品描述</view>
 		<view class="publish-content">
-			 <editor id="editor" class="publish-textarea"  @ready="onEditorReady" @blur='handleInput'></editor>
+			 <editor id="editor" class="publish-textarea"  @ready="onEditorReady" @blur='handleInput' ></editor>
 			<!-- <textarea class="publish-textarea" v-model="textContext" placeholder="请输入您要发布的商品介绍" /> -->
 		</view>
 		<view class="publish-title-pic">商品图片</view>
@@ -139,7 +139,7 @@
  			}
 		},
 		onLoad(option) {
-			console.log('onload')
+			// console.log('onload')
 			this.id = option.id
 			this.geteditMyProduct(option.id)
 			this.getCityList();
@@ -148,15 +148,17 @@
 		
 		//tabbar点击就会触发
 		onTabItemTap(e){
-			console.log(e)
+			// console.log(e)
 		},
 		//页面每次显示都会触发
 		onShow() {
-			console.log('onshow')
+			// console.log('onshow')
 		},
 		methods: {		
 			onEditorReady:function(detail){
                 uni.createSelectorQuery().select('#editor').context((res) => {
+									// debugger
+									// console.log(this.textContext,'1')
                   this.editorCtx = res.context
 									this.editorCtx.setContents({
 										html:this.textContext,
@@ -170,7 +172,13 @@
                 }).exec()				
 			},
 			handleInput:function(detail){
-				this.textContext = detail.detail.html
+				// console.log(detail.detail.html,detail)
+				if(detail.detail.html === '<p><br></p>'){
+					
+				}else{
+					this.textContext =  detail.detail.html
+				}
+
 			},
 			geteditMyProduct:function(id){
 				editMyProduct({pro_id:id}).then((res)=>{
@@ -184,15 +192,26 @@
 					}
 					let images = res.data.slider_image
 					images.unshift(res.data.image)
-					this.new_percentage = mapObj[this.index]
+					// 
 					if(res.status === 200){
+						// debugger
 						this.bookName = res.data.store_name
 						this.prePrice = res.data.cost
 						this.curPrice = res.data.price
 						this.num = res.data.stock
 						this.index = mapObj[res.data.new_percentage]
+						this.new_percentage =res.data.new_percentage
 						this.textContext = res.data.content
-	
+						// console.log(this.textContext,2)
+	          this.editorCtx&&this.editorCtx.setContents({
+	          	html:this.textContext,
+	          	success:(res)=>{
+	          		
+	          	},
+	          	fail:(res)=>{
+	          		
+	          	}
+	          })
 						// this.editorCtx.detail.html = res.data.content
 						this.pics = images
 						this.deliverPrice = res.data.postage+''
@@ -269,6 +288,7 @@
 				})
 				let that = this;
 				if (that.validateForm() && that.validate) {
+					// console.log(this.textContext)
 					updateItem({
 						store_name: this.bookName, //剧本名称
 						price: this.curPrice+'', //售价
@@ -329,7 +349,7 @@
 					areaChildren.forEach(function(item) {
 						area.push(item.name);
 					});
-					this.multiArray = [province, city, area]
+					this.multiArray = [province, city]
 				}
 			},
 			bindRegionChange: function(e) {
@@ -343,7 +363,7 @@
 					multiArray = this.multiArray,
 					value = e.detail.value;
 			
-				this.region = [multiArray[0][value[0]], multiArray[1][value[1]], multiArray[2][value[2]]]
+				this.region = [multiArray[0][value[0]], multiArray[1][value[1]]]
 				// this.$set(this.region,0,multiArray[0][value[0]]);
 				// this.$set(this.region,1,multiArray[1][value[1]]);
 				// this.$set(this.region,2,multiArray[2][value[2]]);
@@ -369,15 +389,15 @@
 						multiArray[1] = currentCity.children.map((item) => {
 							return item.name;
 						});
-						multiArray[2] = areaList.children.map((item) => {
-							return item.name;
-						});
+						// multiArray[2] = areaList.children.map((item) => {
+						// 	return item.name;
+						// });
 						break;
 					case 1:
 						let cityList = that.district[multiIndex[0]].children[multiIndex[1]].children || [];
-						multiArray[2] = cityList.map((item) => {
-							return item.name;
-						});
+						// multiArray[2] = cityList.map((item) => {
+						// 	return item.name;
+						// });
 						break;
 					case 2:
 			
@@ -386,7 +406,7 @@
 				// #ifdef MP
 				this.$set(this.multiArray, 0, multiArray[0]);
 				this.$set(this.multiArray, 1, multiArray[1]);
-				this.$set(this.multiArray, 2, multiArray[2]);
+				// this.$set(this.multiArray, 2, multiArray[2]);
 				// #endif
 				// #ifdef H5
 				this.multiArray = multiArray;
@@ -413,7 +433,7 @@
 			uploadpic: function() {
 				let that = this;
 				that.$util.uploadImageOne({url:'upload/image',count:6}, function(res) {
-					console.log(res);
+					// console.log(res);
 					that.pics.push(res.data.path);
 					that.$set(that, 'pics', that.pics);
 				});
@@ -436,9 +456,9 @@
 			},
 			//删除照片
 			DelPic: function(index) {
-				pic = this.pics[index];
+				// pic = this.pics[index];
 				this.pics.splice(index, 1);
-				this.$set(that, 'pics', that.pics);
+				this.$set(this, 'pics', that.pics);
 			}
 		}
 	}
@@ -492,6 +512,8 @@
 		margin-bottom: 20rpx;
 		.title{
 			margin-right: 10rpx;
+			padding: 6rpx 20rpx 0 0;
+			min-width: 110rpx;
 		}
 		.tag-wrapper{
 			display: flex;

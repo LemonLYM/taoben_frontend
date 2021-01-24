@@ -29,9 +29,9 @@
 			<view class="name">
 				新旧程度
 			</view>
-			<view class="rightbox">
+			<view class="rightbox boxstyle">
 				  <picker @change="bindPickerChange" :value="index" :range="array">
-				    <view class="uni-input"  style="height: 1.4rem;">{{array[index]}}</view>
+				    <view class="uni-input"  style="height: 1.4rem;line-height: 1.4rem;">{{array[index]}}</view>
 				  </picker>
 			</view>
 		</view>
@@ -173,7 +173,6 @@
 		},
 		methods: {
 			handleInput:function(detail){
-				debugger
 				console.log(detail)
 				this.textContext = detail.detail.html
 			},
@@ -345,7 +344,7 @@
 					areaChildren.forEach(function(item) {
 						area.push(item.name);
 					});
-					this.multiArray = [province, city, area]
+					this.multiArray = [province, city]
 				}
 			},
 			bindRegionChange: function(e) {
@@ -359,7 +358,7 @@
 					multiArray = this.multiArray,
 					value = e.detail.value;
 			
-				this.region = [multiArray[0][value[0]], multiArray[1][value[1]], multiArray[2][value[2]]]
+				this.region = [multiArray[0][value[0]], multiArray[1][value[1]]]
 				// this.$set(this.region,0,multiArray[0][value[0]]);
 				// this.$set(this.region,1,multiArray[1][value[1]]);
 				// this.$set(this.region,2,multiArray[2][value[2]]);
@@ -386,15 +385,15 @@
 						multiArray[1] = currentCity.children.map((item) => {
 							return item.name;
 						});
-						multiArray[2] = areaList.children.map((item) => {
-							return item.name;
-						});
+						// multiArray[2] = areaList.children.map((item) => {
+						// 	return item.name;
+						// });
 						break;
 					case 1:
 						let cityList = that.district[multiIndex[0]].children[multiIndex[1]].children || [];
-						multiArray[2] = cityList.map((item) => {
-							return item.name;
-						});
+						// multiArray[2] = cityList.map((item) => {
+						// 	return item.name;
+						// });
 						break;
 					case 2:
 			
@@ -403,7 +402,7 @@
 				// #ifdef MP
 				this.$set(this.multiArray, 0, multiArray[0]);
 				this.$set(this.multiArray, 1, multiArray[1]);
-				this.$set(this.multiArray, 2, multiArray[2]);
+				// this.$set(this.multiArray, 2, multiArray[2]);
 				// #endif
 				// #ifdef H5
 				this.multiArray = multiArray;
@@ -510,7 +509,8 @@
 		margin-bottom: 20rpx;
 		.title{
 			margin-right: 10rpx;
-			padding: 0 20rpx 0 0;
+			padding: 6rpx 20rpx 0 0;
+			min-width: 110rpx;
 		}
 		.tag-wrapper{
 			display: flex;

@@ -57,7 +57,7 @@
 						<view class="acea-row row-middle price-favor">
 							<view class='money font-color'>￥<text class='num'>{{item.price}}</text></view>
 							<text class="coupon font-color-red" v-if="item.issetCoupon&&false">领券</text>
-							<text class="favor-num">{{item.merchant.care_count}}人想要</text>
+							<text class="favor-num">{{item.care_count||0}}人想要</text>
 						</view>
 						<view class="user-info">
 							<view :class="item.merchant.credit<2 ? 'avatr-img-wrapper ':'avatr-img-wrapper avatar-has'">
@@ -191,6 +191,7 @@
 		.user-info{
 			overflow: hidden;
 			.credibility{
+				text-align: center;
 				font-size: 22rpx;
 				white-space:nowrap;
 				word-break:break-all;

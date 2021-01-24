@@ -9,7 +9,7 @@
 					<input placeholder="最高价" v-model="max" type="number"/>
 				</view>
 			</view>
-			<view class="content-box">
+			<view class="content-box" style="display: none;">
 				<view class="title">品牌</view>
 				<view class="brand-wrapper">
 					<scroll-view :style="{'height':isShow?'90%':'250rpx'}" :scroll-y="isShow">

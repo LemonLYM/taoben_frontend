@@ -406,6 +406,7 @@
 	}
 	.yueee-text {
 		display: inline-block;
+		vertical-align: bottom;
 	}
 	.yueee {
 		

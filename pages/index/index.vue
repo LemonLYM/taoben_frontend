@@ -78,11 +78,11 @@
 
 				</block>
 			</view>
-			<n<!-- avigator class="ad" :url="ad.home_ad_url" hover-class="none">
+			<!-- <navigator class="ad" :url="ad.home_ad_url" hover-class="none">
 				<image mode="" :src="ad.home_ad_pic"></image>
 			</navigator> -->
 			<navigator class="ad" url="/pages/users/o-publish/o-publish" hover-class="none">
-				<image mode="" :src="ad.home_ad_pic"></image>
+				<image mode="" src="/static/img/yijiuhuanxin.png" style="border-radius: 400rpx;"></image>
 			</navigator>
 			<!--秒杀-->
 			<view class="main" v-if="spikeList.length > 0">

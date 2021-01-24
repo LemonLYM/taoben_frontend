@@ -111,6 +111,9 @@ export function getSaleOrderDetail(uni){
   return request.get('store/order/detail/'+uni);
 }
 
+export function getOrderDetail1(uni){
+  return request.get('order/detail/'+uni);
+}
 
 /**
  * 订单详情
